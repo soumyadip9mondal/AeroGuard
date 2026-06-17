@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: aeroguard-redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  inference-service:
+    build: ./inference-service
+    container_name: aeroguard-inference-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./inference-service:/app
+    environment:
+      - YOLO_MODEL_PATH=models/yolov8n.pt
+      - CONFIDENCE_THRESHOLD=0.25
+      - DEVICE=cpu
+    restart: always
+
+  node-api:
+    build: ./node-api
+    container_name: aeroguard-node-api
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - DATABASE_URL=$DATABASE_URL
+      - CLOUDFLARE_R2_URL=$CLOUDFLARE_R2_URL
+      - R2_ACCOUNT_ID=$R2_ACCOUNT_ID
+      - R2_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID
+      - R2_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY
+      - R2_BUCKET_NAME=$R2_BUCKET_NAME
+      - R2_WEBHOOK_SECRET=$R2_WEBHOOK_SECRET
+      - PRESIGNED_URL_EXPIRY_SECONDS=${PRESIGNED_URL_EXPIRY_SECONDS:-900}
+      - CORS_ORIGINS=http://localhost:3000
+    depends_on:
+      - redis
+    restart: always
+
+  worker:
+    build: ./worker
+    container_name: aeroguard-worker
+    environment:
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - DATABASE_URL=$DATABASE_URL
+      - CLOUDFLARE_R2_URL=$CLOUDFLARE_R2_URL
+      - INFERENCE_SERVICE_URL=http://inference-service:8000
+      - R2_ACCOUNT_ID=$R2_ACCOUNT_ID
+      - R2_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID
+      - R2_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY
+      - R2_BUCKET_NAME=$R2_BUCKET_NAME
+      - SAMPLE_RATE_FPS=1
+      - CONFIDENCE_THRESHOLD=0.25
+      - LOG_LEVEL=info
+      - WORKER_CONCURRENCY=2
+    depends_on:
+      - redis
+      - inference-service
+    restart: always
+
+  frontend:
+    build: ./frontend/Frontend/Aero frontend/aeroguard
+    container_name: aeroguard-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - node-api
+    restart: always
