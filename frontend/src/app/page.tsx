@@ -41,7 +41,7 @@ function Nav() {
         <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-xs font-bold text-white">
           A
         </div>
-        <span className="text-[15px] font-semibold text-text-primary">AeroGuard</span>
+        <span className="text-[15px] font-bold text-text-primary">AeroGuard</span>
       </div>
       <div className="flex items-center gap-3">
         <Link
@@ -52,7 +52,7 @@ function Nav() {
         </Link>
         <Link
           href="/app/dashboard"
-          className="flex items-center gap-1.5 rounded-md bg-accent px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-accent-hover"
+          className="flex items-center gap-1.5 rounded-md bg-accent px-3.5 py-1.5 text-[13px] font-bold text-white transition-colors hover:bg-accent-hover"
         >
           Start Inspection
           <ArrowRight className="h-3.5 w-3.5" />
@@ -99,7 +99,7 @@ function Hero() {
             className="mb-4 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3 py-1.5 backdrop-blur-sm"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-            <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#A1A1AA' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#A1A1AA' }}>
               Aircraft Inspection AI
             </span>
           </motion.div>
@@ -109,8 +109,8 @@ function Hero() {
             variants={fadeUpVariants}
             initial="hidden"
             animate="visible"
-            className="mb-5 text-text-primary bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 font-bold tracking-tighter"
-            style={{ font: '500 52px/1.08 var(--font-display)', letterSpacing: '-0.03em' }}
+            className="mb-5 text-text-primary bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 font-heading italic tracking-tighter"
+            style={{ font: 'italic 700 52px/1.08 var(--font-mileast)', letterSpacing: '-0.03em' }}
           >
             AI-Powered
             <br />
@@ -137,12 +137,12 @@ function Hero() {
           >
             <Link
               href="/app/dashboard"
-              className="flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-accent-hover shadow-lg shadow-accent/20"
+              className="flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-accent-hover shadow-lg shadow-accent/20"
             >
               Start Free Trial
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <button className="flex items-center gap-2 rounded-md border border-border-default bg-surface/30 backdrop-blur-sm px-5 py-2.5 text-[14px] font-medium text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary">
+            <button className="flex items-center gap-2 rounded-md border border-border-default bg-surface/30 backdrop-blur-sm px-5 py-2.5 text-[14px] font-bold text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary">
               <Play className="h-3.5 w-3.5" />
               Watch Demo
             </button>
@@ -190,8 +190,8 @@ function PipelineDiagram() {
   // --- CONFIGURABLE DIMENSIONS ---
   // Change these numbers to adjust the box size. 
   // For a perfect 16:9 rectangle, use sizes like 960x540, 1280x720, or 640x360.
-  const BOX_WIDTH = 2048;
-  const BOX_HEIGHT = 1350;
+  const BOX_WIDTH = 1920;
+  const BOX_HEIGHT = 1080;
   // -------------------------------
 
   const [activeStage, setActiveStage] = useState(0);
@@ -244,9 +244,9 @@ function PipelineDiagram() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="flex h-full w-full flex-col justify-center p-6"
+            className="flex h-full w-full flex-col justify-center p-4 lg:p-6"
           >
-            <div className="space-y-3">
+            <div className="space-y-1.5 lg:space-y-2">
               {stages.map((stage, i) => {
                 const Icon = stage.icon;
                 const isActive = i === activeStage;
@@ -258,7 +258,7 @@ function PipelineDiagram() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.08, duration: 0.4, ease: 'easeOut' }}
-                    className={`flex items-center gap-4 rounded-lg border px-4 py-3 transition-all duration-500 ${isActive
+                    className={`flex items-center gap-3 rounded-lg border px-3 py-2 transition-all duration-500 ${isActive
                         ? 'border-accent/40 bg-accent-subtle shadow-sm shadow-accent/10'
                         : isComplete
                           ? 'border-border-subtle bg-surface/30'
@@ -266,7 +266,7 @@ function PipelineDiagram() {
                       }`}
                   >
                     <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-all duration-500 ${isActive
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-all duration-500 ${isActive
                           ? 'bg-accent text-white shadow-md shadow-accent/30'
                           : isComplete
                             ? 'bg-success/10 text-success'
@@ -274,18 +274,18 @@ function PipelineDiagram() {
                         }`}
                     >
                       {isComplete ? (
-                        <CheckCircle2 className="h-4 w-4" />
+                        <CheckCircle2 className="h-3.5 w-3.5" />
                       ) : (
-                        <Icon className="h-4 w-4" />
+                        <Icon className="h-3.5 w-3.5" />
                       )}
                     </div>
                     <div className="flex-1">
-                      <div className={`text-[14px] font-medium transition-colors ${isActive ? 'text-text-primary' : 'text-text-secondary'}`}>
+                      <div className={`text-[13px] font-bold transition-colors ${isActive ? 'text-text-primary' : 'text-text-secondary'}`}>
                         {stage.label}
                       </div>
                     </div>
                     <div
-                      className={`text-[11px] font-mono transition-colors ${isActive ? 'text-accent' : isComplete ? 'text-success' : 'text-text-tertiary'
+                      className={`text-[10px] font-mono transition-colors ${isActive ? 'text-accent' : isComplete ? 'text-success' : 'text-text-tertiary'
                         }`}
                     >
                       {isComplete ? 'Done' : isActive ? 'Running...' : stage.detail}
@@ -296,9 +296,9 @@ function PipelineDiagram() {
             </div>
 
             {/* Data flow indicator */}
-            <div className="mt-4 flex items-center justify-between rounded-md bg-elevated px-4 py-2">
-              <span className="text-[11px] text-text-tertiary font-mono">Pipeline ETA</span>
-              <span className="text-[13px] font-mono text-accent">~12 min</span>
+            <div className="mt-3 flex items-center justify-between rounded-md bg-elevated px-4 py-1.5">
+              <span className="text-[10px] text-text-tertiary font-mono">Pipeline ETA</span>
+              <span className="text-[12px] font-mono text-accent">~12 min</span>
             </div>
           </motion.div>
         )}
@@ -317,7 +317,7 @@ function PipelineDiagram() {
               src={`/video/${currentVideo}.mp4`}
               autoPlay
               muted
-              className="h-full w-full object-fill rounded-xl"
+              className="h-full w-full object-cover rounded-xl"
               onEnded={() => {
                 if (currentVideo === 1) {
                   setCurrentVideo(2);
@@ -341,12 +341,12 @@ function TrustedBy() {
   return (
     <section className="border-y border-border-subtle bg-surface/30 py-10">
       <div className="mx-auto max-w-[1200px] px-6">
-        <p className="mb-6 text-center text-[11px] font-medium uppercase tracking-[0.08em] text-text-tertiary">
+        <p className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.08em] text-text-tertiary">
           Trusted by leading MRO organizations
         </p>
         <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
           {logos.map((name) => (
-            <span key={name} className="text-[14px] font-medium text-text-tertiary/60 transition-colors hover:text-text-secondary">
+            <span key={name} className="text-[14px] font-bold text-text-tertiary/60 transition-colors hover:text-text-secondary">
               {name}
             </span>
           ))}
@@ -371,10 +371,10 @@ function HowItWorks() {
     <section className="py-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="mb-12 text-center">
-          <p className="mb-3" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#71717A' }}>
+          <p className="mb-3" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#71717A' }}>
             How It Works
           </p>
-          <h2 className="text-text-primary" style={{ font: '500 36px/1.15 var(--font-display)', letterSpacing: '-0.025em' }}>
+          <h2 className="text-text-primary font-heading italic" style={{ font: 'italic 500 36px/1.15 var(--font-mileast)', letterSpacing: '-0.025em' }}>
             From Video to Report in 15 Minutes
           </h2>
         </div>
@@ -386,7 +386,7 @@ function HowItWorks() {
               className="group card p-6 transition-all duration-standard hover:-translate-y-0.5 hover:shadow-md"
             >
               <span className="mb-3 block font-mono text-[12px] text-accent">{step.num}</span>
-              <h3 className="mb-2 text-[16px] font-medium text-text-primary">{step.title}</h3>
+              <h3 className="mb-2 text-[16px] font-bold text-text-primary">{step.title}</h3>
               <p className="text-[13px] leading-[1.6] text-text-secondary">{step.desc}</p>
             </div>
           ))}
@@ -435,10 +435,10 @@ function Features() {
     <section className="border-t border-border-subtle bg-surface/20 py-24">
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="mb-12 text-center">
-          <p className="mb-3" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#71717A' }}>
+          <p className="mb-3" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#71717A' }}>
             Core Capabilities
           </p>
-          <h2 className="text-text-primary" style={{ font: '500 36px/1.15 var(--font-display)', letterSpacing: '-0.025em' }}>
+          <h2 className="text-text-primary font-heading italic" style={{ font: 'italic 500 36px/1.15 var(--font-mileast)', letterSpacing: '-0.025em' }}>
             Built for Mission-Critical Inspection
           </h2>
         </div>
@@ -454,7 +454,7 @@ function Features() {
                 <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-accent-subtle text-accent">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mb-2 text-[16px] font-medium text-text-primary">{feature.title}</h3>
+                <h3 className="mb-2 text-[16px] font-bold text-text-primary">{feature.title}</h3>
                 <p className="text-[13px] leading-[1.6] text-text-secondary">{feature.desc}</p>
               </div>
             );
@@ -478,10 +478,10 @@ function Security() {
     <section className="py-20">
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="mb-10 text-center">
-          <p className="mb-3" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#71717A' }}>
+          <p className="mb-3" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#71717A' }}>
             Security & Compliance
           </p>
-          <h2 className="mb-3 text-text-primary" style={{ font: '500 28px/1.2 var(--font-display)', letterSpacing: '-0.02em' }}>
+          <h2 className="mb-3 text-text-primary font-heading italic" style={{ font: 'italic 500 28px/1.2 var(--font-mileast)', letterSpacing: '-0.02em' }}>
             Enterprise-Grade Trust
           </h2>
           <p className="mx-auto max-w-[500px] text-[14px] leading-[1.7] text-text-secondary">
@@ -494,7 +494,7 @@ function Security() {
             <div key={cert.label} className="flex items-center gap-3 rounded-lg border border-border-subtle bg-surface px-5 py-3">
               <Shield className="h-5 w-5 text-accent" />
               <div>
-                <div className="text-[13px] font-medium text-text-primary">{cert.label}</div>
+                <div className="text-[13px] font-bold text-text-primary">{cert.label}</div>
                 <div className="text-[11px] text-text-tertiary">{cert.detail}</div>
               </div>
             </div>
@@ -510,7 +510,7 @@ function FinalCTA() {
   return (
     <section className="border-t border-border-subtle py-24">
       <div className="mx-auto max-w-[600px] px-6 text-center">
-        <h2 className="mb-4 text-text-primary" style={{ font: '500 36px/1.15 var(--font-display)', letterSpacing: '-0.025em' }}>
+        <h2 className="mb-4 text-text-primary font-heading italic" style={{ font: 'italic 500 36px/1.15 var(--font-mileast)', letterSpacing: '-0.025em' }}>
           Ready to Transform Your Inspection Workflow?
         </h2>
         <p className="mb-8 text-[15px] leading-[1.7] text-text-secondary">
@@ -519,14 +519,14 @@ function FinalCTA() {
         <div className="flex items-center justify-center gap-3">
           <Link
             href="/app/dashboard"
-            className="flex items-center gap-2 rounded-md bg-accent px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-accent-hover"
+            className="flex items-center gap-2 rounded-md bg-accent px-6 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-accent-hover"
           >
             Start Free Trial
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             href="/app/dashboard"
-            className="flex items-center gap-2 rounded-md border border-border-default px-6 py-2.5 text-[14px] font-medium text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary"
+            className="flex items-center gap-2 rounded-md border border-border-default px-6 py-2.5 text-[14px] font-bold text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary"
           >
             Request Enterprise Demo
             <ChevronRight className="h-4 w-4" />
@@ -551,8 +551,9 @@ function Footer() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="flex h-6 w-6 items-center justify-center rounded bg-accent text-[10px] font-bold text-white">A</div>
-            <span className="text-[14px] font-semibold text-text-primary">AeroGuard</span>
+            <span className="text-[14px] font-bold text-text-primary">AeroGuard</span>
           </div>
+
           <p className="max-w-[220px] text-[12px] leading-[1.6] text-text-tertiary">
             AI-powered aircraft inspection platform for MRO organizations worldwide.
           </p>
@@ -560,7 +561,7 @@ function Footer() {
 
         {columns.map((col) => (
           <div key={col.title}>
-            <h4 className="mb-3 text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">{col.title}</h4>
+            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.04em] text-text-tertiary">{col.title}</h4>
             <ul className="space-y-2">
               {col.links.map((link) => (
                 <li key={link}>

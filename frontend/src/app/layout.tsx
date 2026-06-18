@@ -1,16 +1,23 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, JetBrains_Mono, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
+const googleSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-google-sans',
   display: 'swap',
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrains-mono',
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  style: ['italic', 'normal'],
+  variable: '--font-mileast', // Keeping this variable name so tailwind config still works
   display: 'swap',
 });
 
@@ -27,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${googleSans.variable} ${jetbrainsMono.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="font-display bg-base text-text-primary antialiased">
         {children}
       </body>

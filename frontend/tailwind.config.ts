@@ -49,8 +49,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-google-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-jetbrains-mono)', 'monospace'],
+        heading: ['var(--font-mileast)', 'serif'],
       },
       spacing: {
         '1': '4px',
