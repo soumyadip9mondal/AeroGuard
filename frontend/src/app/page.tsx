@@ -314,7 +314,7 @@ function PipelineDiagram() {
           >
             <video
               ref={(el) => { if (el) el.playbackRate = 1.5; }}
-              src={`/video/video/${currentVideo}.mp4`}
+              src={`/video/${currentVideo}.mp4`}
               autoPlay
               muted
               className="h-full w-full object-fill rounded-xl"
