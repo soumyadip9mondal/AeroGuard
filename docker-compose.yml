@@ -26,11 +26,9 @@ services:
       - redis
     restart: always
 
-  node-api:
+  node-api-1:
     build: ./node-api
-    container_name: aeroguard-node-api
-    ports:
-      - "3001:3001"
+    container_name: aeroguard-node-api-1
     environment:
       - PORT=3001
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
@@ -47,6 +45,57 @@ services:
       - redis
     restart: always
 
+  node-api-2:
+    build: ./node-api
+    container_name: aeroguard-node-api-2
+    environment:
+      - PORT=3001
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - DATABASE_URL=$DATABASE_URL
+      - CLOUDFLARE_R2_URL=$CLOUDFLARE_R2_URL
+      - R2_ACCOUNT_ID=$R2_ACCOUNT_ID
+      - R2_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID
+      - R2_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY
+      - R2_BUCKET_NAME=$R2_BUCKET_NAME
+      - R2_WEBHOOK_SECRET=$R2_WEBHOOK_SECRET
+      - PRESIGNED_URL_EXPIRY_SECONDS=${PRESIGNED_URL_EXPIRY_SECONDS:-900}
+      - CORS_ORIGINS=http://localhost:3000
+    depends_on:
+      - redis
+    restart: always
+
+  node-api-3:
+    build: ./node-api
+    container_name: aeroguard-node-api-3
+    environment:
+      - PORT=3001
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - DATABASE_URL=$DATABASE_URL
+      - CLOUDFLARE_R2_URL=$CLOUDFLARE_R2_URL
+      - R2_ACCOUNT_ID=$R2_ACCOUNT_ID
+      - R2_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID
+      - R2_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY
+      - R2_BUCKET_NAME=$R2_BUCKET_NAME
+      - R2_WEBHOOK_SECRET=$R2_WEBHOOK_SECRET
+      - PRESIGNED_URL_EXPIRY_SECONDS=${PRESIGNED_URL_EXPIRY_SECONDS:-900}
+      - CORS_ORIGINS=http://localhost:3000
+    depends_on:
+      - redis
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: aeroguard-nginx
+    ports:
+      - "3001:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - node-api-1
+      - node-api-2
+      - node-api-3
+    restart: always
+
   frontend:
     build: ./frontend
     container_name: aeroguard-frontend
@@ -55,5 +104,5 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:3001
     depends_on:
-      - node-api
+      - nginx
     restart: always

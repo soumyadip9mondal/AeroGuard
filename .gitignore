@@ -33,3 +33,21 @@ __pycache__/
 .env.production
 .env.development
 .env.test
+
+# Local redis snapshot
+dump.rdb
+
+# Local mock R2 storage
+mock-r2-bucket/
+
+# Test media files
+*.mp4
+
+# Local redis snapshot
+dump.rdb
+
+# Local mock R2 storage
+mock-r2-bucket/
+
+# Test media files
+*.mp4

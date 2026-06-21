@@ -33,7 +33,7 @@ def get_s3_client():
     )
     return s3, bucket_name
 
-def process_video_job_sync(job_id, r2_object_key, fps_target=1):
+def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps_target=1):
     logger.info(f"Starting job {job_id} for {r2_object_key}")
     
     db_url = os.environ.get("DATABASE_URL")
@@ -70,6 +70,10 @@ def process_video_job_sync(job_id, r2_object_key, fps_target=1):
             video_fps = 30.0
             
         frame_interval = max(1, int(video_fps / fps_target))
+        
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        if not total_frames or total_frames <= 0:
+            total_frames = 1
         
         model = model_manager.get_model()
         
@@ -116,6 +120,9 @@ def process_video_job_sync(job_id, r2_object_key, fps_target=1):
                         metrics.append(metric)
                         
             frame_count += 1
+            if on_progress_callback:
+                percentage = min(100, int((frame_count / total_frames) * 100))
+                on_progress_callback(percentage)
             
         cap.release()
         
@@ -151,6 +158,15 @@ def process_video_job_sync(job_id, r2_object_key, fps_target=1):
         cursor.close()
         conn.close()
 
+def make_progress_callback(loop, job):
+    last_percentage = -1
+    def callback(percentage):
+        nonlocal last_percentage
+        if percentage > last_percentage:
+            last_percentage = percentage
+            asyncio.run_coroutine_threadsafe(job.updateProgress(percentage), loop)
+    return callback
+
 async def process(job, job_token):
     """
     BullMQ worker process function.
@@ -160,9 +176,11 @@ async def process(job, job_token):
         job_id = data.get("jobId")
         r2_key = data.get("r2ObjectKey")
         
+        loop = asyncio.get_running_loop()
+        on_progress = make_progress_callback(loop, job)
+        
         # OpenCV and Psycopg2 are blocking, so we run them in an executor thread
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, process_video_job_sync, job_id, r2_key, 1)
+        await loop.run_in_executor(None, process_video_job_sync, job_id, r2_key, on_progress, 1)
         
     except Exception as e:
         logger.error(f"Error processing BullMQ job {job.id}: {str(e)}")
