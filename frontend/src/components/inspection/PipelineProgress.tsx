@@ -2,7 +2,9 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, Circle, Loader2, XCircle, Box, FileText, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, Circle, Loader2, XCircle, FileText, Flag, Box, PlayCircle, ShieldCheck, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { generatePDFReport } from '@/lib/pdfGenerator';
+import { DBJob, DBMetric } from '@/lib/api';
 import { useInspectionStore } from '@/stores/inspection.store';
 import { DefectSeverity } from '@/types/defect';
 
@@ -151,7 +153,7 @@ export default function PipelineProgress() {
                         <span className="font-medium text-text-primary">{det.class_name}</span>
                       </div>
                       <div className="flex gap-4 text-text-secondary font-mono text-[12px]">
-                        <span>Conf: <span className="text-accent">{Math.round(det.confidence * 100)}%</span></span>
+                        <span>Conf: <span className="text-accent">{Math.round(det.confidence)}%</span></span>
                         <span>Area Ratio: <span className="text-text-primary">{(det.area_ratio * 100).toFixed(2)}%</span></span>
                       </div>
                     </div>
@@ -163,9 +165,56 @@ export default function PipelineProgress() {
                 <Link href="/app/models/demo" className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors">
                   <Box className="h-3.5 w-3.5" /> View 3D Twin
                 </Link>
-                <Link href="/app/reports" className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors">
+                <button 
+                  onClick={() => {
+                    // Create mock job/metrics from state
+                    const currentJobId = useInspectionStore.getState().jobId || 'unknown';
+                    const mockJob: DBJob = {
+                      id: currentJobId,
+                      r2ObjectKey: '',
+                      originalFilename: 'Inspection Report',
+                      fileSizeBytes: 0,
+                      status: 'completed',
+                      errorMessage: null,
+                      aircraftModel: useInspectionStore.getState().aircraftModel || '-',
+                      registrationNumber: useInspectionStore.getState().registrationNumber || '-',
+                      tailNumber: useInspectionStore.getState().tailNumber || '-',
+                      inspectionType: useInspectionStore.getState().inspectionType || '-',
+                      metadata: {
+                        aircraftMake: useInspectionStore.getState().aircraftMake,
+                        airframeSerialNumber: useInspectionStore.getState().airframeSerialNumber,
+                        yearOfManufacture: useInspectionStore.getState().yearOfManufacture,
+                        engineMake: useInspectionStore.getState().engineMake,
+                        engineModel: useInspectionStore.getState().engineModel,
+                        engineSerialNumber: useInspectionStore.getState().engineSerialNumber,
+                        propellerMakeModel: useInspectionStore.getState().propellerMakeModel,
+                        propellerSerialNumber: useInspectionStore.getState().propellerSerialNumber,
+                        totalAirframeTime: useInspectionStore.getState().totalAirframeTime,
+                        totalEngineHours: useInspectionStore.getState().totalEngineHours,
+                      },
+                      createdAt: new Date().toISOString(),
+                      updatedAt: new Date().toISOString(),
+                      completedAt: new Date().toISOString(),
+                      purgedAt: null,
+                      metricsCount: detections.length,
+                    };
+                    const mockMetrics: DBMetric[] = detections.map((d, i) => ({
+                      id: `det-${i}`,
+                      jobId: currentJobId,
+                      frameTimestampMs: 0,
+                      metricType: 'detection',
+                      label: d.class_name,
+                      confidence: d.confidence,
+                      bboxX1: null, bboxY1: null, bboxX2: null, bboxY2: null,
+                      rawValue: null,
+                      createdAt: new Date().toISOString(),
+                    }));
+                    generatePDFReport(mockJob, mockMetrics);
+                  }}
+                  className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors"
+                >
                   <FileText className="h-3.5 w-3.5" /> Download Report
-                </Link>
+                </button>
               </div>
             </div>
           </div>

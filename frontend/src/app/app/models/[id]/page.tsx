@@ -11,7 +11,7 @@ import HeatmapLegend from '@/components/twin/HeatmapLegend';
 import { getJob, getJobMetrics, DBMetric } from '@/lib/api';
 import { useTwinStore } from '@/stores/twin.store';
 import { Defect, DefectSeverity, DefectType } from '@/types/defect';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Box } from 'lucide-react';
 
 const EngineViewer = dynamic(() => import('@/components/twin/EngineViewer'), {
   ssr: false,
@@ -30,32 +30,7 @@ function deriveSeverity(confidence: number | null): DefectSeverity {
   return 'minor';
 }
 
-/**
- * Maps a YOLO model class name (as stored in the DB label field)
- * to a canonical DefectType. Normalizes common variations.
- */
-const LABEL_TO_TYPE: Record<string, DefectType> = {
-  crack: 'surface_crack',
-  surface_crack: 'surface_crack',
-  fatigue_crack: 'fatigue_crack',
-  corrosion: 'corrosion',
-  erosion: 'erosion',
-  dent: 'dent',
-  foreign_object_damage: 'foreign_object_damage',
-  fod: 'foreign_object_damage',
-  thermal_damage: 'thermal_damage',
-  coating_loss: 'coating_loss',
-  welding: 'surface_crack',
-};
 
-function resolveDefectType(label: string): DefectType {
-  const normalised = label.toLowerCase().replace(/[\s-]+/g, '_').trim();
-  if (LABEL_TO_TYPE[normalised]) return LABEL_TO_TYPE[normalised];
-  for (const [key, val] of Object.entries(LABEL_TO_TYPE)) {
-    if (normalised.includes(key)) return val;
-  }
-  return 'surface_crack';
-}
 
 function metricToDefect(m: DBMetric, index: number): Defect {
   const sev = deriveSeverity(m.confidence);
@@ -75,8 +50,8 @@ function metricToDefect(m: DBMetric, index: number): Defect {
     id: m.id.slice(0, 8),
     inspectionId: m.jobId,
     bladeId: detectedLabel,
-    section: m.metricType || 'defect',
-    type: resolveDefectType(detectedLabel),
+    section: m.metricType || 'detection',
+    type: detectedLabel,
     severity: sev,
     dimensions: { length: Math.round(width * 100) || 10, width: Math.round(height * 100) || 5 },
     confidence: m.confidence || 0,
@@ -104,6 +79,7 @@ export default function DigitalTwinPage() {
 
   const [defects, setDefects] = useState<Defect[]>([]);
   const [jobFilename, setJobFilename] = useState('');
+  const [aircraftModel, setAircraftModel] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -116,6 +92,7 @@ export default function DigitalTwinPage() {
           getJobMetrics(jobId),
         ]);
         setJobFilename(jobData.originalFilename || 'Unknown');
+        setAircraftModel(jobData.aircraftModel || null);
         const mapped = metricsData.map((m, i) => metricToDefect(m, i));
         setDefects(mapped);
       } catch (err) {
@@ -126,6 +103,20 @@ export default function DigitalTwinPage() {
     }
 
     fetchData();
+
+    const interval = setInterval(async () => {
+      try {
+        const jobData = await getJob(jobId);
+        if (jobData.status === 'completed' || jobData.status === 'failed') {
+          const metricsData = await getJobMetrics(jobId);
+          setDefects(metricsData.map((m, i) => metricToDefect(m, i)));
+        }
+      } catch (err) {
+        // Ignore polling errors
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [jobId]);
 
   const selectedDefect = defects.find((d) => d.id === selectedDefectId) || null;
@@ -178,12 +169,32 @@ export default function DigitalTwinPage() {
         </div>
       </aside>
 
-      {/* Center — 3D canvas */}
-      <div className="relative flex-1">
-        <EngineViewer defects={defects} />
-        <ViewerToolbar />
-        <HeatmapLegend />
-      </div>
+      {/* Right panel — 3D Viewer */}
+      <main className="flex-1 relative">
+        {loading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-base">
+            <Loader2 className="h-6 w-6 animate-spin text-accent" />
+          </div>
+        ) : !aircraftModel || !['boeing 737', 'airbus a320'].some(m => aircraftModel.toLowerCase().includes(m)) ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-base flex-col gap-4">
+            <div className="rounded-full bg-surface p-4 border border-border-subtle">
+              <Box className="h-8 w-8 text-text-tertiary" />
+            </div>
+            <div className="text-center">
+              <h3 className="text-[16px] font-medium text-text-primary">3D Model Not Available</h3>
+              <p className="mt-1 text-[13px] text-text-secondary max-w-sm">
+                No 3D model is currently available for the aircraft model: <span className="font-medium text-text-primary">{aircraftModel || 'Unknown'}</span>. We currently support Boeing 737 and Airbus A320.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <EngineViewer defects={defects} />
+            <ViewerToolbar />
+            <HeatmapLegend />
+          </>
+        )}
+      </main>
 
       {/* Right panel — defect detail */}
       {panelOpen && selectedDefect && (

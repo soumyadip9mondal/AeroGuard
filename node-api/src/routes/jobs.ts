@@ -4,6 +4,7 @@ import { QueueEvents } from 'bullmq';
 import { db } from '../db/client';
 import { jobs, metrics } from '../db/schema';
 import { redisConnection } from '../lib/redis';
+import { addVideoJob } from '../lib/queue';
 
 const router = Router();
 
@@ -26,6 +27,11 @@ router.get('/', async (req: Request, res: Response) => {
         updatedAt: jobs.updatedAt,
         completedAt: jobs.completedAt,
         purgedAt: jobs.purgedAt,
+        aircraftModel: jobs.aircraftModel,
+        registrationNumber: jobs.registrationNumber,
+        tailNumber: jobs.tailNumber,
+        inspectionType: jobs.inspectionType,
+        metadata: jobs.metadata,
         metricsCount: count(metrics.id),
       })
       .from(jobs)
@@ -64,6 +70,11 @@ router.get('/:jobId', async (req: Request, res: Response) => {
         updatedAt: jobs.updatedAt,
         completedAt: jobs.completedAt,
         purgedAt: jobs.purgedAt,
+        aircraftModel: jobs.aircraftModel,
+        registrationNumber: jobs.registrationNumber,
+        tailNumber: jobs.tailNumber,
+        inspectionType: jobs.inspectionType,
+        metadata: jobs.metadata,
         metricsCount: count(metrics.id),
       })
       .from(jobs)
@@ -81,6 +92,44 @@ router.get('/:jobId', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching job:', error);
     return res.status(500).json({ error: 'Failed to fetch job.' });
+  }
+});
+
+// 0c. POST /api/v1/jobs/:jobId/start — Start processing an uploaded video
+router.post('/:jobId/start', async (req: Request, res: Response) => {
+  const { jobId } = req.params;
+
+  try {
+    const existingJobs = await db.select().from(jobs).where(eq(jobs.id, jobId)).limit(1);
+    const job = existingJobs[0];
+
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found.' });
+    }
+
+    if (job.status !== 'uploaded' && job.status !== 'pending') {
+      return res.status(400).json({ error: `Job is already in ${job.status} state.` });
+    }
+
+    // 1. Enqueue BullMQ Task
+    await addVideoJob({
+      jobId: job.id,
+      r2ObjectKey: job.r2ObjectKey,
+      fileSizeBytes: job.fileSizeBytes ?? 0,
+      uploadedAt: new Date().toISOString(),
+    });
+
+    // 2. Update status to queued
+    await db.update(jobs).set({ status: 'queued', updatedAt: new Date() }).where(eq(jobs.id, jobId));
+
+    return res.status(200).json({
+      jobId,
+      status: 'queued',
+      message: 'Successfully started analysis (queued).'
+    });
+  } catch (error) {
+    console.error('Error starting job:', error);
+    return res.status(500).json({ error: 'Failed to start job.' });
   }
 });
 

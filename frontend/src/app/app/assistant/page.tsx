@@ -39,7 +39,7 @@ export default function AssistantPage() {
     setInput('');
     addUserMessage(msg);
     const resp = responses[msg] || responses.default;
-    setTimeout(() => simulateResponse(resp.text, resp.citations), 600);
+    simulateResponse(resp.text, resp.citations);
   };
 
   const allSources = ['Inspection Reports', 'Aircraft Manuals', 'FAA Regulations', 'Inventory'];

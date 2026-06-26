@@ -15,9 +15,7 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      router.push('/app/dashboard');
-    }, 800);
+    router.push('/app/dashboard');
   };
 
   return (

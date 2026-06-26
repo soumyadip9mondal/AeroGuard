@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { PipelineStage, PipelineStageStatus } from '@/types/inspection';
-import { getPresignedUrl, getJobMetrics, Detection } from '@/lib/api';
+import { getJobMetrics, Detection } from '@/lib/api';
 
 const STAGE_DEFAULTS: PipelineStage[] = [
   { name: 'upload', label: 'Upload Complete', status: 'pending' },
@@ -35,13 +35,36 @@ interface InspectionState {
   setStep: (step: number) => void;
   setField: (field: string, value: string) => void;
   startUpload: (file: File) => void;
+  aircraftMake: string;
+  airframeSerialNumber: string;
+  yearOfManufacture: string;
+  engineMake: string;
+  engineModel: string;
+  engineSerialNumber: string;
+  propellerMakeModel: string;
+  propellerSerialNumber: string;
+  totalAirframeTime: string;
+  totalEngineHours: string;
+
+  removeVideo: () => void;
   startPipeline: () => Promise<void>;
   reset: () => void;
 }
 
 export const useInspectionStore = create<InspectionState>()((set, get) => ({
   currentStep: 1,
+  aircraftMake: '',
   aircraftModel: '',
+  airframeSerialNumber: '',
+  yearOfManufacture: '',
+  engineMake: '',
+  engineModel: '',
+  engineSerialNumber: '',
+  propellerMakeModel: '',
+  propellerSerialNumber: '',
+  totalAirframeTime: '',
+  totalEngineHours: '',
+
   registrationNumber: '',
   tailNumber: '',
   inspectionType: '',
@@ -60,6 +83,15 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
   setStep: (step) => set({ currentStep: step }),
   setField: (field, value) => set({ [field]: value } as any),
 
+  removeVideo: () => set({
+    uploadProgress: 0,
+    uploadedFile: null,
+    fileObject: null,
+    jobId: null,
+    pipelineError: null,
+    isUploading: false,
+  }),
+
   startUpload: async (file) => {
     set({ isUploading: true, uploadProgress: 0, uploadedFile: null, fileObject: file, jobId: null, pipelineError: null });
     try {
@@ -74,14 +106,34 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
         else contentType = 'video/mp4'; // fallback
       }
 
-      // 1. Get presigned URL
-      const { uploadUrl, jobId } = await getPresignedUrl(file.name, file.size, contentType);
-      set({ jobId });
-
-      // 2. Perform PUT request to R2 using XMLHttpRequest
+      // 1. Perform POST request directly to node-api using XMLHttpRequest
       const xhr = new XMLHttpRequest();
-      xhr.open('PUT', uploadUrl, true);
-      xhr.setRequestHeader('Content-Type', contentType);
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      xhr.open('POST', `${API_URL}/api/v1/uploads/direct`, true);
+
+      const { 
+        aircraftMake, aircraftModel, airframeSerialNumber, yearOfManufacture,
+        engineMake, engineModel, engineSerialNumber,
+        propellerMakeModel, propellerSerialNumber,
+        totalAirframeTime, totalEngineHours,
+        registrationNumber, tailNumber, inspectionType 
+      } = get();
+
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const metadata = {
+        aircraftMake, aircraftModel, airframeSerialNumber, yearOfManufacture,
+        engineMake, engineModel, engineSerialNumber,
+        propellerMakeModel, propellerSerialNumber,
+        totalAirframeTime, totalEngineHours
+      };
+      formData.append('metadata', JSON.stringify(metadata));
+      
+      if (aircraftModel) formData.append('aircraftModel', aircraftModel);
+      if (registrationNumber) formData.append('registrationNumber', registrationNumber);
+      if (tailNumber) formData.append('tailNumber', tailNumber);
+      if (inspectionType) formData.append('inspectionType', inspectionType);
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
@@ -93,22 +145,15 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
       xhr.onload = async () => {
         if (xhr.status === 200) {
           try {
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-            const notifyRes = await fetch(`${API_URL}/api/v1/uploads/upload-success`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ jobId }),
-            });
-            if (!notifyRes.ok) {
-              throw new Error(`Failed to notify backend: ${notifyRes.statusText}`);
-            }
+            const data = JSON.parse(xhr.responseText);
             set({
+              jobId: data.jobId,
               uploadProgress: 100,
               isUploading: false,
               uploadedFile: { name: file.name, size: `${sizeMb} MB` },
             });
           } catch (notifyErr: any) {
-            console.error('Error notifying backend of upload success:', notifyErr);
+            console.error('Error parsing backend upload response:', notifyErr);
             set({
               isUploading: false,
               pipelineError: notifyErr.message || 'Failed to initialize processing on backend.',
@@ -129,9 +174,9 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
         });
       };
 
-      xhr.send(file);
+      xhr.send(formData);
     } catch (error: any) {
-      console.error('Error generating upload URL:', error);
+      console.error('Error starting upload process:', error);
       set({
         isUploading: false,
         pipelineError: error.message || 'Failed to start upload process.',
@@ -175,6 +220,14 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
       set({ pipelineStages: [...stages] });
 
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+      // Explicitly start the job
+      const startRes = await fetch(`${API_URL}/api/v1/jobs/${jobId}/start`, { method: 'POST' });
+      if (!startRes.ok) {
+        const errorData = await startRes.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to start analysis.');
+      }
+
       const eventSource = new EventSource(`${API_URL}/api/v1/jobs/${jobId}/stream`);
 
       const handleCleanup = () => {
@@ -240,31 +293,25 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
 
               // Sequentially complete remaining stages for premium UX
               stages[4].status = 'complete';
-              stages[4].duration = '0.5s';
+              stages[4].duration = '0s';
               stages[4].progress = undefined;
 
               stages[5].status = 'running';
               stages[5].progress = 'Generating inspection reports...';
-              set({ pipelineStages: [...stages] });
-              await new Promise((r) => setTimeout(r, 400));
               stages[5].status = 'complete';
-              stages[5].duration = '0.4s';
+              stages[5].duration = '0s';
               stages[5].progress = undefined;
 
               stages[6].status = 'running';
               stages[6].progress = 'Checking parts inventory...';
-              set({ pipelineStages: [...stages] });
-              await new Promise((r) => setTimeout(r, 400));
               stages[6].status = 'complete';
-              stages[6].duration = '0.4s';
+              stages[6].duration = '0s';
               stages[6].progress = undefined;
 
               stages[7].status = 'running';
               stages[7].progress = 'Finalizing recommendations...';
-              set({ pipelineStages: [...stages] });
-              await new Promise((r) => setTimeout(r, 400));
               stages[7].status = 'complete';
-              stages[7].duration = '0.4s';
+              stages[7].duration = '0s';
               stages[7].progress = undefined;
 
               set({

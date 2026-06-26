@@ -1,11 +1,11 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Upload, FileVideo, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Upload, FileVideo, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle, X } from 'lucide-react';
 import { useInspectionStore } from '@/stores/inspection.store';
 
 export default function VideoUploadZone({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const { uploadProgress, isUploading, uploadedFile, pipelineError, startUpload } = useInspectionStore();
+  const { uploadProgress, isUploading, uploadedFile, pipelineError, startUpload, removeVideo } = useInspectionStore();
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleFile = useCallback((file: File) => {
@@ -81,10 +81,21 @@ export default function VideoUploadZone({ onNext, onBack }: { onNext: () => void
             <p className="text-[13px] text-text-secondary">Uploading...</p>
           </div>
         ) : uploadedFile ? (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center relative group">
             <CheckCircle2 className="mb-3 h-10 w-10 text-success" />
             <p className="text-[14px] font-medium text-text-primary">{uploadedFile.name}</p>
             <p className="mt-1 text-[12px] text-text-tertiary">{uploadedFile.size}</p>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                removeVideo();
+              }}
+              className="absolute -top-6 -right-6 rounded-full bg-surface border border-border-strong p-1.5 text-text-tertiary opacity-0 transition-all hover:bg-danger/10 hover:text-danger hover:border-danger group-hover:opacity-100"
+              title="Remove video"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         ) : (
           <div className="flex flex-col items-center">

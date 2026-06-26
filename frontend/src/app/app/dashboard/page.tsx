@@ -26,6 +26,10 @@ export default function DashboardPage() {
       }
     }
     fetchJobs();
+
+    // Poll every 5 seconds
+    const interval = setInterval(fetchJobs, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const totalJobs = jobs.length;

@@ -95,6 +95,11 @@ export interface DBJob {
   fileSizeBytes: number | null;
   status: string;
   errorMessage: string | null;
+  aircraftModel: string | null;
+  registrationNumber: string | null;
+  tailNumber: string | null;
+  inspectionType: string | null;
+  metadata: any | null;
   createdAt: string;
   updatedAt: string;
   completedAt: string | null;

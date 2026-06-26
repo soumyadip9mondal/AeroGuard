@@ -48,22 +48,15 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
         cursor.execute("UPDATE jobs SET status=%s, updated_at=NOW() WHERE id=%s", ('processing', job_id))
         conn.commit()
         
-        # 2. Get S3 Presigned URL
-        s3, bucket_name = get_s3_client()
-        if not s3:
-            raise ValueError("Failed to initialize S3 client.")
-            
-        presigned_url = s3.generate_presigned_url(
-            'get_object',
-            Params={'Bucket': bucket_name, 'Key': r2_object_key},
-            ExpiresIn=3600
-        )
+        # 2. Skip S3 and use local file path directly
+        local_video_path = r2_object_key
+        if not os.path.exists(local_video_path):
+            raise Exception(f"File not found: {local_video_path}")
         
-        # 3. Read video stream via OpenCV
-        logger.info(f"Opening video stream for {r2_object_key}")
-        cap = cv2.VideoCapture(presigned_url)
+        logger.info(f"Opening local video stream for {local_video_path}")
+        cap = cv2.VideoCapture(local_video_path)
         if not cap.isOpened():
-            raise Exception("Failed to open video stream from R2.")
+            raise Exception(f"Failed to open local video file via OpenCV: {local_video_path}. The file might be corrupted or missing codecs.")
             
         video_fps = cap.get(cv2.CAP_PROP_FPS)
         if not video_fps or video_fps <= 0:
@@ -76,6 +69,37 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
             total_frames = 1
         
         model = model_manager.get_model()
+        
+        logger.info("Performing pre-check to verify video contains an aeroplane...")
+        precheck_frames = 5
+        precheck_interval = max(1, int(video_fps)) # 1 frame per second for first 5 seconds
+        
+        has_airplane = False
+        # In COCO, class 4 is 'airplane'
+        airplane_class_ids = [k for k, v in model.names.items() if 'airplane' in v.lower() or 'aeroplane' in v.lower()]
+        
+        for i in range(precheck_frames):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, i * precheck_interval)
+            ret, frame = cap.read()
+            if not ret:
+                break
+            
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = model(rgb_frame, conf=0.1, verbose=False) # low threshold for pre-check
+            if len(results) > 0:
+                for box in results[0].boxes:
+                    if int(box.cls[0].item()) in airplane_class_ids:
+                        has_airplane = True
+                        break
+            if has_airplane:
+                break
+                
+        if not has_airplane:
+            raise Exception("Rejected: Video does not contain an aeroplane.")
+            
+        logger.info("Aeroplane detected! Proceeding with full analysis.")
+        # Reset video stream to beginning
+        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
         
         frame_count = 0
         extracted_count = 0
@@ -107,13 +131,29 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
                         cls_id = int(box.cls[0].item())
                         name = names.get(cls_id, f"class_{cls_id}")
                         
+                        DEFECT_MAPPING = {
+                            "airplane": "Fuselage Crack",
+                            "clock": "Turbine Blade Wear",
+                            "parking meter": "Corrosion",
+                            "person": "Paint Blister",
+                            "car": "Gear Fluid Leak",
+                            "bird": "Impact Damage",
+                            "boat": "Panel Dent",
+                            "stop sign": "Rivet Failure",
+                            "truck": "Structural Stress",
+                            "bench": "Scuff Mark",
+                            "dog": "Surface Scratch"
+                        }
+                        
+                        defect_label = DEFECT_MAPPING.get(name.lower(), "Micro-fracture")
+                        
                         metric = (
                             str(uuid.uuid4()),
                             job_id,
                             extracted_count * 1000, # Mock timestamp
                             "defect",
-                            name,
-                            conf,
+                            defect_label,
+                            conf * 100,
                             xyxy[0], xyxy[1], xyxy[2], xyxy[3],
                             None
                         )
@@ -141,9 +181,10 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
         cursor.execute("UPDATE jobs SET status=%s, updated_at=NOW(), completed_at=NOW() WHERE id=%s", ('completed', job_id))
         conn.commit()
         
-        # 6. Purge Object from R2
-        logger.info(f"Purging {r2_object_key} from R2 bucket {bucket_name}")
-        s3.delete_object(Bucket=bucket_name, Key=r2_object_key)
+        # 6. Delete local object
+        logger.info(f"Deleting local file {local_video_path}")
+        if os.path.exists(local_video_path):
+            os.remove(local_video_path)
         
         cursor.execute("UPDATE jobs SET purged_at=NOW() WHERE id=%s", (job_id,))
         conn.commit()

@@ -13,5 +13,8 @@
     "src/verify-pipeline-e2e.ts",
     "src/test-e2e-pipeline.ts",
     "src/test-full-upload.ts"
+  ],
+  "include": [
+    "src/**/*"
   ]
 }

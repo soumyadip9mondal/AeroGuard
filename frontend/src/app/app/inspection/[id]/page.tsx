@@ -7,7 +7,8 @@ import TopBar from '@/components/layout/TopBar';
 import DefectBadge from '@/components/shared/DefectBadge';
 import SeverityIndicator from '@/components/shared/SeverityIndicator';
 import { Box, FileText, Flag, Loader2, AlertCircle } from 'lucide-react';
-import { getJob, getJobMetrics, DBJob, DBMetric } from '@/lib/api';
+import { DBJob, DBMetric, getJob, getJobMetrics } from '@/lib/api';
+import { generatePDFReport } from '@/lib/pdfGenerator';
 import { DefectSeverity } from '@/types/defect';
 
 function deriveSeverity(confidence: number | null): DefectSeverity {
@@ -57,6 +58,22 @@ export default function InspectionDetailPage() {
     }
 
     fetchJob();
+
+    // Poll every 3 seconds if job is not completed/failed/purged
+    const interval = setInterval(async () => {
+      try {
+        const jobData = await getJob(jobId);
+        setJob(jobData);
+        if (jobData.status === 'completed' || jobData.status === 'failed') {
+          const metricsData = await getJobMetrics(jobId);
+          setMetrics(metricsData);
+        }
+      } catch (err) {
+        // Ignore polling errors
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [jobId]);
 
   if (loading) {
@@ -159,7 +176,7 @@ export default function InspectionDetailPage() {
             >
               <Box className="h-3.5 w-3.5" /> View 3D Twin
             </Link>
-            <button className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] text-text-secondary hover:text-text-primary transition-colors">
+            <button onClick={() => job && metrics && generatePDFReport(job, metrics)} className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] text-text-secondary hover:text-text-primary transition-colors">
               <FileText className="h-3.5 w-3.5" /> Download Report
             </button>
             <button className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] text-text-secondary hover:text-text-primary transition-colors">

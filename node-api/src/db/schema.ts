@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, bigint, timestamp, integer, real } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, bigint, timestamp, integer, real, jsonb } from 'drizzle-orm/pg-core';
 
 // Jobs Table Definition
 export const jobs = pgTable('jobs', {
@@ -10,6 +10,11 @@ export const jobs = pgTable('jobs', {
     enum: ['pending', 'uploaded', 'queued', 'processing', 'completed', 'failed', 'purged']
   }).notNull(),
   errorMessage: text('error_message'),
+  aircraftModel: text('aircraft_model'),
+  registrationNumber: text('registration_number'),
+  tailNumber: text('tail_number'),
+  inspectionType: text('inspection_type'),
+  metadata: jsonb('metadata'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   completedAt: timestamp('completed_at', { withTimezone: true }),

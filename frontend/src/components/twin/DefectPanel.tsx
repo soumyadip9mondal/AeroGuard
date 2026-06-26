@@ -1,6 +1,8 @@
 'use client';
 
 import { Defect } from '@/types/defect';
+import { generatePDFReport } from '@/lib/pdfGenerator';
+import { DBJob, DBMetric } from '@/lib/api';
 import { useTwinStore } from '@/stores/twin.store';
 import SeverityIndicator from '@/components/shared/SeverityIndicator';
 import { X, ShoppingCart, FileText, Flag } from 'lucide-react';
@@ -29,7 +31,7 @@ export default function DefectPanel({ defect }: { defect: Defect }) {
             { label: 'TYPE', value: defect.type.replace(/_/g, ' '), capitalize: true },
             { label: 'SEVERITY', custom: <SeverityIndicator level={sevLevel[defect.severity] || 3} /> },
             { label: 'DIMENSIONS', value: `${defect.dimensions.length}mm × ${defect.dimensions.width}mm`, mono: true },
-            { label: 'CONFIDENCE', value: `${defect.confidence}%`, mono: true, accent: true },
+            { label: 'CONFIDENCE', value: `${Number(defect.confidence).toFixed(1)}%`, mono: true, accent: true },
             { label: 'LOCATION', value: defect.location },
             { label: 'FAA REFERENCE', value: defect.faaReference, mono: true },
             { label: 'RECOMMENDATION', value: defect.recommendation },
@@ -52,7 +54,41 @@ export default function DefectPanel({ defect }: { defect: Defect }) {
           <button className="flex w-full items-center justify-center gap-2 rounded-md bg-accent px-4 py-2.5 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors">
             <ShoppingCart className="h-3.5 w-3.5" /> Draft Parts Order
           </button>
-          <button className="flex w-full items-center justify-center gap-2 rounded-md border border-border-default px-4 py-2.5 text-[13px] text-text-secondary hover:text-text-primary transition-colors">
+          <button 
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-border-default px-4 py-2.5 text-[13px] text-text-secondary hover:text-text-primary transition-colors"
+            onClick={() => {
+              const mockJob: DBJob = {
+                id: defect.inspectionId,
+                r2ObjectKey: '',
+                originalFilename: 'Defect Report',
+                fileSizeBytes: 0,
+                status: 'completed',
+                errorMessage: null,
+                aircraftModel: '-',
+                registrationNumber: '-',
+                tailNumber: '-',
+                inspectionType: '-',
+                metadata: {},
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                completedAt: new Date().toISOString(),
+                purgedAt: null,
+                metricsCount: 1,
+              };
+              const mockMetric: DBMetric = {
+                id: defect.id,
+                jobId: defect.inspectionId,
+                frameTimestampMs: 0,
+                metricType: defect.section,
+                label: defect.type,
+                confidence: defect.confidence,
+                bboxX1: null, bboxY1: null, bboxX2: null, bboxY2: null,
+                rawValue: null,
+                createdAt: new Date().toISOString(),
+              };
+              generatePDFReport(mockJob, [mockMetric]);
+            }}
+          >
             <FileText className="h-3.5 w-3.5" /> Download Report
           </button>
           <button className="flex w-full items-center justify-center gap-2 rounded-md border border-border-default px-4 py-2.5 text-[13px] text-text-secondary hover:text-text-primary transition-colors">

@@ -1,14 +1,6 @@
 export type DefectSeverity = 'critical' | 'major' | 'moderate' | 'minor';
 
-export type DefectType =
-  | 'surface_crack'
-  | 'erosion'
-  | 'dent'
-  | 'corrosion'
-  | 'foreign_object_damage'
-  | 'thermal_damage'
-  | 'fatigue_crack'
-  | 'coating_loss';
+export type DefectType = string;
 
 export interface Defect {
   id: string;

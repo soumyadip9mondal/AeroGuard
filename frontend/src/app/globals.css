@@ -76,9 +76,9 @@
   --ease-fast:     cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-page:     cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast:     150ms;
-  --duration-standard: 280ms;
-  --duration-page:     450ms;
+  --duration-fast:     0ms;
+  --duration-standard: 0ms;
+  --duration-page:     0ms;
 }
 
 
