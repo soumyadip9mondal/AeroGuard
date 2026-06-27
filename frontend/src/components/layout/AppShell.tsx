@@ -4,7 +4,6 @@ import { useEffect, useCallback } from 'react';
 import { useUIStore } from '@/stores/ui.store';
 import Sidebar from './Sidebar';
 import CommandPalette from './CommandPalette';
-import RouteTransitionOverlay from './RouteTransitionOverlay';
 import { cn } from '@/lib/utils';
 
 interface AppShellProps {
@@ -55,7 +54,6 @@ export default function AppShell({ children }: AppShellProps) {
           sidebarExpanded ? 'lg:ml-[240px]' : 'lg:ml-[60px]'
         )}
       >
-        <RouteTransitionOverlay />
         {children}
       </main>
     </div>

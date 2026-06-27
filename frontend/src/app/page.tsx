@@ -22,11 +22,14 @@ import {
   X,
 } from 'lucide-react';
 
+import { useUIStore } from '@/stores/ui.store';
+
 /* ─── Scroll-aware Nav with mobile hamburger ─── */
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const setPendingRoute = useUIStore((state) => state.setPendingRoute);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -78,12 +81,14 @@ function Nav() {
         <div className="hidden lg:flex items-center gap-3">
           <Link
             href="/login"
+            onClick={() => setPendingRoute('/login')}
             className="text-[13px] text-text-secondary hover:text-text-primary transition-colors"
           >
             Sign In
           </Link>
           <Link
             href="/app/dashboard"
+            onClick={() => setPendingRoute('/app/dashboard')}
             className="flex items-center gap-1.5 rounded-md bg-accent px-3.5 py-1.5 text-[13px] font-normal text-white transition-colors hover:bg-accent-hover"
           >
             Start Inspection
@@ -116,14 +121,20 @@ function Nav() {
         <div className="flex flex-col gap-2 px-4 py-4">
           <Link
             href="/login"
-            onClick={() => setMobileOpen(false)}
+            onClick={() => {
+              setMobileOpen(false);
+              setPendingRoute('/login');
+            }}
             className="flex items-center justify-center rounded-md px-4 py-3 text-[14px] text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors"
           >
             Sign In
           </Link>
           <Link
             href="/app/dashboard"
-            onClick={() => setMobileOpen(false)}
+            onClick={() => {
+              setMobileOpen(false);
+              setPendingRoute('/app/dashboard');
+            }}
             className="flex items-center justify-center gap-1.5 rounded-md bg-accent px-4 py-3 text-[14px] font-normal text-white transition-colors hover:bg-accent-hover"
           >
             Start Inspection
@@ -137,6 +148,8 @@ function Nav() {
 
 /* ─── Hero Section ─── */
 function Hero() {
+  const setPendingRoute = useUIStore((state) => state.setPendingRoute);
+  
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: (i: number) => ({
@@ -213,6 +226,7 @@ function Hero() {
           >
             <Link
               href="/app/dashboard"
+              onClick={() => setPendingRoute('/app/dashboard')}
               className="flex items-center justify-center gap-2 rounded-md bg-accent px-5 py-2.5 text-[14px] font-normal text-white transition-colors hover:bg-accent-hover shadow-lg shadow-accent/20 w-full sm:w-auto"
             >
               Start Free Trial
@@ -596,6 +610,8 @@ function Security() {
 
 /* ─── CTA ─── */
 function FinalCTA() {
+  const setPendingRoute = useUIStore((state) => state.setPendingRoute);
+
   return (
     <section className="border-t border-border-subtle py-16 sm:py-24">
       <div className="mx-auto max-w-[600px] px-4 sm:px-6 text-center">
@@ -610,6 +626,7 @@ function FinalCTA() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
           <Link
             href="/app/dashboard"
+            onClick={() => setPendingRoute('/app/dashboard')}
             className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-2.5 text-[14px] font-normal text-white transition-colors hover:bg-accent-hover w-full sm:w-auto"
           >
             Start Free Trial
@@ -617,6 +634,7 @@ function FinalCTA() {
           </Link>
           <Link
             href="/app/dashboard"
+            onClick={() => setPendingRoute('/app/dashboard')}
             className="flex items-center justify-center gap-2 rounded-md border border-border-default px-6 py-2.5 text-[14px] font-normal text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary w-full sm:w-auto"
           >
             Request Enterprise Demo

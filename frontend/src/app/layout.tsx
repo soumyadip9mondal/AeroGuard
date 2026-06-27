@@ -38,6 +38,8 @@ export const metadata: Metadata = {
   },
 };
 
+import RouteTransitionOverlay from '@/components/layout/RouteTransitionOverlay';
+
 export default function RootLayout({
   children,
 }: {
@@ -46,6 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${googleSans.variable} ${jetbrainsMono.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="font-display bg-base text-text-primary antialiased">
+        <RouteTransitionOverlay />
         {children}
       </body>
     </html>
