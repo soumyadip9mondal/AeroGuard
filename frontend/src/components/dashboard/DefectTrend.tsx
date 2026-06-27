@@ -50,7 +50,7 @@ export default function DefectTrend({ jobs }: { jobs: DBJob[] }) {
   const data = computeTrendData(jobs, days);
 
   return (
-    <div className="rounded-lg border border-border-subtle bg-surface p-5">
+    <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-[15px] font-medium text-text-primary">Defect Trends</h3>
         <div className="flex gap-1 rounded-md border border-border-subtle p-0.5">
@@ -58,7 +58,7 @@ export default function DefectTrend({ jobs }: { jobs: DBJob[] }) {
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              className={`rounded px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
                 range === r ? 'bg-accent-subtle text-accent' : 'text-text-tertiary hover:text-text-secondary'
               }`}
             >
@@ -67,7 +67,7 @@ export default function DefectTrend({ jobs }: { jobs: DBJob[] }) {
           ))}
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={250}>
         <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
           <defs>
             <linearGradient id="gInspections" x1="0" y1="0" x2="0" y2="1">

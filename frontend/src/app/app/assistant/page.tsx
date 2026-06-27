@@ -45,15 +45,15 @@ export default function AssistantPage() {
   const allSources = ['Inspection Reports', 'Aircraft Manuals', 'FAA Regulations', 'Inventory'];
 
   return (
-    <div className="flex h-screen bg-base overflow-hidden">
-      <div className="flex flex-1 flex-col">
+    <div className="flex h-[100dvh] flex-col xl:flex-row bg-base overflow-hidden">
+      <div className="flex flex-1 flex-col min-w-0 min-h-0">
         <TopBar title="AI Assistant" subtitle="Ask questions about inspections, fleet health, and compliance" />
 
         {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] ${msg.role === 'user' ? '' : 'flex gap-3'}`}>
+              <div className={`max-w-[100%] ${msg.role === 'user' ? '' : 'flex gap-3'}`}>
                 {msg.role === 'assistant' && (
                   <div className="mt-1 h-6 w-6 shrink-0 rounded-full bg-accent flex items-center justify-center">
                     <Sparkles className="h-3 w-3 text-white" />
@@ -61,10 +61,10 @@ export default function AssistantPage() {
                 )}
                 <div>
                   <div
-                    className={`rounded-xl px-4 py-3 text-[14px] leading-[1.7] whitespace-pre-wrap ${
+                    className={`rounded-xl px-4 py-2.5 text-[14px] leading-relaxed max-w-[90%] sm:max-w-[80%] break-words whitespace-pre-wrap ${
                       msg.role === 'user'
-                        ? 'bg-elevated text-text-primary rounded-br-md'
-                        : 'border border-border-subtle bg-transparent text-text-secondary rounded-bl-md'
+                        ? 'bg-accent text-white rounded-br-md'
+                        : 'border border-border-subtle bg-surface text-text-primary rounded-bl-md'
                     }`}
                   >
                     {msg.content}
@@ -90,7 +90,7 @@ export default function AssistantPage() {
         <div className="border-t border-border-subtle p-4">
           <div className="mb-3 flex flex-wrap gap-2">
             {prompts.map((p) => (
-              <button key={p} onClick={() => handleSend(p)} className="rounded-full border border-border-subtle bg-elevated px-3 py-1 text-[12px] text-text-secondary hover:text-text-primary hover:border-border-default transition-colors">
+              <button key={p} onClick={() => handleSend(p)} className="whitespace-nowrap rounded-full border border-border-subtle bg-surface px-4 py-1.5 min-h-[36px] text-[13px] text-text-secondary hover:bg-elevated hover:text-text-primary transition-colors">
                 {p}
               </button>
             ))}

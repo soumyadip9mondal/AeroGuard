@@ -50,7 +50,7 @@ export default function VideoUploadZone({ onNext, onBack }: { onNext: () => void
         onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={handleDrop}
-        className={`flex h-[320px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all ${
+        className={`flex min-h-[200px] sm:min-h-[260px] md:h-[320px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all ${
           isDragOver
             ? 'border-accent bg-accent-subtle'
             : uploadedFile
@@ -85,13 +85,14 @@ export default function VideoUploadZone({ onNext, onBack }: { onNext: () => void
             <CheckCircle2 className="mb-3 h-10 w-10 text-success" />
             <p className="text-[14px] font-medium text-text-primary">{uploadedFile.name}</p>
             <p className="mt-1 text-[12px] text-text-tertiary">{uploadedFile.size}</p>
+            {/* Remove button — always visible on touch, hover-reveal on desktop */}
             <button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 removeVideo();
               }}
-              className="absolute -top-6 -right-6 rounded-full bg-surface border border-border-strong p-1.5 text-text-tertiary opacity-0 transition-all hover:bg-danger/10 hover:text-danger hover:border-danger group-hover:opacity-100"
+              className="absolute -top-6 -right-6 rounded-full bg-surface border border-border-strong p-2 min-h-[36px] min-w-[36px] flex items-center justify-center text-text-tertiary opacity-100 [@media(hover:hover)]:opacity-0 transition-all hover:bg-danger/10 hover:text-danger hover:border-danger group-hover:opacity-100"
               title="Remove video"
             >
               <X className="h-4 w-4" />

@@ -10,11 +10,11 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-base">
       <TopBar title="Settings" />
-      <div className="page-enter p-6 space-y-5">
-        <div className="flex gap-1 border-b border-border-subtle">
+      <div className="page-enter px-3 py-4 md:p-6 space-y-5 content-max">
+        <div className="flex gap-1 border-b border-border-subtle overflow-x-auto custom-scrollbar">
           {([['profile', 'Profile', User], ['org', 'Organization', Building2], ['integrations', 'Integrations', Link2], ['billing', 'Billing', CreditCard]] as const).map(([key, label, Icon]) => (
-            <button key={key} onClick={() => setTab(key)} className={`flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium border-b-2 transition-colors ${tab === key ? 'border-accent text-text-primary' : 'border-transparent text-text-tertiary hover:text-text-secondary'}`}>
-              <Icon className="h-3.5 w-3.5" />{label}
+            <button key={key} onClick={() => setTab(key)} className={`flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-medium border-b-2 transition-colors whitespace-nowrap ${tab === key ? 'border-accent text-text-primary' : 'border-transparent text-text-tertiary hover:text-text-secondary'}`}>
+              <Icon className="h-3.5 w-3.5 shrink-0" /><span className="hidden sm:inline">{label}</span>
             </button>
           ))}
         </div>
@@ -60,17 +60,19 @@ export default function SettingsPage() {
               { name: 'Cloud Storage', desc: 'Store inspection videos and reports in your cloud', connected: false, system: 'Not configured' },
               { name: 'SSO / SAML', desc: 'Single sign-on via your identity provider', connected: true, system: 'Okta' },
             ].map((i) => (
-              <div key={i.name} className="flex items-center justify-between rounded-lg border border-border-subtle bg-surface p-4">
-                <div className="flex items-center gap-3">
-                  {i.connected ? <CheckCircle2 className="h-5 w-5 text-success" /> : <XCircle className="h-5 w-5 text-text-tertiary" />}
+              <div key={i.name} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border-subtle bg-surface p-4">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="mt-0.5 sm:mt-0 shrink-0">
+                    {i.connected ? <CheckCircle2 className="h-5 w-5 text-success" /> : <XCircle className="h-5 w-5 text-text-tertiary" />}
+                  </div>
                   <div>
                     <div className="text-[14px] font-medium text-text-primary">{i.name}</div>
-                    <div className="text-[12px] text-text-tertiary">{i.desc}</div>
+                    <div className="text-[12px] text-text-tertiary leading-relaxed">{i.desc}</div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="flex items-center justify-between sm:flex-col sm:items-end w-full sm:w-auto mt-1 sm:mt-0 border-t border-border-subtle sm:border-0 pt-3 sm:pt-0">
                   <div className="text-[12px] font-mono text-text-secondary">{i.system}</div>
-                  <button className={`mt-1 rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${i.connected ? 'text-text-tertiary hover:text-text-primary' : 'bg-accent text-white hover:bg-accent-hover'}`}>
+                  <button className={`mt-0 sm:mt-1 rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${i.connected ? 'text-text-tertiary hover:text-text-primary' : 'bg-accent text-white hover:bg-accent-hover'}`}>
                     {i.connected ? 'Configure' : 'Connect'}
                   </button>
                 </div>

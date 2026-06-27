@@ -103,7 +103,7 @@ export default function AnalysisPage() {
     return (
       <div className="min-h-screen bg-base">
         <TopBar title="Analysis" subtitle="Defect trends, predictions, and fleet health monitoring" />
-        <div className="page-enter p-6 space-y-6">
+        <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
           <div className="rounded-lg border border-border-subtle bg-surface p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="skeleton h-5 w-32" />
@@ -145,9 +145,9 @@ export default function AnalysisPage() {
   return (
     <div className="min-h-screen bg-base">
       <TopBar title="Analysis" subtitle="Defect trends, predictions, and fleet health monitoring" />
-      <div className="page-enter p-6 space-y-6">
+      <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
         {/* Defect Trends — full width */}
-        <div className="rounded-lg border border-border-subtle bg-surface p-5">
+        <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[15px] font-medium text-text-primary">Defect Trends</h3>
             <div className="flex gap-1 rounded-md border border-border-subtle p-0.5">
@@ -156,7 +156,7 @@ export default function AnalysisPage() {
               ))}
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={trendData}>
               <defs>
                 <linearGradient id="aInspections" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2563EB" stopOpacity={0.15} /><stop offset="100%" stopColor="#2563EB" stopOpacity={0} /></linearGradient>
@@ -173,9 +173,9 @@ export default function AnalysisPage() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Predictive Maintenance */}
-          <div className="rounded-lg border border-border-subtle bg-surface p-5">
+          <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
             <h3 className="mb-4 text-[15px] font-medium text-text-primary">Predictive Failure Probability</h3>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={250}>
               <AreaChart data={predictiveData}>
                 <defs>
                   <linearGradient id="band" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2563EB" stopOpacity={0.1} /><stop offset="100%" stopColor="#2563EB" stopOpacity={0} /></linearGradient>
@@ -191,7 +191,7 @@ export default function AnalysisPage() {
           </div>
 
           {/* Fleet Health Grid */}
-          <div className="rounded-lg border border-border-subtle bg-surface p-5">
+          <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
             <h3 className="mb-4 text-[15px] font-medium text-text-primary">Fleet Health Grid</h3>
             <div className="grid gap-3 sm:grid-cols-2">
               {fleetData.length === 0 ? (

@@ -61,7 +61,7 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen bg-base">
       <TopBar title="Reports" subtitle="Generated PDF inspection reports" />
-      <div className="page-enter p-6 space-y-5">
+      <div className="page-enter px-3 py-4 md:p-6 space-y-5 content-max">
         <div className="relative max-w-[400px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
           <input 
@@ -78,18 +78,18 @@ export default function ReportsPage() {
             <table className="w-full text-left">
               <thead><tr className="border-b border-border-subtle">
                 {['Report', 'Tail #', 'Date', 'Status', 'Format', 'Size', ''].map((h) => (
-                  <th key={h} className="px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} className={`px-4 py-2.5 text-text-tertiary whitespace-nowrap ${['Tail #', 'Format', 'Size'].includes(h) ? 'hidden md:table-cell' : ''}`} style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr></thead>
               <tbody>
                 {[...Array(5)].map((_, i) => (
                   <tr key={i} className="border-b border-border-subtle last:border-0">
                     <td className="px-4 py-3"><div className="skeleton h-8 w-32" /></td>
-                    <td className="px-4 py-3"><div className="skeleton h-4 w-16" /></td>
+                    <td className="px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-16" /></td>
                     <td className="px-4 py-3"><div className="skeleton h-4 w-24" /></td>
                     <td className="px-4 py-3"><div className="skeleton h-4 w-16" /></td>
-                    <td className="px-4 py-3"><div className="skeleton h-4 w-8" /></td>
-                    <td className="px-4 py-3"><div className="skeleton h-4 w-12" /></td>
+                    <td className="px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-8" /></td>
+                    <td className="px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-12" /></td>
                     <td className="px-4 py-3"><div className="skeleton h-6 w-20" /></td>
                   </tr>
                 ))}
@@ -106,7 +106,7 @@ export default function ReportsPage() {
             <table className="w-full text-left">
               <thead><tr className="border-b border-border-subtle">
                 {['Report', 'Tail #', 'Date', 'Status', 'Format', 'Size', ''].map((h) => (
-                  <th key={h} className="px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} className={`px-4 py-2.5 text-text-tertiary whitespace-nowrap ${['Tail #', 'Format', 'Size'].includes(h) ? 'hidden md:table-cell' : ''}`} style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr></thead>
               <tbody>{filtered.map((job) => (
@@ -120,11 +120,11 @@ export default function ReportsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-text-secondary">{job.registrationNumber || job.tailNumber || '-'}</td>
+                  <td className="px-4 py-3 text-[13px] text-text-secondary hidden md:table-cell">{job.registrationNumber || job.tailNumber || '-'}</td>
                   <td className="px-4 py-3 text-[13px] text-text-tertiary">{new Date(job.createdAt).toLocaleDateString()}</td>
                   <td className="px-4 py-3">{typeBadge(job.status)}</td>
-                  <td className="px-4 py-3 text-[12px] font-mono text-text-tertiary">PDF</td>
-                  <td className="px-4 py-3 text-[12px] text-text-tertiary">{job.fileSizeBytes ? `${(job.fileSizeBytes / (1024 * 1024)).toFixed(1)} MB` : '-'}</td>
+                  <td className="px-4 py-3 text-[12px] font-mono text-text-tertiary hidden md:table-cell">PDF</td>
+                  <td className="px-4 py-3 text-[12px] text-text-tertiary hidden md:table-cell">{job.fileSizeBytes ? `${(job.fileSizeBytes / (1024 * 1024)).toFixed(1)} MB` : '-'}</td>
                   <td className="px-4 py-3">
                     <button 
                       onClick={() => handleDownload(job)}

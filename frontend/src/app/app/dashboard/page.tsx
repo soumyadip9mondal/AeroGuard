@@ -83,9 +83,10 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-base">
         <TopBar title="Dashboard" />
-        <div className="p-6 space-y-6">
-          {/* KPI Row Skeleton */}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
+        {/* Responsive page padding: tighter on mobile */}
+        <div className="px-3 py-4 md:p-6 space-y-6 content-max">
+          {/* KPI Row Skeleton — auto-fit grid prevents orphan cards */}
+          <div className="grid gap-3 sm:gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(140px, 100%), 1fr))' }}>
             {[...Array(5)].map((_, i) => (
               <div key={i} className="animate-pulse h-[100px] rounded-lg border border-border-subtle overflow-hidden">
                 <div className="skeleton h-full w-full" />
@@ -122,9 +123,10 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-base">
       <TopBar title="Dashboard" />
 
-      <div className="page-enter p-6 space-y-6">
-        {/* KPI Row */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
+      {/* Responsive page padding */}
+      <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
+        {/* KPI Row — auto-fit grid prevents orphan cards across all breakpoints */}
+        <div className="grid gap-3 sm:gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(140px, 100%), 1fr))' }}>
           <KPICard label="Total Inspections" value={kpiData.aircraftInspected} format="number" delta={kpiData.deltas.aircraftInspected} icon={Activity} />
           <KPICard label="Defects Detected" value={kpiData.defectsDetected} format="number" delta={kpiData.deltas.defectsDetected} icon={AlertTriangle} />
           <KPICard label="Inspections With Defects" value={kpiData.criticalFindings} format="number" delta={kpiData.deltas.criticalFindings} icon={AlertOctagon} />

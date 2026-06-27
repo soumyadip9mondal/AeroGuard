@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { DBJob } from '@/lib/api';
 
@@ -36,36 +37,60 @@ function computeFleetData(jobs: DBJob[]) {
 export default function FleetOverview({ jobs }: { jobs: DBJob[] }) {
   const data = computeFleetData(jobs);
 
+  /* ResizeObserver — dynamically compute YAxis width based on container width */
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(400);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  /* Clamp YAxis width: 30% of container, min 70px, max 130px */
+  const yAxisWidth = Math.min(130, Math.max(70, containerWidth * 0.3));
+  /* Scale font size with container */
+  const tickFontSize = Math.min(12, Math.max(9, containerWidth * 0.03));
+
   return (
-    <div className="rounded-lg border border-border-subtle bg-surface p-5">
+    <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
       <h3 className="mb-4 text-[15px] font-medium text-text-primary">File Health Overview</h3>
       {data.length === 0 ? (
-        <div className="flex items-center justify-center h-[280px] text-[13px] text-text-tertiary">
+        <div className="flex items-center justify-center h-[240px] sm:h-[280px] text-[13px] text-text-tertiary">
           No data available
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={data} layout="vertical" margin={{ left: 8, right: 16, top: 4, bottom: 4 }}>
-            <XAxis type="number" domain={[0, 100]} hide />
-            <YAxis
-              type="category"
-              dataKey="aircraft"
-              width={130}
-              tick={{ fill: '#A1A1AA', fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={false} />
-            <Bar dataKey="healthScore" radius={[0, 4, 4, 0]} barSize={20}>
-              {data.map((entry, i) => (
-                <Cell
-                  key={i}
-                  fill={entry.healthScore >= 95 ? '#16A34A' : entry.healthScore >= 90 ? '#2563EB' : '#D97706'}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <div ref={containerRef}>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={data} layout="vertical" margin={{ left: 8, right: 16, top: 4, bottom: 4 }}>
+              <XAxis type="number" domain={[0, 100]} hide />
+              <YAxis
+                type="category"
+                dataKey="aircraft"
+                width={yAxisWidth}
+                tick={{ fill: '#A1A1AA', fontSize: tickFontSize }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={false} />
+              <Bar dataKey="healthScore" radius={[0, 4, 4, 0]} barSize={20}>
+                {data.map((entry, i) => (
+                  <Cell
+                    key={i}
+                    fill={entry.healthScore >= 95 ? '#16A34A' : entry.healthScore >= 90 ? '#2563EB' : '#D97706'}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </div>
   );

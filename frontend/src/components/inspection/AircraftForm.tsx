@@ -85,29 +85,29 @@ export default function AircraftForm({ onNext }: { onNext: () => void }) {
         {/* Core Airframe */}
         <section className="space-y-4">
           <h3 className="text-[14px] font-medium text-text-primary border-b border-border-subtle pb-2">Core Airframe Details</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Registration / Tail Number</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Registration / Tail Number</label>
               <input value={registrationNumber} onChange={(e) => { setField('registrationNumber', e.target.value.toUpperCase()); setField('tailNumber', e.target.value.toUpperCase()); }} placeholder="e.g. VT-IXD" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary uppercase placeholder:text-text-tertiary placeholder:normal-case outline-none transition-colors focus:border-accent" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Aircraft Make</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Aircraft Make</label>
               <input value={aircraftMake} onChange={(e) => setField('aircraftMake', e.target.value)} placeholder="e.g. Airbus, Boeing" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Aircraft Model</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Aircraft Model</label>
               <input value={aircraftModel} onChange={(e) => setField('aircraftModel', e.target.value)} placeholder="e.g. A320-251N" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Airframe Serial Number</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Airframe Serial Number</label>
               <input value={airframeSerialNumber} onChange={(e) => setField('airframeSerialNumber', e.target.value)} placeholder="e.g. 19420" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Year of Manufacture</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Year of Manufacture</label>
               <input type="number" value={yearOfManufacture} onChange={(e) => setField('yearOfManufacture', e.target.value)} placeholder="e.g. 2019" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Inspection Type</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Inspection Type</label>
               <select value={inspectionType} onChange={(e) => setField('inspectionType', e.target.value)} className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary outline-none transition-colors focus:border-accent appearance-none">
                 <option value="" className="bg-elevated text-text-tertiary">Select type</option>
                 {INSPECTION_TYPES.map((t) => (
@@ -121,17 +121,17 @@ export default function AircraftForm({ onNext }: { onNext: () => void }) {
         {/* Powerplant */}
         <section className="space-y-4">
           <h3 className="text-[14px] font-medium text-text-primary border-b border-border-subtle pb-2">Powerplant (Engine) Details</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Engine Make</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Engine Make</label>
               <input value={engineMake} onChange={(e) => setField('engineMake', e.target.value)} placeholder="e.g. CFM International" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Engine Model</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Engine Model</label>
               <input value={engineModel} onChange={(e) => setField('engineModel', e.target.value)} placeholder="e.g. LEAP-1A26" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
             <div className="col-span-2">
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Engine Serial Number(s)</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Engine Serial Number(s)</label>
               <input value={engineSerialNumber} onChange={(e) => setField('engineSerialNumber', e.target.value)} placeholder="e.g. 592300, 592301" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
           </div>
@@ -140,13 +140,13 @@ export default function AircraftForm({ onNext }: { onNext: () => void }) {
         {/* Lifespan */}
         <section className="space-y-4">
           <h3 className="text-[14px] font-medium text-text-primary border-b border-border-subtle pb-2">Lifespan & Hardware State</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Total Airframe Time (hrs)</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Total Airframe Time (hrs)</label>
               <input type="number" step="0.1" value={totalAirframeTime} onChange={(e) => setField('totalAirframeTime', e.target.value)} placeholder="e.g. 15200.5" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Total Engine Hours (hrs)</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Total Engine Hours (hrs)</label>
               <input type="number" step="0.1" value={totalEngineHours} onChange={(e) => setField('totalEngineHours', e.target.value)} placeholder="e.g. 8400.0" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
           </div>
@@ -155,13 +155,13 @@ export default function AircraftForm({ onNext }: { onNext: () => void }) {
         {/* Propeller (Optional) */}
         <section className="space-y-4 opacity-80">
           <h3 className="text-[14px] font-medium text-text-primary border-b border-border-subtle pb-2">Propeller/Rotor Details <span className="text-text-tertiary font-normal">(If Applicable)</span></h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Propeller Make & Model</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Propeller Make & Model</label>
               <input value={propellerMakeModel} onChange={(e) => setField('propellerMakeModel', e.target.value)} placeholder="e.g. McCauley" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Propeller Serial Number(s)</label>
+              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary truncate">Propeller Serial Number(s)</label>
               <input value={propellerSerialNumber} onChange={(e) => setField('propellerSerialNumber', e.target.value)} placeholder="e.g. 193822" className="w-full rounded-md border border-border-subtle bg-elevated px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none transition-colors focus:border-accent" />
             </div>
           </div>

@@ -46,11 +46,11 @@ export default function InventoryPage() {
   return (
     <div className="min-h-screen bg-base">
       <TopBar title="Inventory & Procurement" />
-      <div className="page-enter p-6 space-y-5">
+      <div className="page-enter px-3 py-4 md:p-6 space-y-5 content-max">
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-border-subtle">
+        <div className="flex gap-1 border-b border-border-subtle overflow-x-auto custom-scrollbar">
           {([['inventory', 'Inventory'], ['orders', 'Pending Orders'], ['suppliers', 'Suppliers']] as const).map(([key, label]) => (
-            <button key={key} onClick={() => setTab(key)} className={`px-4 py-2.5 text-[13px] font-medium border-b-2 transition-colors ${tab === key ? 'border-accent text-text-primary' : 'border-transparent text-text-tertiary hover:text-text-secondary'}`}>
+            <button key={key} onClick={() => setTab(key)} className={`px-4 py-2.5 text-[13px] font-medium border-b-2 transition-colors whitespace-nowrap ${tab === key ? 'border-accent text-text-primary' : 'border-transparent text-text-tertiary hover:text-text-secondary'}`}>
               {label}
             </button>
           ))}
@@ -59,12 +59,12 @@ export default function InventoryPage() {
         {tab === 'inventory' && (
           <>
             {/* Alert */}
-            <div className="rounded-lg border border-warning/30 bg-warning-subtle p-4 flex items-start gap-3">
+            <div className="rounded-lg border border-warning/30 bg-warning-subtle p-3 sm:p-4 flex flex-col sm:flex-row items-start gap-3">
               <AlertTriangle className="mt-0.5 h-5 w-5 text-warning shrink-0" />
               <div>
                 <div className="text-[13px] font-medium text-text-primary mb-0.5">Stage 3 Defect Detected — Blade #15, N-737CD</div>
-                <div className="text-[12px] text-text-secondary mb-2">Part: <span className="font-mono">CFM56-5B-L28410</span> · Status: 0 units in stock</div>
-                <div className="flex gap-2">
+                <div className="text-[12px] text-text-secondary mb-2">Part: <span className="font-mono break-all">CFM56-5B-L28410</span> · Status: 0 units in stock</div>
+                <div className="flex flex-wrap gap-2">
                   <button className="rounded-md bg-accent px-3 py-1.5 text-[12px] font-medium text-white hover:bg-accent-hover transition-colors">Raise Purchase Request</button>
                   <button className="rounded-md border border-border-default px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors">View Inventory</button>
                 </div>
@@ -101,11 +101,11 @@ export default function InventoryPage() {
         {tab === 'orders' && (
           <div className="space-y-3">
             {dummyOrders.map((o) => (
-              <div key={o.id} className="rounded-lg border border-border-subtle bg-surface p-5 hover:border-border-default transition-colors">
-                <div className="flex items-start justify-between mb-3">
+              <div key={o.id} className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-5 hover:border-border-default transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-2">
                   <div>
                     <span className="font-mono text-[14px] font-medium text-text-primary">{o.id}</span>
-                    <span className={`ml-3 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${o.priority === 'critical' ? 'bg-danger-subtle text-danger' : o.priority === 'urgent' ? 'bg-warning-subtle text-warning' : 'bg-info-subtle text-info'}`}>{o.priority}</span>
+                    <span className={`ml-2 sm:ml-3 inline-block sm:inline rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${o.priority === 'critical' ? 'bg-danger-subtle text-danger' : o.priority === 'urgent' ? 'bg-warning-subtle text-warning' : 'bg-info-subtle text-info'}`}>{o.priority}</span>
                   </div>
                   <span className={`text-[12px] font-medium capitalize ${o.status === 'shipped' ? 'text-success' : o.status === 'approved' ? 'text-accent' : 'text-warning'}`}>{o.status}</span>
                 </div>
@@ -125,7 +125,7 @@ export default function InventoryPage() {
         {tab === 'suppliers' && (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {suppliers.map((s) => (
-              <div key={s.name} className="rounded-lg border border-border-subtle bg-surface p-5 hover:border-border-default transition-colors">
+              <div key={s.name} className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-5 hover:border-border-default transition-colors">
                 <div className="text-[15px] font-medium text-text-primary mb-1">{s.name}</div>
                 <div className="text-[12px] text-text-tertiary mb-3">{s.location}</div>
                 <div className="space-y-1.5 text-[13px]">

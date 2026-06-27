@@ -54,7 +54,7 @@ export default function PipelineProgress() {
         <p className="text-[13px] text-text-secondary">Processing your inspection file through the detection pipeline.</p>
       </div>
 
-      <div className="rounded-lg border border-border-subtle bg-surface p-6">
+      <div className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-6">
         <div className="space-y-1">
           {pipelineStages.map((stage, i) => (
             <div key={stage.name}>
@@ -143,7 +143,7 @@ export default function PipelineProgress() {
               {detections.length > 0 && (
                 <div className="mb-5 divide-y divide-border-subtle rounded border border-border-subtle bg-surface overflow-hidden">
                   {detections.map((det, idx) => (
-                    <div key={idx} className="flex items-center justify-between px-3.5 py-2.5 text-[13px] transition-colors hover:bg-elevated">
+                    <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 py-2.5 text-[13px] transition-colors hover:bg-elevated gap-2">
                       <div className="flex items-center gap-2">
                         <span className={`h-1.5 w-1.5 rounded-full ${
                           deriveSeverity(det.confidence) === 'critical' ? 'bg-danger' :
@@ -161,7 +161,7 @@ export default function PipelineProgress() {
                 </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Link href="/app/models/demo" className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors">
                   <Box className="h-3.5 w-3.5" /> View 3D Twin
                 </Link>

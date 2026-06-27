@@ -13,7 +13,7 @@ export default function DefectPanel({ defect }: { defect: Defect }) {
   const { setSelectedDefect } = useTwinStore();
 
   return (
-    <aside className="w-[360px] shrink-0 animate-slide-in-right border-l border-border-subtle bg-surface overflow-y-auto">
+    <aside className="absolute inset-y-0 right-0 z-[60] w-full sm:w-[360px] sm:static shrink-0 animate-slide-in-right border-l border-border-subtle bg-surface overflow-y-auto shadow-2xl sm:shadow-none">
       <div className="flex items-center justify-between border-b border-border-subtle px-5 py-3">
         <span className="font-mono text-[14px] font-medium text-text-primary">DEFECT {defect.id}</span>
         <button onClick={() => setSelectedDefect(null)} className="text-text-tertiary hover:text-text-primary transition-colors">

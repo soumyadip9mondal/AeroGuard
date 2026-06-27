@@ -16,7 +16,7 @@ export default function ViewerToolbar() {
   ];
 
   return (
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-xl border border-border-subtle bg-surface/90 px-2 py-1.5 shadow-lg backdrop-blur-sm">
+    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-1.5 w-[90%] max-w-fit overflow-x-auto custom-scrollbar rounded-xl border border-border-subtle bg-surface/90 px-2 py-1.5 shadow-lg backdrop-blur-sm z-[10]">
       {buttons.map((btn, i) => {
         const Icon = btn.icon;
         return (
