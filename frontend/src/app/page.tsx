@@ -52,7 +52,7 @@ function Nav() {
         </Link>
         <Link
           href="/app/dashboard"
-          className="flex items-center gap-1.5 rounded-md bg-accent px-3.5 py-1.5 text-[13px] font-bold text-white transition-colors hover:bg-accent-hover"
+          className="flex items-center gap-1.5 rounded-md bg-accent px-3.5 py-1.5 text-[13px] font-normal text-white transition-colors hover:bg-accent-hover"
         >
           Start Inspection
           <ArrowRight className="h-3.5 w-3.5" />
@@ -137,12 +137,12 @@ function Hero() {
           >
             <Link
               href="/app/dashboard"
-              className="flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-accent-hover shadow-lg shadow-accent/20"
+              className="flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-[14px] font-normal text-white transition-colors hover:bg-accent-hover shadow-lg shadow-accent/20"
             >
               Start Free Trial
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <button className="flex items-center gap-2 rounded-md border border-border-default bg-surface/30 backdrop-blur-sm px-5 py-2.5 text-[14px] font-bold text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary">
+            <button className="flex items-center gap-2 rounded-md border border-border-default bg-surface/30 backdrop-blur-sm px-5 py-2.5 text-[14px] font-normal text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary">
               <Play className="h-3.5 w-3.5" />
               Watch Demo
             </button>
@@ -529,14 +529,14 @@ function FinalCTA() {
         <div className="flex items-center justify-center gap-3">
           <Link
             href="/app/dashboard"
-            className="flex items-center gap-2 rounded-md bg-accent px-6 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-accent-hover"
+            className="flex items-center gap-2 rounded-md bg-accent px-6 py-2.5 text-[14px] font-normal text-white transition-colors hover:bg-accent-hover"
           >
             Start Free Trial
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             href="/app/dashboard"
-            className="flex items-center gap-2 rounded-md border border-border-default px-6 py-2.5 text-[14px] font-bold text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary"
+            className="flex items-center gap-2 rounded-md border border-border-default px-6 py-2.5 text-[14px] font-normal text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary"
           >
             Request Enterprise Demo
             <ChevronRight className="h-4 w-4" />
