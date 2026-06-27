@@ -66,7 +66,7 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen bg-base">
       <TopBar title="Inspection History" />
-      <div className="page-enter flex">
+      <div className="page-enter flex flex-col lg:flex-row">
         {/* Filter sidebar */}
         {showFilters && (
           <aside className="hidden w-[260px] shrink-0 border-r border-border-subtle bg-surface p-5 lg:block">
@@ -94,15 +94,37 @@ export default function HistoryPage() {
         )}
 
         {/* Main table */}
-        <div className="flex-1 p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-[13px] text-text-tertiary">
+        <div className="flex-1 px-3 py-4 sm:p-4 md:p-6 content-max">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <span className="text-[13px] text-text-tertiary shrink-0">
               {loading ? 'Loading...' : `${filtered.length} inspections`}
             </span>
             <button onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-1.5 rounded-md border border-border-subtle px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors lg:hidden">
               <Filter className="h-3.5 w-3.5" /> Filters
             </button>
           </div>
+
+          {/* Mobile filter panel — inline collapsible */}
+          {showFilters && (
+            <div className="mb-4 rounded-lg border border-border-subtle bg-surface p-4 space-y-4 lg:hidden">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-medium text-text-primary">Filters</span>
+                <button onClick={() => { setStatusFilter([]); setSearch(''); setPage(0); }} className="text-[11px] text-accent hover:text-accent-hover">Clear all</button>
+              </div>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
+                <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }} placeholder="Filename or job ID" className="w-full rounded-md border border-border-subtle bg-elevated pl-8 pr-3 py-2 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent" />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {['completed', 'processing', 'failed', 'pending', 'queued'].map((s) => (
+                  <label key={s} className="flex items-center gap-1.5 rounded-md border border-border-subtle px-2.5 py-1.5 text-[12px] text-text-secondary cursor-pointer hover:text-text-primary has-[:checked]:border-accent/30 has-[:checked]:bg-accent-subtle has-[:checked]:text-text-primary transition-colors">
+                    <input type="checkbox" checked={statusFilter.includes(s)} onChange={() => { toggle(statusFilter, s, setStatusFilter); setPage(0); }} className="h-3 w-3 rounded border-border-default bg-elevated accent-accent" />
+                    <span>{statusConfig[s]?.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           {loading ? (
             <>

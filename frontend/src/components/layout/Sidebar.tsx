@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { PlusCircle, ChevronLeft, ChevronRight, User, LogOut, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PlusCircle, ChevronLeft, ChevronRight, LogOut, Search, X } from 'lucide-react';
 import { navigation } from '@/config/nav';
 import { APP_NAME, ORG_NAME } from '@/config/constants';
 import { useUIStore } from '@/stores/ui.store';
@@ -12,40 +12,103 @@ import { cn } from '@/lib/utils';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { sidebarExpanded, toggleSidebar, setCommandPaletteOpen, pendingRoute, setPendingRoute } = useUIStore();
+  const { sidebarExpanded, toggleSidebar, setSidebarExpanded, setCommandPaletteOpen, pendingRoute, setPendingRoute } = useUIStore();
+  const sidebarRef = useRef<HTMLElement>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchCurrentX = useRef<number | null>(null);
 
   useEffect(() => {
     setPendingRoute(null);
   }, [pathname, setPendingRoute]);
 
+  // Close sidebar on Escape key (mobile)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && sidebarExpanded && window.innerWidth < 1024) {
+        setSidebarExpanded(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [sidebarExpanded, setSidebarExpanded]);
+
+  // Swipe-to-close on mobile
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.innerWidth >= 1024) return;
+    touchStartX.current = e.touches[0].clientX;
+    touchCurrentX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (window.innerWidth >= 1024 || touchStartX.current === null) return;
+    touchCurrentX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (
+      window.innerWidth >= 1024 ||
+      touchStartX.current === null ||
+      touchCurrentX.current === null
+    )
+      return;
+    const diff = touchStartX.current - touchCurrentX.current;
+    // Swipe left to close (threshold 60px)
+    if (diff > 60) {
+      setSidebarExpanded(false);
+    }
+    touchStartX.current = null;
+    touchCurrentX.current = null;
+  }, [setSidebarExpanded]);
+
+  // Close sidebar on mobile when navigating
+  const handleMobileClose = useCallback(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setSidebarExpanded(false);
+    }
+  }, [setSidebarExpanded]);
+
   return (
     <>
       {/* Mobile overlay */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40 bg-black/50 transition-opacity lg:hidden',
-          sidebarExpanded ? 'opacity-100' : 'pointer-events-none opacity-0'
+      <AnimatePresence>
+        {sidebarExpanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px] lg:hidden"
+            onClick={() => setSidebarExpanded(false)}
+          />
         )}
-        onClick={toggleSidebar}
-      />
+      </AnimatePresence>
 
       <aside
+        ref={sidebarRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         className={cn(
           'fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-border-subtle bg-surface transition-all duration-standard ease-standard',
-          sidebarExpanded ? 'w-[240px]' : 'w-[60px]',
-          'max-lg:translate-x-0 max-lg:shadow-lg',
-          !sidebarExpanded && 'max-lg:-translate-x-full'
+          // Mobile first width
+          'w-[280px] sm:w-[320px]',
+          // Desktop width based on state
+          sidebarExpanded ? 'lg:w-[240px]' : 'lg:w-[60px]',
+          // Translate logic: mobile slides in/out, desktop always visible
+          sidebarExpanded
+            ? 'translate-x-0 shadow-lg lg:shadow-none'
+            : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Header */}
         <div className="flex h-[64px] items-center gap-3 border-b border-border-subtle px-[12px]">
-          <img 
-            src="/logo.png" 
-            alt="AeroGuard Logo" 
+          <img
+            src="/logo.png"
+            alt="AeroGuard Logo"
             className={cn(
               "shrink-0 object-contain drop-shadow-[0_0_8px_rgba(37,99,235,0.4)] transition-all duration-300",
               sidebarExpanded ? "h-11 w-11 ml-0" : "h-9 w-9 ml-0"
-            )} 
+            )}
           />
           {sidebarExpanded && (
             <div className="min-w-0 flex-1">
@@ -53,15 +116,22 @@ export default function Sidebar() {
               <div className="text-[11px] text-text-tertiary truncate">{ORG_NAME}</div>
             </div>
           )}
+
+          {/* Mobile close button */}
+          <button
+            onClick={() => setSidebarExpanded(false)}
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-md text-text-tertiary transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-text-primary lg:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         {/* New Inspection CTA */}
         <div className="px-3 pt-4 pb-2">
           <Link
             href="/app/inspection/new"
-            onClick={() => {
-              if (typeof window !== 'undefined' && window.innerWidth < 1024) toggleSidebar();
-            }}
+            onClick={handleMobileClose}
             className={cn(
               'flex items-center justify-center gap-2 rounded-md bg-accent px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover',
               !sidebarExpanded && 'px-0'
@@ -98,7 +168,7 @@ export default function Sidebar() {
               <div className="space-y-0.5">
                 {group.items.map((item) => {
                   const isActuallyActive = pathname === item.href || pathname.startsWith(item.href + '/');
-                  const isActive = pendingRoute 
+                  const isActive = pendingRoute
                     ? (pendingRoute === item.href || pendingRoute.startsWith(item.href + '/'))
                     : isActuallyActive;
                   const Icon = item.icon;
@@ -110,9 +180,7 @@ export default function Sidebar() {
                         if (item.href !== pathname && !pathname.startsWith(item.href + '/')) {
                           setPendingRoute(item.href);
                         }
-                        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-                          toggleSidebar();
-                        }
+                        handleMobileClose();
                       }}
                       className={cn(
                         'relative flex items-center rounded-md px-2 py-1.5 text-sm transition-colors duration-fast',
@@ -167,19 +235,23 @@ export default function Sidebar() {
             </div>
           )}
         </div>
-
-        {/* Collapse toggle — desktop only */}
-        <button
-          onClick={toggleSidebar}
-          className="absolute -right-3 top-[52px] hidden h-6 w-6 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-tertiary hover:text-text-primary transition-colors lg:flex"
-        >
-          {sidebarExpanded ? (
-            <ChevronLeft className="h-3 w-3" />
-          ) : (
-            <ChevronRight className="h-3 w-3" />
-          )}
-        </button>
       </aside>
+
+      {/* Collapse toggle — desktop only, positioned outside aside to avoid overflow issues */}
+      <button
+        onClick={toggleSidebar}
+        aria-label={sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
+        className={cn(
+          'group fixed top-[48px] z-50 hidden h-8 w-8 items-center justify-center rounded-full border border-border-subtle bg-surface shadow-sm text-text-tertiary transition-all duration-standard ease-standard hover:bg-elevated hover:text-text-primary hover:shadow-md hover:scale-110 lg:flex',
+          sidebarExpanded ? 'left-[224px]' : 'left-[44px]'
+        )}
+      >
+        {sidebarExpanded ? (
+          <ChevronLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+        )}
+      </button>
     </>
   );
 }

@@ -81,8 +81,8 @@ export default function InspectionDetailPage() {
     return (
       <div className="min-h-screen bg-base">
         <TopBar title="Inspection Detail" subtitle={jobId} />
-        <div className="page-enter p-6 space-y-6">
-          <div className="flex flex-wrap items-start justify-between gap-4 rounded-lg border border-border-subtle bg-surface p-6">
+        <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 rounded-lg border border-border-subtle bg-surface p-4 sm:p-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <div className="skeleton h-7 w-48" />
@@ -99,7 +99,7 @@ export default function InspectionDetailPage() {
               <div className="skeleton h-9 w-32 rounded-md" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+          <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="rounded-lg border border-border-subtle bg-surface p-4">
                 <div className="skeleton h-3 w-20 mb-2" />
@@ -192,12 +192,12 @@ export default function InspectionDetailPage() {
   return (
     <div className="min-h-screen bg-base">
       <TopBar title="Inspection Detail" subtitle={job.originalFilename || job.id.slice(0, 8)} />
-      <div className="page-enter p-6 space-y-6">
+      <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
         {/* Header */}
-        <div className="flex flex-wrap items-start justify-between gap-4 rounded-lg border border-border-subtle bg-surface p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 rounded-lg border border-border-subtle bg-surface p-4 sm:p-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <span className="font-mono text-[22px] font-medium text-text-primary">
+              <span className="font-mono text-[16px] sm:text-[22px] font-medium text-text-primary break-all">
                 {job.originalFilename || 'Untitled'}
               </span>
               {maxSeverity && <DefectBadge severity={maxSeverity} size="md" />}
@@ -214,7 +214,7 @@ export default function InspectionDetailPage() {
               </span>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col xs:flex-row flex-wrap gap-2 w-full sm:w-auto">
             <Link
               href="/app/models/demo"
               className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors"
@@ -231,15 +231,15 @@ export default function InspectionDetailPage() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+        <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
           {[
             { label: 'Total Detections', value: metrics.length, color: '#FAFAFA' },
             { label: 'Critical', value: severityCounts.critical, color: '#DC2626' },
             { label: 'Major', value: severityCounts.major, color: '#D97706' },
             { label: 'Moderate', value: severityCounts.moderate, color: '#EA580C' },
             { label: 'Minor', value: severityCounts.minor, color: '#16A34A' },
-          ].map((s) => (
-            <div key={s.label} className="rounded-lg border border-border-subtle bg-surface p-4">
+          ].map((s, i) => (
+            <div key={s.label} className={`rounded-lg border border-border-subtle bg-surface p-4 ${i === 0 ? 'col-span-2 xs:col-span-1' : ''}`}>
               <span className="text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">{s.label}</span>
               <div className="mt-1 text-[28px] font-medium leading-none" style={{ color: s.color }}>{s.value}</div>
             </div>
@@ -250,7 +250,7 @@ export default function InspectionDetailPage() {
         <div>
           <h3 className="mb-4 text-[15px] font-medium text-text-primary">Detected Defects</h3>
           {metrics.length === 0 ? (
-            <div className="rounded-lg border border-border-subtle bg-surface p-8 text-center">
+            <div className="rounded-lg border border-border-subtle bg-surface p-6 sm:p-8 text-center">
               <span className="text-[13px] text-text-tertiary">
                 {job.status === 'completed'
                   ? 'No defects detected in this inspection.'
@@ -263,7 +263,7 @@ export default function InspectionDetailPage() {
                 const sev = deriveSeverity(m.confidence);
                 const bboxDefined = m.bboxX1 !== null && m.bboxY1 !== null && m.bboxX2 !== null && m.bboxY2 !== null;
                 return (
-                  <div key={m.id} className="rounded-lg border border-border-subtle bg-surface p-5 transition-colors hover:border-border-default">
+                  <div key={m.id} className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-5 transition-colors hover:border-border-default">
                     <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-[14px] font-medium text-text-primary">{m.id.slice(0, 8)}</span>

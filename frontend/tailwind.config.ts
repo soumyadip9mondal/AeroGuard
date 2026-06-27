@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '390px', // iPhone 14 / 15 width — slot between default mobile and sm:640px
+      },
       colors: {
         base: '#090909',
         surface: '#111111',

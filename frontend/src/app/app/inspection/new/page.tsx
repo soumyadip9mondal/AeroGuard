@@ -15,37 +15,42 @@ export default function NewInspectionPage() {
   return (
     <div className="min-h-screen bg-base">
       <TopBar title="New Inspection" subtitle="Start a new AI-powered inspection" />
-      <div className="page-enter mx-auto max-w-[720px] px-6 py-8">
-        {/* Step Indicator */}
-        <div className="mb-10 flex items-center justify-center gap-0">
-          {steps.map((label, i) => {
-            const stepNum = i + 1;
-            const isActive = stepNum === currentStep;
-            const isComplete = stepNum < currentStep;
-            return (
-              <div key={label} className="flex items-center">
-                <div className="flex flex-col items-center">
-                  <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-medium transition-all ${
-                      isComplete
-                        ? 'bg-success text-white'
-                        : isActive
-                        ? 'bg-accent text-white'
-                        : 'border border-border-default bg-surface text-text-tertiary'
-                    }`}
-                  >
-                    {isComplete ? <CheckCircle2 className="h-4 w-4" /> : stepNum}
+      <div className="page-enter mx-auto max-w-[720px] px-3 py-4 sm:px-6 sm:py-8 content-max">
+        {/* Step Indicator — scrollable on narrow viewports */}
+        <div className="mb-10 overflow-x-auto">
+          <div className="flex items-center justify-center gap-0 min-w-max mx-auto">
+            {steps.map((label, i) => {
+              const stepNum = i + 1;
+              const isActive = stepNum === currentStep;
+              const isComplete = stepNum < currentStep;
+              return (
+                <div key={label} className="flex items-center">
+                  <div className="flex flex-col items-center">
+                    {/* Responsive step circle: 28px on mobile, 32px on sm+ */}
+                    <div
+                      className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-[12px] font-medium transition-all ${
+                        isComplete
+                          ? 'bg-success text-white'
+                          : isActive
+                          ? 'bg-accent text-white'
+                          : 'border border-border-default bg-surface text-text-tertiary'
+                      }`}
+                    >
+                      {isComplete ? <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : stepNum}
+                    </div>
+                    {/* Responsive label: truncated on mobile */}
+                    <span className={`mt-2 text-[11px] font-medium max-w-[64px] sm:max-w-none truncate text-center ${isActive ? 'text-text-primary' : 'text-text-tertiary'}`}>
+                      {label}
+                    </span>
                   </div>
-                  <span className={`mt-2 text-[11px] font-medium ${isActive ? 'text-text-primary' : 'text-text-tertiary'}`}>
-                    {label}
-                  </span>
+                  {/* Responsive connector line: shorter on mobile */}
+                  {i < steps.length - 1 && (
+                    <div className={`mx-1 sm:mx-3 mb-5 h-px w-4 sm:w-16 ${isComplete ? 'bg-success' : 'bg-border-subtle'}`} />
+                  )}
                 </div>
-                {i < steps.length - 1 && (
-                  <div className={`mx-3 mb-5 h-px w-16 ${isComplete ? 'bg-success' : 'bg-border-subtle'}`} />
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Step Content */}

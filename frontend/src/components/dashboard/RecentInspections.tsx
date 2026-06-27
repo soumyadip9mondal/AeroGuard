@@ -40,7 +40,7 @@ export default function RecentInspections() {
 
   return (
     <div className="rounded-lg border border-border-subtle bg-surface">
-      <div className="flex items-center justify-between border-b border-border-subtle px-5 py-3">
+      <div className="flex items-center justify-between border-b border-border-subtle px-3 sm:px-5 py-3">
         <h3 className="text-[15px] font-medium text-text-primary">Recent Inspections</h3>
         <Link href="/app/history" className="text-[12px] text-accent hover:text-accent-hover transition-colors">
           View all →
@@ -54,7 +54,7 @@ export default function RecentInspections() {
               {['Job ID', 'File', 'Created', 'Defects', 'Status'].map((h) => (
                 <th
                   key={h}
-                  className="px-5 py-2.5 text-text-tertiary"
+                  className="px-3 sm:px-5 py-2.5 text-text-tertiary whitespace-nowrap"
                   style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}
                 >
                   {h}
@@ -82,19 +82,19 @@ export default function RecentInspections() {
                 const created = new Date(job.createdAt);
                 return (
                   <tr key={job.id} className="border-b border-border-subtle last:border-0 transition-colors hover:bg-elevated/50">
-                    <td className="px-5 py-3 font-mono text-[13px] text-text-primary">
+                    <td className="px-3 sm:px-5 py-3 font-mono text-[13px] text-text-primary">
                       <Link href={`/app/inspection/${job.id}`} className="hover:text-accent">
                         {job.id.slice(0, 8)}
                       </Link>
                     </td>
-                    <td className="px-5 py-3 text-[13px] text-text-secondary max-w-[180px] truncate">
+                    <td className="px-3 sm:px-5 py-3 text-[13px] text-text-secondary max-w-[180px] truncate">
                       {job.originalFilename || '—'}
                     </td>
-                    <td className="px-5 py-3 text-[13px] text-text-tertiary">
+                    <td className="px-3 sm:px-5 py-3 text-[13px] text-text-tertiary">
                       {created.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </td>
-                    <td className="px-5 py-3 text-[13px] text-text-primary">{job.metricsCount}</td>
-                    <td className="px-5 py-3">
+                    <td className="px-3 sm:px-5 py-3 text-[13px] text-text-primary">{job.metricsCount}</td>
+                    <td className="px-3 sm:px-5 py-3">
                       <span className="inline-flex items-center gap-1.5 text-[12px]" style={{ color: st.color }}>
                         <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
                         {st.label}
@@ -108,15 +108,15 @@ export default function RecentInspections() {
         </table>
       </div>
 
-      <div className="flex items-center justify-between border-t border-border-subtle px-5 py-3">
+      <div className="flex items-center justify-between border-t border-border-subtle px-3 sm:px-5 py-3">
         <span className="text-[12px] text-text-tertiary">
           Page {page + 1} of {totalPages || 1}
         </span>
         <div className="flex gap-1">
-          <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="rounded p-1 text-text-tertiary hover:bg-elevated disabled:opacity-30 transition-colors">
+          <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="rounded p-2 text-text-tertiary hover:bg-elevated disabled:opacity-30 transition-colors">
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page >= totalPages - 1} className="rounded p-1 text-text-tertiary hover:bg-elevated disabled:opacity-30 transition-colors">
+          <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page >= totalPages - 1} className="rounded p-2 text-text-tertiary hover:bg-elevated disabled:opacity-30 transition-colors">
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>

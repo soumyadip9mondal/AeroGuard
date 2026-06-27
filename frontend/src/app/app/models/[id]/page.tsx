@@ -12,7 +12,7 @@ import { getJob, getJobMetrics, DBMetric } from '@/lib/api';
 import { useTwinStore } from '@/stores/twin.store';
 import { Defect, DefectSeverity, DefectType } from '@/types/defect';
 import FullscreenLoader from '@/components/shared/FullscreenLoader';
-import { ArrowLeft, Loader2, Box } from 'lucide-react';
+import { ArrowLeft, Loader2, Box, List, X } from 'lucide-react';
 
 const EngineViewer = dynamic(() => import('@/components/twin/EngineViewer'), {
   ssr: false,
@@ -82,6 +82,7 @@ export default function DigitalTwinPage() {
   const [jobFilename, setJobFilename] = useState('');
   const [aircraftModel, setAircraftModel] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showMobileList, setShowMobileList] = useState(false);
 
   useEffect(() => {
     if (!jobId) return;
@@ -123,17 +124,29 @@ export default function DigitalTwinPage() {
   const selectedDefect = defects.find((d) => d.id === selectedDefectId) || null;
 
   return (
-    <div className="flex h-screen bg-base overflow-hidden">
+    <div className="flex h-[100dvh] bg-base overflow-hidden relative">
+      {/* Mobile Top Bar */}
+      <div className="absolute top-4 left-4 z-[40] lg:hidden">
+        <button onClick={() => setShowMobileList(true)} className="flex items-center justify-center rounded-lg bg-surface/90 border border-border-subtle p-2.5 shadow-lg backdrop-blur-sm text-text-primary hover:bg-elevated transition-colors">
+          <List className="h-5 w-5" />
+        </button>
+      </div>
+
       {/* Left panel — defect list */}
-      <aside className="hidden w-[300px] shrink-0 flex-col border-r border-border-subtle bg-surface lg:flex">
-        <div className="flex items-center gap-3 border-b border-border-subtle px-4 py-3">
-          <Link href="/app/dashboard" className="text-text-tertiary hover:text-text-primary transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <div>
-            <div className="text-[14px] font-medium text-text-primary">3D Digital Twin</div>
-            <div className="text-[11px] text-text-tertiary font-mono">{jobFilename} · {jobId.slice(0, 8)}</div>
+      <aside className={`absolute inset-y-0 left-0 z-[50] w-[85%] max-w-[320px] flex-col border-r border-border-subtle bg-surface transition-transform duration-300 lg:static lg:w-[300px] lg:translate-x-0 lg:flex ${showMobileList ? 'translate-x-0 flex shadow-2xl' : '-translate-x-full hidden'}`}>
+        <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Link href="/app/dashboard" className="text-text-tertiary hover:text-text-primary transition-colors">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <div>
+              <div className="text-[14px] font-medium text-text-primary">3D Digital Twin</div>
+              <div className="text-[11px] text-text-tertiary font-mono">{jobFilename} · {jobId.slice(0, 8)}</div>
+            </div>
           </div>
+          <button onClick={() => setShowMobileList(false)} className="lg:hidden text-text-tertiary hover:text-text-primary p-1">
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
@@ -159,7 +172,7 @@ export default function DigitalTwinPage() {
               {defects.map((d) => (
                 <button
                   key={d.id}
-                  onClick={() => setSelectedDefect(d.id)}
+                  onClick={() => { setSelectedDefect(d.id); setShowMobileList(false); }}
                   className={`w-full rounded-md p-3 text-left transition-all ${
                     selectedDefectId === d.id
                       ? 'border border-accent/40 bg-accent-subtle'
@@ -178,6 +191,14 @@ export default function DigitalTwinPage() {
           )}
         </div>
       </aside>
+      
+      {/* Mobile Backdrop */}
+      {showMobileList && (
+        <div 
+          className="absolute inset-0 bg-black/60 z-[45] lg:hidden animate-fade-in" 
+          onClick={() => setShowMobileList(false)} 
+        />
+      )}
 
       {/* Right panel — 3D Viewer */}
       <main className="flex-1 relative">

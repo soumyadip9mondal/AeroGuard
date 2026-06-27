@@ -49,8 +49,9 @@ export default function KPICard({ label, value, format, delta, icon: Icon }: KPI
     : isPositive;
 
   return (
-    <div className="rounded-lg border border-border-subtle bg-surface p-5 transition-colors hover:border-border-default">
-      <div className="mb-3 flex flex-nowrap items-center justify-between gap-2">
+    /* Responsive padding: p-3 on mobile, p-5 on sm+. Min-height for consistency */
+    <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5 min-h-[80px] transition-colors hover:border-border-default">
+      <div className="mb-2 sm:mb-3 flex flex-nowrap items-center justify-between gap-2">
         <span
           className="text-text-tertiary truncate"
           style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}
@@ -61,11 +62,12 @@ export default function KPICard({ label, value, format, delta, icon: Icon }: KPI
         <Icon className="h-4 w-4 shrink-0 text-text-tertiary" />
       </div>
 
-      <div className="mb-2 text-[28px] font-medium leading-none tracking-tight text-text-primary">
+      {/* Responsive value font: 22px on mobile, 28px on sm+ */}
+      <div className="mb-1.5 sm:mb-2 text-[22px] sm:text-[28px] font-medium leading-none tracking-tight text-text-primary" style={{ fontVariantNumeric: 'tabular-nums' }}>
         {formatValue(displayValue, format)}
       </div>
 
-      <div className="flex items-center gap-1 text-[13px]" style={{ color: deltaIsGood ? '#16A34A' : '#DC2626' }}>
+      <div className="flex items-center gap-1 text-[12px] sm:text-[13px] whitespace-nowrap overflow-hidden" style={{ color: deltaIsGood ? '#16A34A' : '#DC2626' }}>
         {isPositive ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
         <span>{Math.abs(delta).toFixed(1)}% vs last week</span>
       </div>

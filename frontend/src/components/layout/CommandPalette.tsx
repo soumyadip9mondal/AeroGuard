@@ -74,7 +74,7 @@ export default function CommandPalette() {
       />
 
       {/* Dialog */}
-      <div className="relative mx-auto mt-[20vh] w-full max-w-[560px] px-4 animate-slide-up">
+      <div className="relative mx-auto mt-[15vh] sm:mt-[20vh] w-full max-w-[560px] px-3 sm:px-4 animate-slide-up">
         <Command
           className="overflow-hidden rounded-xl border border-border-default bg-surface shadow-lg"
           shouldFilter={true}
@@ -92,7 +92,7 @@ export default function CommandPalette() {
             </kbd>
           </div>
 
-          <Command.List className="max-h-[320px] overflow-y-auto p-2">
+          <Command.List className="max-h-[min(320px,50vh)] overflow-y-auto p-2">
             <Command.Empty className="py-8 text-center text-sm text-text-tertiary">
               No results found.
             </Command.Empty>
