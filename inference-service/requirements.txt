@@ -13,3 +13,4 @@ boto3
 psycopg2-binary
 python-dotenv
 asyncio
+sahi>=0.11.15

@@ -18,7 +18,7 @@ def test_health(client):
 
 def test_model_loaded_on_startup():
     # Verify ModelManager loaded and cached the YOLO model
-    assert model_manager.get_model() is not None
+    assert model_manager.get_plane_model() is not None
 
 def test_detect_successful(client):
     # Create a small valid JPEG image in memory

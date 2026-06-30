@@ -45,13 +45,76 @@ class DetectionService:
                 detail="Corrupted or invalid image data."
             )
 
-        # 3. Get YOLO Model (Singleton)
-        yolo_model = model_manager.get_model()
+        # 3. Get Models (Singleton)
+        plane_model = model_manager.get_plane_model()
+        sahi_model = model_manager.get_sahi_model()
 
         # 4. Perform Inference
         inference_start = time.perf_counter()
+        detections = []
         try:
-            results = yolo_model(image, conf=settings.CONFIDENCE_THRESHOLD, verbose=False)
+            from sahi.predict import get_sliced_prediction
+            # Convert PIL Image to RGB for consistent behavior
+            image = image.convert("RGB")
+            
+            # Stage 1: Detect planes
+            plane_results = plane_model(image, conf=0.25, verbose=False)
+            
+            for r in plane_results:
+                for box in r.boxes:
+                    class_id = int(box.cls[0].item())
+                    class_name = r.names[class_id]
+                    
+                    if class_name.lower() in ["airplane", "aeroplane", "aircraft"]:
+                        x1, y1, x2, y2 = [int(v) for v in box.xyxy[0].tolist()]
+                        plane_conf = float(box.conf[0].item())
+                        
+                        detections.append(
+                            DetectionItem(
+                                class_name="airplane",
+                                confidence=round(plane_conf, 4),
+                                bbox=[float(x1), float(y1), float(x2), float(y2)]
+                            )
+                        )
+                        
+                        # Crop the plane
+                        width, height = image.size
+                        x1, y1 = max(0, x1), max(0, y1)
+                        x2, y2 = min(width, x2), min(height, y2)
+                        
+                        if x2 > x1 and y2 > y1:
+                            plane_crop = image.crop((x1, y1, x2, y2))
+                            
+                            # Stage 2: SAHI on the cropped plane
+                            result = get_sliced_prediction(
+                                plane_crop,
+                                sahi_model,
+                                slice_height=512,
+                                slice_width=512,
+                                overlap_height_ratio=0.2,
+                                overlap_width_ratio=0.2
+                            )
+                            
+                            for obj in result.object_prediction_list:
+                                obj_bbox = obj.bbox.to_xyxy()
+                                confidence = obj.score.value
+                                defect_class_name = obj.category.name
+                                
+                                # Shift bounding box to original image coordinates
+                                final_bbox = [
+                                    round(obj_bbox[0] + x1, 2),
+                                    round(obj_bbox[1] + y1, 2),
+                                    round(obj_bbox[2] + x1, 2),
+                                    round(obj_bbox[3] + y1, 2)
+                                ]
+                                
+                                detections.append(
+                                    DetectionItem(
+                                        class_name=defect_class_name,
+                                        confidence=round(confidence, 4),
+                                        bbox=final_bbox
+                                    )
+                                )
         except Exception as e:
             logger.error(f"Inference execution failed: {str(e)}")
             raise HTTPException(
@@ -59,27 +122,6 @@ class DetectionService:
                 detail=f"Inference error: {str(e)}"
             )
         inference_time_ms = (time.perf_counter() - inference_start) * 1000
-
-        # 5. Extract Detections
-        detections = []
-        if len(results) > 0:
-            result = results[0]
-            boxes = result.boxes
-            names = result.names
-
-            for box in boxes:
-                xyxy = box.xyxy[0].tolist()
-                confidence = float(box.conf[0].item())
-                class_id = int(box.cls[0].item())
-                class_name = names.get(class_id, f"class_{class_id}")
-
-                detections.append(
-                    DetectionItem(
-                        class_name=class_name,
-                        confidence=round(confidence, 4),
-                        bbox=[round(coord, 2) for coord in xyxy]
-                    )
-                )
 
         total_time_ms = (time.perf_counter() - total_start) * 1000
 

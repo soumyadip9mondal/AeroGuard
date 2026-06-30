@@ -5,7 +5,7 @@ from ultralytics import YOLO
 
 def parse_args():
     parser = argparse.ArgumentParser(description="AeroGuard Defect Detection YOLOv8 Training Script")
-    parser.add_argument("--model", type=str, default="yolov8n.pt", help="Base model (yolov8n.pt or yolov8s.pt)")
+    parser.add_argument("--model", type=str, default="yolo11x.pt", help="Base model (yolo11x.pt or yolov8x.pt)")
     parser.add_argument("--epochs", type=int, default=50, help="Number of training epochs")
     parser.add_argument("--batch", type=int, default=16, help="Batch size")
     parser.add_argument("--imgsz", type=int, default=640, help="Image size")

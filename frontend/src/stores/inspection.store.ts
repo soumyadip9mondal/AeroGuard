@@ -260,6 +260,13 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
           } else if (data.type === 'job_complete') {
             handleCleanup();
 
+            stages[1].status = 'complete';
+            stages[1].duration = 'Done';
+            stages[1].progress = undefined;
+
+            stages[2].status = 'complete';
+            stages[2].duration = 'Done';
+
             stages[3].status = 'complete';
             stages[3].duration = 'Done';
             stages[3].progress = undefined;

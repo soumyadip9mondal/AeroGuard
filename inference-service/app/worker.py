@@ -68,42 +68,16 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
         if not total_frames or total_frames <= 0:
             total_frames = 1
         
-        model = model_manager.get_model()
+        plane_model = model_manager.get_plane_model()
+        sahi_model = model_manager.get_sahi_model()
         
-        logger.info("Performing pre-check to verify video contains an aeroplane...")
-        precheck_frames = 5
-        precheck_interval = max(1, int(video_fps)) # 1 frame per second for first 5 seconds
-        
-        has_airplane = False
-        # In COCO, class 4 is 'airplane'
-        airplane_class_ids = [k for k, v in model.names.items() if 'airplane' in v.lower() or 'aeroplane' in v.lower()]
-        
-        for i in range(precheck_frames):
-            cap.set(cv2.CAP_PROP_POS_FRAMES, i * precheck_interval)
-            ret, frame = cap.read()
-            if not ret:
-                break
-            
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            results = model(rgb_frame, conf=0.1, verbose=False) # low threshold for pre-check
-            if len(results) > 0:
-                for box in results[0].boxes:
-                    if int(box.cls[0].item()) in airplane_class_ids:
-                        has_airplane = True
-                        break
-            if has_airplane:
-                break
-                
-        if not has_airplane:
-            raise Exception("Rejected: Video does not contain an aeroplane.")
-            
-        logger.info("Aeroplane detected! Proceeding with full analysis.")
-        # Reset video stream to beginning
-        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-        
+
         frame_count = 0
         extracted_count = 0
         metrics = []
+        
+        from sahi.predict import get_sliced_prediction
+        from PIL import Image
         
         logger.info("Starting inference loop...")
         while True:
@@ -116,48 +90,63 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
                 
                 # Convert BGR (OpenCV) to RGB (YOLO)
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                image = Image.fromarray(rgb_frame)
                 
-                # Inference
-                results = model(rgb_frame, conf=settings.CONFIDENCE_THRESHOLD, verbose=False)
+                # Stage 1: Detect planes
+                plane_results = plane_model(image, conf=0.25, verbose=False)
                 
-                if len(results) > 0:
-                    res = results[0]
-                    boxes = res.boxes
-                    names = res.names
-                    
-                    for box in boxes:
-                        xyxy = box.xyxy[0].tolist()
-                        conf = float(box.conf[0].item())
-                        cls_id = int(box.cls[0].item())
-                        name = names.get(cls_id, f"class_{cls_id}")
+                for r in plane_results:
+                    for box in r.boxes:
+                        class_id = int(box.cls[0].item())
+                        class_name = r.names[class_id]
                         
-                        DEFECT_MAPPING = {
-                            "airplane": "Fuselage Crack",
-                            "clock": "Turbine Blade Wear",
-                            "parking meter": "Corrosion",
-                            "person": "Paint Blister",
-                            "car": "Gear Fluid Leak",
-                            "bird": "Impact Damage",
-                            "boat": "Panel Dent",
-                            "stop sign": "Rivet Failure",
-                            "truck": "Structural Stress",
-                            "bench": "Scuff Mark",
-                            "dog": "Surface Scratch"
-                        }
-                        
-                        defect_label = DEFECT_MAPPING.get(name.lower(), "Micro-fracture")
-                        
-                        metric = (
-                            str(uuid.uuid4()),
-                            job_id,
-                            extracted_count * 1000, # Mock timestamp
-                            "defect",
-                            defect_label,
-                            conf * 100,
-                            xyxy[0], xyxy[1], xyxy[2], xyxy[3],
-                            None
-                        )
-                        metrics.append(metric)
+                        if class_name.lower() in ["airplane", "aeroplane", "aircraft"]:
+                            x1, y1, x2, y2 = [int(v) for v in box.xyxy[0].tolist()]
+                            
+                            # Crop the plane
+                            width, height = image.size
+                            x1, y1 = max(0, x1), max(0, y1)
+                            x2, y2 = min(width, x2), min(height, y2)
+                            
+                            if x2 > x1 and y2 > y1:
+                                plane_crop = image.crop((x1, y1, x2, y2))
+                                
+                                # Inference with SAHI
+                                result = get_sliced_prediction(
+                                    plane_crop,
+                                    sahi_model,
+                                    slice_height=512,
+                                    slice_width=512,
+                                    overlap_height_ratio=0.2,
+                                    overlap_width_ratio=0.2
+                                )
+                                
+                                for obj in result.object_prediction_list:
+                                    obj_bbox = obj.bbox.to_xyxy()
+                                    conf = float(obj.score.value)
+                                    name = obj.category.name
+                                        
+                                    defect_label = name.title()
+                                    
+                                    # Shift bounding box to original image coordinates
+                                    final_bbox = [
+                                        float(obj_bbox[0] + x1),
+                                        float(obj_bbox[1] + y1),
+                                        float(obj_bbox[2] + x1),
+                                        float(obj_bbox[3] + y1)
+                                    ]
+                                    
+                                    metric = (
+                                        str(uuid.uuid4()),
+                                        job_id,
+                                        extracted_count * 1000, # Mock timestamp
+                                        "defect",
+                                        defect_label,
+                                        conf * 100,
+                                        final_bbox[0], final_bbox[1], final_bbox[2], final_bbox[3],
+                                        None
+                                    )
+                                    metrics.append(metric)
                         
             frame_count += 1
             if on_progress_callback:
@@ -192,6 +181,7 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
         
     except Exception as e:
         logger.error(f"Job failed: {e}")
+        conn.rollback()
         cursor.execute("UPDATE jobs SET status=%s, error_message=%s, updated_at=NOW() WHERE id=%s", ('failed', str(e), job_id))
         conn.commit()
         raise e

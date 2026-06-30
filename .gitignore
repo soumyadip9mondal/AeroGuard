@@ -51,3 +51,8 @@ mock-r2-bucket/
 
 # Test media files
 *.mp4
+
+inference-service/cv_engine/runs/
+
+# Ephemeral PDF files
+*.pdf

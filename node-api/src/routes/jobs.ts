@@ -57,6 +57,12 @@ router.get('/:jobId', async (req: Request, res: Response) => {
     return (req as any).next?.();
   }
 
+  // Validate UUID format to prevent DB type errors
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(jobId)) {
+    return res.status(400).json({ error: 'Invalid job ID format.' });
+  }
+
   try {
     const results = await db
       .select({
@@ -252,6 +258,11 @@ router.get('/:jobId/metrics', async (req: Request, res: Response) => {
   const page = Math.max(1, parseInt(req.query.page as string) || 1);
   const limit = Math.max(1, Math.min(100, parseInt(req.query.limit as string) || 100));
   const offset = (page - 1) * limit;
+
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(jobId)) {
+    return res.status(400).json({ error: 'Invalid job ID format.' });
+  }
 
   try {
     // Query metrics records from the DB using pagination parameters

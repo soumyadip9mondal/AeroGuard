@@ -162,7 +162,7 @@ export default function PipelineProgress() {
               )}
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/app/models/demo" className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors">
+                <Link href={`/app/models/${useInspectionStore.getState().jobId}`} className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors">
                   <Box className="h-3.5 w-3.5" /> View 3D Twin
                 </Link>
                 <button 
