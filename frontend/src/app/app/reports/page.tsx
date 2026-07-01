@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useUIStore } from '@/stores/ui.store';
 import { Download, Search, FileText, Loader2 } from 'lucide-react';
 import { DBJob, getJobs, getJobMetrics } from '@/lib/api';
-import FullscreenLoader from '@/components/shared/FullscreenLoader';
 import { generatePDFReport } from '@/lib/pdfGenerator';
 
 const typeBadge = (t: string) => {

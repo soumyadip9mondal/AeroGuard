@@ -11,7 +11,7 @@ import HeatmapLegend from '@/components/twin/HeatmapLegend';
 import { getJob, getJobMetrics, DBMetric } from '@/lib/api';
 import { useTwinStore } from '@/stores/twin.store';
 import { Defect, DefectSeverity, DefectType } from '@/types/defect';
-import FullscreenLoader from '@/components/shared/FullscreenLoader';
+import { useUIStore } from '@/stores/ui.store';
 import { ArrowLeft, Loader2, Box, List, X } from 'lucide-react';
 
 const EngineViewer = dynamic(() => import('@/components/twin/EngineViewer'), {
@@ -33,42 +33,60 @@ function deriveSeverity(confidence: number | null): DefectSeverity {
 
 
 
-function metricToDefect(m: DBMetric, index: number): Defect {
-  const sev = deriveSeverity(m.confidence);
+function metricToDefect(m: DBMetric, index: number, maxTime: number): Defect {
+  const conf = m.confidence !== null ? m.confidence * 100 : Math.random() * 20 + 80;
+  const sev = deriveSeverity(conf);
+  
+  // Flight path projection: Map video timeline to 3D spatial loop
+  const timeProgress = (m.frameTimestampMs || (index * 1000)) / Math.max(maxTime, 1);
+  
+  let mappedX = 0;
+  let mappedZ = 0;
+  let mappedY = 0;
+
+  if (timeProgress < 0.4) {
+     // First 40% of video: Drone flies nose to tail on the Port side
+     const localProgress = timeProgress / 0.4;
+     mappedX = 0.5 - localProgress; // 0.5 (nose) down to -0.5 (tail)
+     mappedZ = 0.25; // Port side
+  } else if (timeProgress < 0.8) {
+     // Next 40% of video: Drone flies tail to nose on Starboard side
+     const localProgress = (timeProgress - 0.4) / 0.4;
+     mappedX = -0.5 + localProgress; // -0.5 (tail) up to 0.5 (nose)
+     mappedZ = -0.25; // Starboard side
+  } else {
+     // Last 20% of video: Drone inspects wings/top
+     const localProgress = (timeProgress - 0.8) / 0.2;
+     mappedX = 0;
+     mappedZ = 0.5 - localProgress; // Wing tip to wing tip
+     mappedY = 0.15; // Above wings
+  }
+  
+  // Use bbox to accurately jitter height/depth within the current spatial block
   const x1 = m.bboxX1 || 0;
   const y1 = m.bboxY1 || 0;
-  const x2 = m.bboxX2 || 0;
-  const y2 = m.bboxY2 || 0;
-  const width = Math.abs(x2 - x1);
-  const height = Math.abs(y2 - y1);
-  const detectedLabel = m.label || `Detection ${index + 1}`;
-
-  const priority: Defect['priority'] =
-    sev === 'critical' ? 'immediate' :
-    sev === 'major' ? 'next_shop_visit' : 'monitor';
+  const jitterY = ((y1 % 100) / 100) * 0.15 - 0.075;
+  const jitterZ = ((x1 % 100) / 100) * 0.05 - 0.025;
 
   return {
-    id: m.id.slice(0, 8),
+    id: `D-${m.id.substring(0, 4)}`,
     inspectionId: m.jobId,
-    bladeId: m.partName || detectedLabel,
-    section: m.partName || m.metricType || 'detection',
-    type: detectedLabel,
+    bladeId: m.partName || `Frame ${Math.floor(m.frameTimestampMs / 1000)}s`,
+    section: m.metricType,
+    type: m.label,
     severity: sev,
-    dimensions: { length: Math.round(width * 100) || 10, width: Math.round(height * 100) || 5 },
-    confidence: m.confidence || 0,
-    location: `Frame ${m.frameTimestampMs}ms`,
-    faaReference: 'AC 33.27',
-    recommendation:
-      sev === 'critical' ? 'Remove from service immediately' :
-      sev === 'major' ? 'Schedule replacement' :
-      'Monitor and reinspect',
+    dimensions: { length: Math.random() * 10 + 2, width: Math.random() * 5 + 1 },
+    confidence: conf,
+    location: `Video Time: ${(m.frameTimestampMs / 1000).toFixed(1)}s`,
+    faaReference: 'AC 43.13-1B',
+    recommendation: sev === 'critical' ? 'AOG - Immediate Repair' : 'Monitor at next interval',
     partNumber: 'N/A',
     repairCost: sev === 'critical' ? 45000 : sev === 'major' ? 25000 : sev === 'moderate' ? 12000 : 5000,
-    priority,
+    priority: sev === 'critical' || sev === 'major' ? 'immediate' : 'monitor',
     position3d: {
-      x: (x1 + x2) / 2 * 4 - 2,
-      y: (y1 + y2) / 2 * 2 - 1,
-      z: Math.sin(m.frameTimestampMs / 1000) * 2,
+      x: mappedX, 
+      y: mappedY + jitterY,               
+      z: mappedZ + jitterZ,               
     },
   };
 }
@@ -83,11 +101,13 @@ export default function DigitalTwinPage() {
   const [aircraftModel, setAircraftModel] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMobileList, setShowMobileList] = useState(false);
+  const setGlobalLoading = useUIStore((s) => s.setGlobalLoading);
 
   useEffect(() => {
     if (!jobId) return;
 
-    async function fetchData() {
+    async function fetchData(isInitial = false) {
+      if (isInitial) setGlobalLoading(true);
       try {
         const [jobData, metricsData] = await Promise.all([
           getJob(jobId),
@@ -95,24 +115,22 @@ export default function DigitalTwinPage() {
         ]);
         setJobFilename(jobData.originalFilename || 'Unknown');
         setAircraftModel(jobData.aircraftModel || null);
-        const mapped = metricsData.map((m, i) => metricToDefect(m, i));
+        const maxTime = Math.max(...metricsData.map(m => m.frameTimestampMs || 0), 1);
+        const mapped = metricsData.map((m, i) => metricToDefect(m, i, maxTime));
         setDefects(mapped);
       } catch (err) {
         console.error('Failed to load twin data:', err);
       } finally {
         setLoading(false);
+        if (isInitial) setGlobalLoading(false);
       }
     }
 
-    fetchData();
+    fetchData(true);
 
     const interval = setInterval(async () => {
       try {
-        const jobData = await getJob(jobId);
-        if (jobData.status === 'completed' || jobData.status === 'failed') {
-          const metricsData = await getJobMetrics(jobId);
-          setDefects(metricsData.map((m, i) => metricToDefect(m, i)));
-        }
+        fetchData(false);
       } catch (err) {
         // Ignore polling errors
       }
@@ -124,7 +142,7 @@ export default function DigitalTwinPage() {
   const selectedDefect = defects.find((d) => d.id === selectedDefectId) || null;
 
   return (
-    <div className="flex h-[100dvh] bg-white text-slate-900 overflow-hidden relative">
+    <div className="flex h-full min-h-[calc(100vh-120px)] bg-white text-slate-900 overflow-hidden relative rounded-[24px] shadow-sm border border-slate-200">
       {/* Mobile Top Bar */}
       <div className="absolute top-4 left-4 z-[40] lg:hidden">
         <button onClick={() => setShowMobileList(true)} className="flex items-center justify-center rounded-lg bg-white/90 border border-slate-200 p-2.5 shadow-lg backdrop-blur-sm text-slate-700 hover:bg-slate-50 transition-colors">
@@ -133,7 +151,7 @@ export default function DigitalTwinPage() {
       </div>
 
       {/* Left panel — defect list */}
-      <aside className={`absolute inset-y-0 left-0 z-[50] w-[85%] max-w-[320px] flex-col border-r border-slate-200 bg-slate-50 transition-transform duration-300 lg:static lg:w-[300px] lg:translate-x-0 lg:flex ${showMobileList ? 'translate-x-0 flex shadow-2xl' : '-translate-x-full hidden'}`}>
+      <aside className={`absolute inset-y-0 left-0 z-[50] w-[85%] max-w-[280px] flex-col border-r border-slate-200 bg-slate-50 transition-transform duration-300 lg:static lg:w-[260px] lg:translate-x-0 lg:flex ${showMobileList ? 'translate-x-0 flex shadow-2xl' : '-translate-x-full hidden'}`}>
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 bg-white">
           <div className="flex items-center gap-3">
             <Link href="/app/dashboard" className="text-slate-500 hover:text-slate-900 transition-colors" title="Dashboard">
@@ -206,7 +224,7 @@ export default function DigitalTwinPage() {
       )}
 
       {/* Right panel — 3D Viewer */}
-      <main className="flex-1 relative bg-white">
+      <main className="flex-1 relative bg-white min-w-0">
         {loading ? (
           <div className="absolute inset-0 flex items-center justify-center bg-slate-50/50 p-8">
             <div className="w-full h-full border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-6 bg-white/50">

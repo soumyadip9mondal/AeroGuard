@@ -5,7 +5,6 @@ import { useUIStore } from '@/stores/ui.store';
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { getJobs, DBJob } from '@/lib/api';
 import StatusDot from '@/components/shared/StatusDot';
-import FullscreenLoader from '@/components/shared/FullscreenLoader';
 import { Loader2 } from 'lucide-react';
 
 const predictiveData = Array.from({ length: 20 }, (_, i) => ({

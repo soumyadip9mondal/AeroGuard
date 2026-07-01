@@ -13,31 +13,14 @@ const DotLottieReact = dynamic(
 );
 
 function UniversalLoader() {
-  const { pendingRoute } = useUIStore();
-  const [show, setShow] = useState(true); // true on initial load
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { pendingRoute, globalLoading } = useUIStore();
 
-  // Initial load timer
-  useEffect(() => {
-    timerRef.current = setTimeout(() => setShow(false), 7000);
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
+  const isShowing = Boolean(pendingRoute || globalLoading);
 
-  // Route transition timer
-  useEffect(() => {
-    if (pendingRoute) {
-      setShow(true);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setShow(false), 7000);
-    }
-  }, [pendingRoute]);
-
-  if (!show) return null;
+  if (!isShowing) return null;
 
   return (
-    <div className="absolute inset-0 z-50 bg-base/80 backdrop-blur-md flex items-center justify-center">
+    <div className="absolute inset-0 z-[100] bg-base/80 backdrop-blur-md flex items-center justify-center">
       <div className="w-80 h-80 sm:w-[500px] sm:h-[500px]">
         <DotLottieReact
           src="/video/Telegram%20Message%20Transp%20Bkg.lottie"

@@ -23,6 +23,10 @@ interface UIState {
   /* Route transition hint */
   pendingRoute: string | null;
   setPendingRoute: (route: string | null) => void;
+
+  /* Global Loading Overlay */
+  globalLoading: boolean;
+  setGlobalLoading: (loading: boolean) => void;
 }
 
 export const useUIStore = create<UIState>()((set) => ({
@@ -46,6 +50,9 @@ export const useUIStore = create<UIState>()((set) => ({
 
   pendingRoute: null,
   setPendingRoute: (route) => set({ pendingRoute: route }),
+
+  globalLoading: false,
+  setGlobalLoading: (loading) => set({ globalLoading: loading }),
 }));
 
 /**

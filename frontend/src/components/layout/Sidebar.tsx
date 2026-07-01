@@ -106,7 +106,7 @@ export default function Sidebar() {
             className={cn("h-12 w-12 shrink-0 object-contain mx-auto transition-opacity duration-200", sidebarCollapsed ? "opacity-100 group-hover:opacity-0" : "opacity-100")}
           />
           <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 max-lg:max-w-[200px] max-lg:opacity-100" : "max-w-[200px] opacity-100")}>
-            <div className="text-[23px] font-bold text-[#0951B8] tracking-wide truncate">{APP_NAME}</div>
+            <div className="text-[19px] font-bold text-[#0951B8] tracking-wide truncate">{APP_NAME}</div>
           </div>
 
           {/* Desktop Toggle Button */}

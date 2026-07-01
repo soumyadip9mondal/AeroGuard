@@ -35,10 +35,10 @@ export default function PipelineProgress() {
 
   const statusIcon = (status: string) => {
     switch (status) {
-      case 'complete': return <CheckCircle2 className="h-5 w-5 text-success" />;
-      case 'running':  return <Circle className="h-5 w-5 text-transparent" />;
-      case 'error':    return <XCircle className="h-5 w-5 text-danger" />;
-      default:         return <Circle className="h-5 w-5 text-text-tertiary/40" />;
+      case 'complete': return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
+      case 'running':  return <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />;
+      case 'error':    return <XCircle className="h-5 w-5 text-red-500" />;
+      default:         return <Circle className="h-5 w-5 text-slate-300" />;
     }
   };
 
@@ -54,7 +54,7 @@ export default function PipelineProgress() {
         <p className="text-[13px] text-text-secondary">Processing your inspection file through the detection pipeline.</p>
       </div>
 
-      <div className="rounded-lg shadow-none border border-slate-500 bg-slate-400 p-4 sm:p-6">
+      <div className="rounded-xl shadow-sm border border-slate-200 bg-white p-4 sm:p-6">
         <div className="space-y-1">
           {pipelineStages.map((stage, i) => (
             <div key={stage.name}>

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, AlertOctagon, Shield, Wrench, DollarSign, Loader2 } from 'lucide-react';
-import FullscreenLoader from '@/components/shared/FullscreenLoader';
 import { useUIStore } from '@/stores/ui.store';
 import KPICard from '@/components/dashboard/KPICard';
 import DefectTrend from '@/components/dashboard/DefectTrend';
@@ -13,13 +12,15 @@ import { getJobs, DBJob } from '@/lib/api';
 
 export default function DashboardPage() {
   const setPageTitle = useUIStore((s) => s.setPageTitle);
+  const setGlobalLoading = useUIStore((s) => s.setGlobalLoading);
   useEffect(() => { setPageTitle('Dashboard'); }, [setPageTitle]);
 
   const [jobs, setJobs] = useState<DBJob[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchJobs() {
+    async function fetchJobs(isInitial = false) {
+      if (isInitial) setGlobalLoading(true);
       try {
         const data = await getJobs(1, 200);
         setJobs(data);
@@ -27,12 +28,13 @@ export default function DashboardPage() {
         console.error('Failed to load dashboard data:', err);
       } finally {
         setLoading(false);
+        if (isInitial) setGlobalLoading(false);
       }
     }
-    fetchJobs();
+    fetchJobs(true);
 
     // Poll every 5 seconds
-    const interval = setInterval(fetchJobs, 5000);
+    const interval = setInterval(() => fetchJobs(false), 5000);
     return () => clearInterval(interval);
   }, []);
 

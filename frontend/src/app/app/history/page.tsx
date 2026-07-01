@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useUIStore } from '@/stores/ui.store';
-import FullscreenLoader from '@/components/shared/FullscreenLoader';
 import { getJobs, DBJob } from '@/lib/api';
 import { Search, ChevronLeft, ChevronRight, Filter, Loader2 } from 'lucide-react';
 
@@ -26,10 +25,13 @@ export default function HistoryPage() {
   const [page, setPage] = useState(0);
   const perPage = 8;
   const setPageTitle = useUIStore((s) => s.setPageTitle);
+  const setGlobalLoading = useUIStore((s) => s.setGlobalLoading);
+
   useEffect(() => { setPageTitle('Inspection History'); }, [setPageTitle]);
 
   useEffect(() => {
-    async function fetchJobs() {
+    async function fetchJobs(isInitial = false) {
+      if (isInitial) setGlobalLoading(true);
       try {
         const data = await getJobs(1, 200);
         setJobs(data);
@@ -37,13 +39,14 @@ export default function HistoryPage() {
         console.error('Failed to load jobs:', err);
       } finally {
         setLoading(false);
+        if (isInitial) setGlobalLoading(false);
       }
     }
     
-    fetchJobs();
+    fetchJobs(true);
 
     // Poll every 5 seconds to keep status up to date
-    const interval = setInterval(fetchJobs, 5000);
+    const interval = setInterval(() => fetchJobs(false), 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -70,7 +73,7 @@ export default function HistoryPage() {
       <div className="page-enter flex flex-col lg:flex-row">
         {/* Filter sidebar */}
         {showFilters && (
-          <aside className="hidden w-[260px] shrink-0 border-r border-border-subtle bg-surface p-5 lg:block shadow-sm">
+          <aside className="hidden w-[260px] shrink-0 border-r border-border-subtle bg-surface p-5 lg:block shadow-sm rounded-l-[24px]">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[13px] font-medium text-text-primary">Filters</span>
               <button onClick={() => { setStatusFilter([]); setSearch(''); setPage(0); }} className="text-[11px] text-accent hover:text-accent-hover">Clear all</button>
@@ -129,7 +132,7 @@ export default function HistoryPage() {
 
           {loading ? (
             <>
-            <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto shadow-sm">
+            <div className="rounded-[24px] border border-border-subtle bg-surface overflow-x-auto shadow-sm">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-border-subtle">
@@ -156,7 +159,7 @@ export default function HistoryPage() {
           </>
           ) : (
             <>
-              <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto shadow-sm">
+              <div className="rounded-[24px] border border-border-subtle bg-surface overflow-x-auto shadow-sm">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-border-subtle">

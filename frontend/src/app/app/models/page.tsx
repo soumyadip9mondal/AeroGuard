@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useUIStore } from '@/stores/ui.store';
-import FullscreenLoader from '@/components/shared/FullscreenLoader';
 import { getJobs, DBJob } from '@/lib/api';
 import { Box, ArrowRight, Loader2 } from 'lucide-react';
 
