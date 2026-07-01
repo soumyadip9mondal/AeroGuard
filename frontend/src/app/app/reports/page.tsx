@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import TopBar from '@/components/layout/TopBar';
+import { useUIStore } from '@/stores/ui.store';
 import { Download, Search, FileText, Loader2 } from 'lucide-react';
 import { DBJob, getJobs, getJobMetrics } from '@/lib/api';
 import FullscreenLoader from '@/components/shared/FullscreenLoader';
@@ -22,6 +22,8 @@ export default function ReportsPage() {
   const [jobs, setJobs] = useState<DBJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('Reports', 'Generated PDF inspection reports'); }, [setPageTitle]);
 
   useEffect(() => {
     async function load() {
@@ -59,8 +61,7 @@ export default function ReportsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="Reports" subtitle="Generated PDF inspection reports" />
+    <div>
       <div className="page-enter px-3 py-4 md:p-6 space-y-5 content-max">
         <div className="relative max-w-[400px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
@@ -72,7 +73,7 @@ export default function ReportsPage() {
           />
         </div>
 
-        <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto">
+        <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto shadow-sm">
           {loading ? (
             <>
             <table className="w-full text-left">
@@ -95,7 +96,7 @@ export default function ReportsPage() {
                 ))}
               </tbody>
             </table>
-            <FullscreenLoader />
+            
             </>
           ) : filtered.length === 0 ? (
              <div className="flex flex-col items-center justify-center py-12 text-text-tertiary">

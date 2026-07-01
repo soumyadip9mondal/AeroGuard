@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, JetBrains_Mono, Playfair_Display } from 'next/font/google';
+import { Inter, JetBrains_Mono, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -9,9 +9,9 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-const googleSans = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-google-sans',
+  variable: '--font-inter',
   display: 'swap',
 });
 
@@ -38,17 +38,14 @@ export const metadata: Metadata = {
   },
 };
 
-import RouteTransitionOverlay from '@/components/layout/RouteTransitionOverlay';
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${googleSans.variable} ${jetbrainsMono.variable} ${playfair.variable}`} suppressHydrationWarning>
-      <body className="font-display bg-base text-text-primary antialiased">
-        <RouteTransitionOverlay />
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable}`} suppressHydrationWarning>
+      <body className="font-display antialiased">
         {children}
       </body>
     </html>

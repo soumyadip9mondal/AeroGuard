@@ -3,25 +3,57 @@
 import { create } from 'zustand';
 
 interface UIState {
-  sidebarExpanded: boolean;
-  commandPaletteOpen: boolean;
+  /* Mobile sidebar drawer state */
   mobileDrawerOpen: boolean;
-  pendingRoute: string | null;
-  toggleSidebar: () => void;
-  setSidebarExpanded: (expanded: boolean) => void;
-  setCommandPaletteOpen: (open: boolean) => void;
   setMobileDrawerOpen: (open: boolean) => void;
+
+  /* Desktop sidebar collapse state */
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+
+  /* Command palette */
+  commandPaletteOpen: boolean;
+  setCommandPaletteOpen: (open: boolean) => void;
+
+  /* Page title (read by TopBar in AppShell) */
+  pageTitle: string;
+  pageSubtitle: string | null;
+  setPageTitle: (title: string, subtitle?: string) => void;
+
+  /* Route transition hint */
+  pendingRoute: string | null;
   setPendingRoute: (route: string | null) => void;
 }
 
 export const useUIStore = create<UIState>()((set) => ({
-  sidebarExpanded: true,
-  commandPaletteOpen: false,
   mobileDrawerOpen: false,
-  pendingRoute: null,
-  toggleSidebar: () => set((state) => ({ sidebarExpanded: !state.sidebarExpanded })),
-  setSidebarExpanded: (expanded) => set({ sidebarExpanded: expanded }),
-  setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
   setMobileDrawerOpen: (open) => set({ mobileDrawerOpen: open }),
+
+  sidebarCollapsed: typeof window !== 'undefined' && localStorage.getItem('ag-sidebar-collapsed') === 'true',
+  setSidebarCollapsed: (collapsed) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ag-sidebar-collapsed', String(collapsed));
+    }
+    set({ sidebarCollapsed: collapsed });
+  },
+
+  commandPaletteOpen: false,
+  setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
+
+  pageTitle: '',
+  pageSubtitle: null,
+  setPageTitle: (title, subtitle) => set({ pageTitle: title, pageSubtitle: subtitle ?? null }),
+
+  pendingRoute: null,
   setPendingRoute: (route) => set({ pendingRoute: route }),
 }));
+
+/**
+ * Hook for pages to set the topbar title on mount.
+ * Usage: useSetPageTitle('Dashboard', 'Overview');
+ */
+export function useSetPageTitle(title: string, subtitle?: string) {
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  // Must be called inside useEffect in the page component
+  return { setPageTitle, title, subtitle };
+}

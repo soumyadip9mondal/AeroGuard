@@ -36,7 +36,7 @@ export default function PipelineProgress() {
   const statusIcon = (status: string) => {
     switch (status) {
       case 'complete': return <CheckCircle2 className="h-5 w-5 text-success" />;
-      case 'running':  return <Loader2 className="h-5 w-5 text-accent animate-spin" />;
+      case 'running':  return <Circle className="h-5 w-5 text-transparent" />;
       case 'error':    return <XCircle className="h-5 w-5 text-danger" />;
       default:         return <Circle className="h-5 w-5 text-text-tertiary/40" />;
     }
@@ -54,18 +54,18 @@ export default function PipelineProgress() {
         <p className="text-[13px] text-text-secondary">Processing your inspection file through the detection pipeline.</p>
       </div>
 
-      <div className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-6">
+      <div className="rounded-lg shadow-none border border-slate-500 bg-slate-400 p-4 sm:p-6">
         <div className="space-y-1">
           {pipelineStages.map((stage, i) => (
             <div key={stage.name}>
-              <div className="flex items-center gap-4 rounded-md px-3 py-2.5">
+              <div className={`pipeline-stage flex items-center gap-4 rounded-md px-3 py-2.5 ${stage.status === 'running' ? 'active' : stage.status === 'complete' ? 'complete' : ''}`}>
                 {statusIcon(stage.status)}
                 <div className="flex-1">
                   <span className={`text-[14px] font-medium ${stage.status === 'pending' ? 'text-text-tertiary' : 'text-text-primary'}`}>
                     {stage.label}
                   </span>
                   {stage.progress && (
-                    <span className="ml-3 text-[12px] font-mono text-accent">{stage.progress}</span>
+                    <span className="ml-3 text-[12px] font-mono text-blue-800">{stage.progress}</span>
                   )}
                 </div>
                 {stage.duration && (
@@ -162,7 +162,7 @@ export default function PipelineProgress() {
               )}
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href={`/app/models/${useInspectionStore.getState().jobId}`} className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors">
+                <Link href="/app/models/demo" className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors">
                   <Box className="h-3.5 w-3.5" /> View 3D Twin
                 </Link>
                 <button 

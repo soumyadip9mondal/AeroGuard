@@ -10,6 +10,8 @@ interface KPICardProps {
   format: 'number' | 'percentage' | 'currency';
   delta: number;
   icon: LucideIcon;
+  iconColor?: string;
+  shadowColor?: string;
 }
 
 function formatValue(value: number, format: string): string {
@@ -22,7 +24,7 @@ function formatValue(value: number, format: string): string {
   return value.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
-export default function KPICard({ label, value, format, delta, icon: Icon }: KPICardProps) {
+export default function KPICard({ label, value, format, delta, icon: Icon, iconColor, shadowColor }: KPICardProps) {
   const [displayValue, setDisplayValue] = useState(0);
   const frameRef = useRef<number>(0);
   const startRef = useRef<number>(0);
@@ -49,25 +51,24 @@ export default function KPICard({ label, value, format, delta, icon: Icon }: KPI
     : isPositive;
 
   return (
-    /* Responsive padding: p-3 on mobile, p-5 on sm+. Min-height for consistency */
-    <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5 min-h-[80px] transition-colors hover:border-border-default">
+    /* Responsive padding: p-4 on mobile, p-5 on sm+ */
+    <div className={`stat-card transition-all duration-300 hover:-translate-y-1 ${shadowColor || 'hover:shadow-lg'}`}>
       <div className="mb-2 sm:mb-3 flex flex-nowrap items-center justify-between gap-2">
         <span
-          className="text-text-tertiary truncate"
-          style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}
+          className="stat-label truncate"
           title={label}
         >
           {label}
         </span>
-        <Icon className="h-4 w-4 shrink-0 text-text-tertiary" />
+        <Icon className={`h-4 w-4 shrink-0 ${iconColor || 'text-text-tertiary'}`} />
       </div>
 
-      {/* Responsive value font: 22px on mobile, 28px on sm+ */}
-      <div className="mb-1.5 sm:mb-2 text-[22px] sm:text-[28px] font-medium leading-none tracking-tight text-text-primary" style={{ fontVariantNumeric: 'tabular-nums' }}>
+      {/* Responsive value font */}
+      <div className="stat-value mb-1.5 sm:mb-2" style={{ fontVariantNumeric: 'tabular-nums' }}>
         {formatValue(displayValue, format)}
       </div>
 
-      <div className="flex items-center gap-1 text-[12px] sm:text-[13px] whitespace-nowrap overflow-hidden" style={{ color: deltaIsGood ? '#16A34A' : '#DC2626' }}>
+      <div className="stat-delta flex items-center gap-1 whitespace-nowrap overflow-hidden" style={{ color: deltaIsGood ? 'var(--color-success)' : 'var(--color-danger)' }}>
         {isPositive ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
         <span>{Math.abs(delta).toFixed(1)}% vs last week</span>
       </div>

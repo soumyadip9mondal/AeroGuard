@@ -39,7 +39,7 @@ export default function RecentInspections() {
   const totalPages = Math.ceil(jobs.length / perPage);
 
   return (
-    <div className="rounded-lg border border-border-subtle bg-surface">
+    <div className="card-elevated">
       <div className="flex items-center justify-between border-b border-border-subtle px-3 sm:px-5 py-3">
         <h3 className="text-[15px] font-medium text-text-primary">Recent Inspections</h3>
         <Link href="/app/history" className="text-[12px] text-accent hover:text-accent-hover transition-colors">
@@ -51,10 +51,10 @@ export default function RecentInspections() {
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-border-subtle">
-              {['Job ID', 'File', 'Created', 'Defects', 'Status'].map((h) => (
+              {['ID', 'File / Details', 'Detections', 'Status', ''].map((h) => (
                 <th
                   key={h}
-                  className="px-3 sm:px-5 py-2.5 text-text-tertiary whitespace-nowrap"
+                  className="px-3 sm:px-4 py-2 sm:py-2.5 text-text-tertiary whitespace-nowrap"
                   style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}
                 >
                   {h}

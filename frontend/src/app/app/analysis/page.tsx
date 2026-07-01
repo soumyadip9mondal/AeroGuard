@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import TopBar from '@/components/layout/TopBar';
+import { useUIStore } from '@/stores/ui.store';
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { getJobs, DBJob } from '@/lib/api';
 import StatusDot from '@/components/shared/StatusDot';
@@ -80,6 +80,8 @@ export default function AnalysisPage() {
   const [jobs, setJobs] = useState<DBJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('Analysis', 'Defect trends, predictions, and fleet health monitoring'); }, [setPageTitle]);
 
   useEffect(() => {
     async function fetchJobs() {
@@ -101,10 +103,9 @@ export default function AnalysisPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-base">
-        <TopBar title="Analysis" subtitle="Defect trends, predictions, and fleet health monitoring" />
+      <div>
         <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
-          <div className="rounded-lg border border-border-subtle bg-surface p-5">
+          <div className="rounded-lg border border-border-subtle bg-surface p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div className="skeleton h-5 w-32" />
               <div className="skeleton h-8 w-24" />
@@ -112,15 +113,15 @@ export default function AnalysisPage() {
             <div className="skeleton h-[320px] w-full" />
           </div>
           <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-lg border border-border-subtle bg-surface p-5">
+            <div className="rounded-lg border border-border-subtle bg-surface p-5 shadow-sm">
               <div className="skeleton h-5 w-48 mb-4" />
               <div className="skeleton h-[280px] w-full" />
             </div>
-            <div className="rounded-lg border border-border-subtle bg-surface p-5">
+            <div className="rounded-lg border border-border-subtle bg-surface p-5 shadow-sm">
               <div className="skeleton h-5 w-32 mb-4" />
               <div className="grid gap-3 sm:grid-cols-2">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="rounded-md border border-border-subtle bg-elevated p-3">
+                  <div key={i} className="rounded-md border border-border-subtle bg-elevated p-3 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
                       <div className="skeleton h-4 w-20" />
                       <div className="skeleton h-3 w-3 rounded-full" />
@@ -137,17 +138,16 @@ export default function AnalysisPage() {
             </div>
           </div>
         </div>
-        <FullscreenLoader />
+        
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="Analysis" subtitle="Defect trends, predictions, and fleet health monitoring" />
+    <div>
       <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
         {/* Defect Trends — full width */}
-        <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
+        <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[15px] font-medium text-text-primary">Defect Trends</h3>
             <div className="flex gap-1 rounded-md border border-border-subtle p-0.5">
@@ -173,7 +173,7 @@ export default function AnalysisPage() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Predictive Maintenance */}
-          <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
+          <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5 shadow-sm">
             <h3 className="mb-4 text-[15px] font-medium text-text-primary">Predictive Failure Probability</h3>
             <ResponsiveContainer width="100%" height={250}>
               <AreaChart data={predictiveData}>
@@ -191,7 +191,7 @@ export default function AnalysisPage() {
           </div>
 
           {/* Fleet Health Grid */}
-          <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
+          <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5 shadow-sm">
             <h3 className="mb-4 text-[15px] font-medium text-text-primary">Fleet Health Grid</h3>
             <div className="grid gap-3 sm:grid-cols-2">
               {fleetData.length === 0 ? (
@@ -200,7 +200,7 @@ export default function AnalysisPage() {
                 </div>
               ) : (
                 fleetData.map((a) => (
-                  <div key={a.aircraft} className="rounded-md border border-border-subtle bg-elevated p-3">
+                  <div key={a.aircraft} className="rounded-md border border-border-subtle bg-elevated p-3 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[13px] font-medium text-text-primary">{a.aircraft}</span>
                       <StatusDot status={a.healthScore >= 95 ? 'complete' : a.healthScore >= 90 ? 'in_progress' : 'failed'} />

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import TopBar from '@/components/layout/TopBar';
+import { useUIStore } from '@/stores/ui.store';
 import FullscreenLoader from '@/components/shared/FullscreenLoader';
 import { getJobs, DBJob } from '@/lib/api';
 import { Box, ArrowRight, Loader2 } from 'lucide-react';
@@ -10,6 +10,8 @@ import { Box, ArrowRight, Loader2 } from 'lucide-react';
 export default function ModelsIndexPage() {
   const [jobs, setJobs] = useState<DBJob[]>([]);
   const [loading, setLoading] = useState(true);
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('3D Digital Twins', 'View inspection models'); }, [setPageTitle]);
 
   useEffect(() => {
     async function fetchJobs() {
@@ -27,25 +29,24 @@ export default function ModelsIndexPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="3D Digital Twins" subtitle="View inspection models" />
+    <div>
       <div className="page-enter p-6 max-w-[960px] mx-auto">
         {loading ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="rounded-lg border border-border-subtle bg-surface p-5">
+                <div key={i} className="rounded-lg border border-border-subtle bg-surface p-5 shadow-sm">
                   <div className="skeleton h-28 w-full rounded-md mb-4" />
                   <div className="skeleton h-4 w-32 mb-2" />
                   <div className="skeleton h-3 w-20" />
                 </div>
               ))}
             </div>
-            <FullscreenLoader />
+            
           </>
         ) : jobs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="rounded-full bg-surface p-5 border border-border-subtle mb-5">
+            <div className="rounded-full bg-surface p-5 border border-border-subtle mb-5 shadow-sm">
               <Box className="h-8 w-8 text-text-tertiary" />
             </div>
             <h2 className="text-[18px] font-medium text-text-primary mb-2">No 3D Models Yet</h2>
@@ -68,7 +69,7 @@ export default function ModelsIndexPage() {
                 <Link
                   key={job.id}
                   href={`/app/models/${job.id}`}
-                  className="group rounded-lg border border-border-subtle bg-surface p-5 transition-all hover:border-border-default hover:bg-elevated"
+                  className="group rounded-lg border border-border-subtle bg-surface p-5 transition-all hover:border-border-default hover:bg-elevated shadow-sm"
                 >
                   <div className="flex h-28 items-center justify-center rounded-md bg-base border border-border-subtle mb-4">
                     <Box className="h-10 w-10 text-text-tertiary group-hover:text-accent transition-colors" />

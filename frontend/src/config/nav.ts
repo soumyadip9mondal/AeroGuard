@@ -5,7 +5,7 @@ import {
   History,
   Box,
   MessageSquare,
-  Package,
+  Archive,
   FileText,
   Settings,
   type LucideIcon,
@@ -41,7 +41,7 @@ export const navigation: NavGroup[] = [
   {
     label: 'Manage',
     items: [
-      { label: 'Inventory', href: '/app/inventory', icon: Package },
+      { label: 'Inventory', href: '/app/inventory', icon: Archive },
       { label: 'Reports', href: '/app/reports', icon: FileText },
     ],
   },

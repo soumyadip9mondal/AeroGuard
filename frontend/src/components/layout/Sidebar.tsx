@@ -3,8 +3,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { PlusCircle, ChevronLeft, ChevronRight, LogOut, Search, X } from 'lucide-react';
+import { PlusCircle, X, LogOut, PanelLeft, PanelLeftOpen } from 'lucide-react';
 import { navigation } from '@/config/nav';
 import { APP_NAME, ORG_NAME } from '@/config/constants';
 import { useUIStore } from '@/stores/ui.store';
@@ -12,7 +11,7 @@ import { cn } from '@/lib/utils';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { sidebarExpanded, toggleSidebar, setSidebarExpanded, setCommandPaletteOpen, pendingRoute, setPendingRoute } = useUIStore();
+  const { mobileDrawerOpen, setMobileDrawerOpen, pendingRoute, setPendingRoute, sidebarCollapsed, setSidebarCollapsed } = useUIStore();
   const sidebarRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number | null>(null);
   const touchCurrentX = useRef<number | null>(null);
@@ -21,16 +20,16 @@ export default function Sidebar() {
     setPendingRoute(null);
   }, [pathname, setPendingRoute]);
 
-  // Close sidebar on Escape key (mobile)
+  // Close drawer on Escape key (mobile)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && sidebarExpanded && window.innerWidth < 1024) {
-        setSidebarExpanded(false);
+      if (e.key === 'Escape' && mobileDrawerOpen && window.innerWidth < 1024) {
+        setMobileDrawerOpen(false);
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [sidebarExpanded, setSidebarExpanded]);
+  }, [mobileDrawerOpen, setMobileDrawerOpen]);
 
   // Swipe-to-close on mobile
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -54,118 +53,100 @@ export default function Sidebar() {
     const diff = touchStartX.current - touchCurrentX.current;
     // Swipe left to close (threshold 60px)
     if (diff > 60) {
-      setSidebarExpanded(false);
+      setMobileDrawerOpen(false);
     }
     touchStartX.current = null;
     touchCurrentX.current = null;
-  }, [setSidebarExpanded]);
+  }, [setMobileDrawerOpen]);
 
-  // Close sidebar on mobile when navigating
+  // Close drawer on mobile when navigating
   const handleMobileClose = useCallback(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      setSidebarExpanded(false);
+      setMobileDrawerOpen(false);
     }
-  }, [setSidebarExpanded]);
+  }, [setMobileDrawerOpen]);
 
   return (
     <>
-      {/* Mobile overlay */}
-      <AnimatePresence>
-        {sidebarExpanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px] lg:hidden"
-            onClick={() => setSidebarExpanded(false)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Mobile overlay — z-40 */}
+      {mobileDrawerOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          style={{ transition: 'opacity 200ms ease' }}
+          onClick={() => setMobileDrawerOpen(false)}
+        />
+      )}
 
+      {/* Sidebar */}
       <aside
         ref={sidebarRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         className={cn(
-          'fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-border-subtle bg-surface transition-all duration-standard ease-standard',
-          // Mobile first width
-          'w-[280px] sm:w-[320px]',
-          // Desktop width based on state
-          sidebarExpanded ? 'lg:w-[240px]' : 'lg:w-[60px]',
-          // Translate logic: mobile slides in/out, desktop always visible
-          sidebarExpanded
-            ? 'translate-x-0 shadow-lg lg:shadow-none'
-            : '-translate-x-full lg:translate-x-0'
+          /* Desktop: in-flow sidebar via .sidebar CSS class */
+          'sidebar',
+          /* Mobile: fixed drawer */
+          'max-lg:fixed max-lg:left-0 max-lg:top-0 max-lg:z-50 max-lg:h-screen max-lg:overflow-y-auto max-lg:overflow-x-hidden',
+          'max-lg:w-[280px] max-lg:sm:w-[320px] max-lg:bg-white',
+          'max-lg:transition-transform max-lg:duration-standard max-lg:ease-standard',
+          mobileDrawerOpen
+            ? 'max-lg:translate-x-0 max-lg:shadow-lg'
+            : 'max-lg:-translate-x-full',
+          /* Hide on mobile when not open (desktop always visible via .sidebar) */
+          !mobileDrawerOpen && 'max-lg:pointer-events-none'
         )}
+        data-collapsed={sidebarCollapsed}
       >
         {/* Header */}
-        <div className="flex h-[64px] items-center gap-3 border-b border-border-subtle px-[12px]">
+        <div className="group relative flex h-[56px] items-center gap-3 px-[14px] mt-4">
           <img
             src="/logo.png"
             alt="AeroGuard Logo"
-            className={cn(
-              "shrink-0 object-contain drop-shadow-[0_0_8px_rgba(37,99,235,0.4)] transition-all duration-300",
-              sidebarExpanded ? "h-11 w-11 ml-0" : "h-9 w-9 ml-0"
-            )}
+            className={cn("h-12 w-12 shrink-0 object-contain mx-auto transition-opacity duration-200", sidebarCollapsed ? "opacity-100 group-hover:opacity-0" : "opacity-100")}
           />
-          {sidebarExpanded && (
-            <div className="min-w-0 flex-1">
-              <div className="text-[16px] font-bold text-text-primary tracking-wide truncate">{APP_NAME}</div>
-              <div className="text-[11px] text-text-tertiary truncate">{ORG_NAME}</div>
+          <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 max-lg:max-w-[200px] max-lg:opacity-100" : "max-w-[200px] opacity-100")}>
+            <div className="text-[23px] font-bold text-[#0951B8] tracking-wide truncate">{APP_NAME}</div>
+          </div>
+
+          {/* Desktop Toggle Button */}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className={cn("hidden lg:flex h-8 items-center justify-center rounded-lg hover:bg-[#F3F4F6] transition-colors text-[#6B7280] hover:text-[#111827]", sidebarCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-8 opacity-100 ml-auto")}
+            aria-label="Toggle sidebar"
+          >
+            <PanelLeft className="h-5 w-5 shrink-0" />
+          </button>
+          {/* Expand button overlays the logo on hover when collapsed */}
+          <button
+            onClick={() => setSidebarCollapsed(false)}
+            className={cn(
+              "hidden lg:flex absolute top-0 left-0 h-[72px] w-full items-center justify-center transition-all duration-200 z-10",
+              sidebarCollapsed ? "opacity-0 group-hover:opacity-100 cursor-pointer" : "opacity-0 pointer-events-none"
+            )}
+            aria-label="Expand sidebar"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 transition-colors" style={{ color: '#1E3A8A' }}>
+              <PanelLeftOpen className="h-5 w-5 shrink-0" />
             </div>
-          )}
+          </button>
 
           {/* Mobile close button */}
           <button
-            onClick={() => setSidebarExpanded(false)}
-            className="ml-auto flex h-8 w-8 items-center justify-center rounded-md text-text-tertiary transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-text-primary lg:hidden"
+            onClick={() => setMobileDrawerOpen(false)}
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-lg lg:hidden"
+            style={{ color: '#1E3A8A' }}
             aria-label="Close sidebar"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* New Inspection CTA */}
-        <div className="px-3 pt-4 pb-2">
-          <Link
-            href="/app/inspection/new"
-            onClick={handleMobileClose}
-            className={cn(
-              'flex items-center justify-center gap-2 rounded-md bg-accent px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover',
-              !sidebarExpanded && 'px-0'
-            )}
-          >
-            <PlusCircle className="h-4 w-4 shrink-0" />
-            {sidebarExpanded && <span>New Inspection</span>}
-          </Link>
-        </div>
-
-        {/* Search */}
-        {sidebarExpanded && (
-          <div className="px-3 pb-2">
-            <button
-              onClick={() => setCommandPaletteOpen(true)}
-              className="flex w-full items-center gap-2 rounded-md border border-border-subtle px-3 py-1.5 text-sm text-text-tertiary transition-colors hover:border-border-default hover:text-text-secondary"
-            >
-              <Search className="h-3.5 w-3.5" />
-              <span>Search…</span>
-              <kbd className="ml-auto text-[10px] font-mono text-text-tertiary bg-base px-1.5 py-0.5 rounded">⌘K</kbd>
-            </button>
-          </div>
-        )}
-
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 py-2">
+        <nav className="nav-container">
           {navigation.map((group) => (
-            <div key={group.label} className="mb-4">
-              {sidebarExpanded && (
-                <div className="text-label-sm mb-1 px-2 text-text-tertiary" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>
-                  {group.label}
-                </div>
-              )}
-              <div className="space-y-0.5">
+            <div key={group.label} className="mb-2">
+              <div>
                 {group.items.map((item) => {
                   const isActuallyActive = pathname === item.href || pathname.startsWith(item.href + '/');
                   const isActive = pendingRoute
@@ -182,28 +163,10 @@ export default function Sidebar() {
                         }
                         handleMobileClose();
                       }}
-                      className={cn(
-                        'relative flex items-center rounded-md px-2 py-1.5 text-sm transition-colors duration-fast',
-                        isActive
-                          ? 'text-text-primary'
-                          : 'text-text-secondary hover:bg-[rgba(255,255,255,0.04)] hover:text-text-primary',
-                        !sidebarExpanded && 'justify-center px-0'
-                      )}
-                      title={!sidebarExpanded ? item.label : undefined}
+                      className={cn('nav-item', isActive && 'active')}
                     >
-                      {isActive && (
-                        <motion.div
-                          layoutId="sidebar-active-indicator"
-                          className="absolute inset-0 rounded-md bg-accent-subtle"
-                          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                        >
-                          <div className="absolute inset-y-0 left-0 w-[2px] bg-accent rounded-l-md" />
-                        </motion.div>
-                      )}
-                      <span className="relative z-10 flex items-center gap-3">
-                        <Icon className="h-4 w-4 shrink-0" />
-                        {sidebarExpanded && <span>{item.label}</span>}
-                      </span>
+                      <Icon className="h-[22px] w-[22px] shrink-0" />
+                      <span className={cn("transition-all duration-200 overflow-hidden", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 max-lg:max-w-[150px] max-lg:opacity-100" : "max-w-[150px] opacity-100")}>{item.label}</span>
                     </Link>
                   );
                 })}
@@ -213,45 +176,28 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-border-subtle p-3">
-          {sidebarExpanded ? (
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-elevated text-xs font-medium text-text-secondary">
-                JR
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-text-primary truncate">J. Rivera</div>
-                <div className="text-[11px] text-text-tertiary truncate">MRO Engineer</div>
-              </div>
-              <button className="text-text-tertiary hover:text-text-secondary transition-colors">
-                <LogOut className="h-4 w-4" />
-              </button>
+        <div className="mt-auto" style={{ borderTop: '0.5px solid rgba(30,58,138,0.15)', padding: '12px 14px' }}>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-medium mx-auto"
+              style={{ background: 'rgba(30,58,138,0.1)', color: '#1E3A8A' }}
+            >
+              JR
             </div>
-          ) : (
-            <div className="flex justify-center">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-elevated text-xs font-medium text-text-secondary">
-                JR
-              </div>
+            <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden whitespace-nowrap", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 max-lg:max-w-[200px] max-lg:opacity-100" : "max-w-[200px] opacity-100")}>
+              <div className="text-[15px] font-medium text-[#1E3A8A] truncate">J. Rivera</div>
+              <div className="text-[13px] truncate" style={{ color: 'rgba(30,58,138,0.7)' }}>MRO Engineer</div>
             </div>
-          )}
+            <button
+              className={cn("transition-all duration-200 overflow-hidden", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 lg:px-0 max-lg:max-w-[50px] max-lg:opacity-100" : "max-w-[50px] opacity-100")}
+              style={{ color: 'rgba(30,58,138,0.7)' }}
+              aria-label="Sign out"
+            >
+              <LogOut className="h-[22px] w-[22px] shrink-0" />
+            </button>
+          </div>
         </div>
       </aside>
-
-      {/* Collapse toggle — desktop only, positioned outside aside to avoid overflow issues */}
-      <button
-        onClick={toggleSidebar}
-        aria-label={sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
-        className={cn(
-          'group fixed top-[48px] z-50 hidden h-8 w-8 items-center justify-center rounded-full border border-border-subtle bg-surface shadow-sm text-text-tertiary transition-all duration-standard ease-standard hover:bg-elevated hover:text-text-primary hover:shadow-md hover:scale-110 lg:flex',
-          sidebarExpanded ? 'left-[224px]' : 'left-[44px]'
-        )}
-      >
-        {sidebarExpanded ? (
-          <ChevronLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
-        ) : (
-          <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        )}
-      </button>
     </>
   );
 }

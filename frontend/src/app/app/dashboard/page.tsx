@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, AlertOctagon, Shield, Wrench, DollarSign, Loader2 } from 'lucide-react';
-import TopBar from '@/components/layout/TopBar';
 import FullscreenLoader from '@/components/shared/FullscreenLoader';
+import { useUIStore } from '@/stores/ui.store';
 import KPICard from '@/components/dashboard/KPICard';
 import DefectTrend from '@/components/dashboard/DefectTrend';
 import FleetOverview from '@/components/dashboard/FleetOverview';
@@ -12,6 +12,9 @@ import RiskMatrix from '@/components/dashboard/RiskMatrix';
 import { getJobs, DBJob } from '@/lib/api';
 
 export default function DashboardPage() {
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('Dashboard'); }, [setPageTitle]);
+
   const [jobs, setJobs] = useState<DBJob[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -81,8 +84,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-base">
-        <TopBar title="Dashboard" />
+      <div>
         {/* Responsive page padding: tighter on mobile */}
         <div className="px-3 py-4 md:p-6 space-y-6 content-max">
           {/* KPI Row Skeleton — auto-fit grid prevents orphan cards */}
@@ -114,24 +116,23 @@ export default function DashboardPage() {
             <div className="skeleton h-full w-full" />
           </div>
         </div>
-        <FullscreenLoader />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="Dashboard" />
+    <div>
 
       {/* Responsive page padding */}
-      <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
+      <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max relative z-0">
+        
         {/* KPI Row — auto-fit grid prevents orphan cards across all breakpoints */}
-        <div className="grid gap-3 sm:gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(140px, 100%), 1fr))' }}>
-          <KPICard label="Total Inspections" value={kpiData.aircraftInspected} format="number" delta={kpiData.deltas.aircraftInspected} icon={Activity} />
-          <KPICard label="Defects Detected" value={kpiData.defectsDetected} format="number" delta={kpiData.deltas.defectsDetected} icon={AlertTriangle} />
-          <KPICard label="Inspections With Defects" value={kpiData.criticalFindings} format="number" delta={kpiData.deltas.criticalFindings} icon={AlertOctagon} />
-          <KPICard label="Completion Rate" value={kpiData.fleetHealthScore} format="percentage" delta={kpiData.deltas.fleetHealthScore} icon={Shield} />
-          <KPICard label="Processing / Queued" value={kpiData.openWorkOrders} format="number" delta={kpiData.deltas.openWorkOrders} icon={Wrench} />
+        <div className="grid gap-3 sm:gap-4 relative" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(140px, 100%), 1fr))' }}>
+          <KPICard label="Total Inspections" value={kpiData.aircraftInspected} format="number" delta={kpiData.deltas.aircraftInspected} icon={Activity} iconColor="text-blue-500" shadowColor="hover:shadow-blue-500/20" />
+          <KPICard label="Defects Detected" value={kpiData.defectsDetected} format="number" delta={kpiData.deltas.defectsDetected} icon={AlertTriangle} iconColor="text-orange-500" shadowColor="hover:shadow-orange-500/20" />
+          <KPICard label="Inspections With Defects" value={kpiData.criticalFindings} format="number" delta={kpiData.deltas.criticalFindings} icon={AlertOctagon} iconColor="text-red-500" shadowColor="hover:shadow-red-500/20" />
+          <KPICard label="Completion Rate" value={kpiData.fleetHealthScore} format="percentage" delta={kpiData.deltas.fleetHealthScore} icon={Shield} iconColor="text-emerald-500" shadowColor="hover:shadow-emerald-500/20" />
+          <KPICard label="Processing / Queued" value={kpiData.openWorkOrders} format="number" delta={kpiData.deltas.openWorkOrders} icon={Wrench} iconColor="text-purple-500" shadowColor="hover:shadow-purple-500/20" />
         </div>
 
         {/* Charts row */}

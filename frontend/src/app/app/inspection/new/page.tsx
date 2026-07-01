@@ -1,7 +1,8 @@
 'use client';
 
 import { useInspectionStore } from '@/stores/inspection.store';
-import TopBar from '@/components/layout/TopBar';
+import { useEffect } from 'react';
+import { useUIStore } from '@/stores/ui.store';
 import AircraftForm from '@/components/inspection/AircraftForm';
 import VideoUploadZone from '@/components/inspection/VideoUploadZone';
 import PipelineProgress from '@/components/inspection/PipelineProgress';
@@ -11,11 +12,12 @@ const steps = ['Aircraft Details', 'Upload Video', 'AI Pipeline'];
 
 export default function NewInspectionPage() {
   const { currentStep, setStep } = useInspectionStore();
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('New Inspection', 'Start a new AI-powered inspection'); }, [setPageTitle]);
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="New Inspection" subtitle="Start a new AI-powered inspection" />
-      <div className="page-enter mx-auto max-w-[720px] px-3 py-4 sm:px-6 sm:py-8 content-max">
+    <div>
+      <div className="page-enter mx-auto max-w-[720px] px-4 py-6 sm:px-8 sm:py-10 content-max card mt-4 mb-8" style={{ background: '#F3F4F6' }}>
         {/* Step Indicator — scrollable on narrow viewports */}
         <div className="mb-10 overflow-x-auto">
           <div className="flex items-center justify-center gap-0 min-w-max mx-auto">

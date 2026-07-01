@@ -33,7 +33,7 @@ export default function RiskMatrix({ jobs }: { jobs: DBJob[] }) {
   const maxVal = Math.max(...data.flatMap((row) => statuses.map((s) => (row as any)[s] || 0)), 1);
 
   return (
-    <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
+    <div className="card-elevated p-4 sm:p-5">
       <h3 className="mb-4 text-[15px] font-medium text-text-primary">Job Status Matrix</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-left">

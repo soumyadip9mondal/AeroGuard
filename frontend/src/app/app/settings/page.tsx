@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import TopBar from '@/components/layout/TopBar';
+import { useState, useEffect } from 'react';
+import { useUIStore } from '@/stores/ui.store';
 import { User, Building2, Link2, CreditCard, CheckCircle2, XCircle } from 'lucide-react';
 
 export default function SettingsPage() {
   const [tab, setTab] = useState<'profile' | 'org' | 'integrations' | 'billing'>('profile');
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('Settings'); }, [setPageTitle]);
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="Settings" />
+    <div>
       <div className="page-enter px-3 py-4 md:p-6 space-y-5 content-max">
         <div className="flex gap-1 border-b border-border-subtle overflow-x-auto custom-scrollbar">
           {([['profile', 'Profile', User], ['org', 'Organization', Building2], ['integrations', 'Integrations', Link2], ['billing', 'Billing', CreditCard]] as const).map(([key, label, Icon]) => (
@@ -21,7 +22,7 @@ export default function SettingsPage() {
 
         {tab === 'profile' && (
           <div className="max-w-[560px] space-y-5">
-            <div className="flex items-center gap-4 rounded-lg border border-border-subtle bg-surface p-5">
+            <div className="flex items-center gap-4 rounded-lg border border-border-subtle bg-surface p-5 shadow-sm">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-elevated text-[18px] font-medium text-text-secondary">JR</div>
               <div><div className="text-[15px] font-medium text-text-primary">J. Rivera</div><div className="text-[13px] text-text-tertiary">MRO Inspection Engineer</div></div>
             </div>
@@ -37,7 +38,7 @@ export default function SettingsPage() {
 
         {tab === 'org' && (
           <div className="max-w-[560px] space-y-5">
-            <div className="rounded-lg border border-border-subtle bg-surface p-5">
+            <div className="rounded-lg border border-border-subtle bg-surface p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div><div className="text-[15px] font-medium text-text-primary">AeroGuard Aviation</div><div className="text-[13px] text-text-tertiary">MRO Organization</div></div>
                 <span className="rounded-full bg-accent-subtle px-3 py-1 text-[11px] font-medium text-accent">Enterprise</span>
@@ -60,7 +61,7 @@ export default function SettingsPage() {
               { name: 'Cloud Storage', desc: 'Store inspection videos and reports in your cloud', connected: false, system: 'Not configured' },
               { name: 'SSO / SAML', desc: 'Single sign-on via your identity provider', connected: true, system: 'Okta' },
             ].map((i) => (
-              <div key={i.name} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border-subtle bg-surface p-4">
+              <div key={i.name} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border-subtle bg-surface p-4 shadow-sm">
                 <div className="flex items-start sm:items-center gap-3">
                   <div className="mt-0.5 sm:mt-0 shrink-0">
                     {i.connected ? <CheckCircle2 className="h-5 w-5 text-success" /> : <XCircle className="h-5 w-5 text-text-tertiary" />}
