@@ -70,6 +70,7 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
         
         plane_model = model_manager.get_plane_model()
         sahi_model = model_manager.get_sahi_model()
+        part_model = model_manager.get_part_model()
         
 
         frame_count = 0
@@ -136,12 +137,35 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
                                         float(obj_bbox[3] + y1)
                                     ]
                                     
+                                    # Stage 3: Detect Part using the chosen model (yolov8n or yolo11x)
+                                    # For demonstration, we run the part model on the defect crop or plane crop.
+                                    # Let's crop the defect area with some context and run the part model.
+                                    defect_w = obj_bbox[2] - obj_bbox[0]
+                                    defect_h = obj_bbox[3] - obj_bbox[1]
+                                    ctx_w, ctx_h = defect_w * 2, defect_h * 2
+                                    c_x1 = max(0, obj_bbox[0] - ctx_w)
+                                    c_y1 = max(0, obj_bbox[1] - ctx_h)
+                                    c_x2 = min(plane_crop.size[0], obj_bbox[2] + ctx_w)
+                                    c_y2 = min(plane_crop.size[1], obj_bbox[3] + ctx_h)
+                                    
+                                    defect_crop = plane_crop.crop((c_x1, c_y1, c_x2, c_y2))
+                                    part_results = part_model(defect_crop, verbose=False)
+                                    
+                                    part_name = "Engine Turbine" # Fallback if no parts detected
+                                    for pr in part_results:
+                                        if len(pr.boxes) > 0:
+                                            # Pick the part with highest confidence
+                                            best_part_id = int(pr.boxes[0].cls[0].item())
+                                            part_name = pr.names[best_part_id].title()
+                                            break
+                                    
                                     metric = (
                                         str(uuid.uuid4()),
                                         job_id,
                                         extracted_count * 1000, # Mock timestamp
                                         "defect",
                                         defect_label,
+                                        part_name,
                                         conf * 100,
                                         final_bbox[0], final_bbox[1], final_bbox[2], final_bbox[3],
                                         None
@@ -158,7 +182,7 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
         # 4. Insert Metrics
         if metrics:
             insert_query = """
-                INSERT INTO metrics (id, job_id, frame_timestamp_ms, metric_type, label, confidence, bbox_x1, bbox_y1, bbox_x2, bbox_y2, raw_value)
+                INSERT INTO metrics (id, job_id, frame_timestamp_ms, metric_type, label, part_name, confidence, bbox_x1, bbox_y1, bbox_x2, bbox_y2, raw_value)
                 VALUES %s
             """
             execute_values(cursor, insert_query, metrics)

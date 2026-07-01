@@ -133,8 +133,8 @@ export default function HistoryPage() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-border-subtle">
-                    {['Job ID', 'File', 'Created', 'Defects', 'Status'].map((h) => (
-                      <th key={h} className="px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
+                    {['Job ID', 'File', 'Created', 'Defects', 'Status', ''].map((h, i) => (
+                      <th key={i} className="px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -145,6 +145,7 @@ export default function HistoryPage() {
                       <td className="px-4 py-3"><div className="skeleton h-4 w-32" /></td>
                       <td className="px-4 py-3"><div className="skeleton h-4 w-24" /></td>
                       <td className="px-4 py-3"><div className="skeleton h-4 w-8" /></td>
+                      <td className="px-4 py-3"><div className="skeleton h-4 w-16" /></td>
                       <td className="px-4 py-3"><div className="skeleton h-4 w-16" /></td>
                     </tr>
                   ))}
@@ -159,8 +160,8 @@ export default function HistoryPage() {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-border-subtle">
-                      {['Job ID', 'File', 'Created', 'Defects', 'Status'].map((h) => (
-                        <th key={h} className="px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
+                      {['Job ID', 'File', 'Created', 'Defects', 'Status', ''].map((h, i) => (
+                        <th key={i} className="px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -187,6 +188,13 @@ export default function HistoryPage() {
                               <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
                               {st.label}
                             </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            {job.status === 'completed' && (
+                              <Link href={`/app/models/${job.id}`} className="text-[12px] font-medium text-accent hover:underline">
+                                View 3D Twin
+                              </Link>
+                            )}
                           </td>
                         </tr>
                       );

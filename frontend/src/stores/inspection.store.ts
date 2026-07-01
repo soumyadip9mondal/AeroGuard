@@ -185,6 +185,7 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
   },
 
   startPipeline: async () => {
+    const pipelineStartTime = Date.now();
     const { fileObject, jobId } = get();
     const stages = STAGE_DEFAULTS.map((s) => ({ ...s }));
 
@@ -314,11 +315,13 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
               stages[7].duration = '0s';
               stages[7].progress = undefined;
 
+              const totalTimeMs = Date.now() - pipelineStartTime;
+
               set({
                 isPipelineRunning: false,
                 pipelineComplete: true,
                 detections: detectionsList,
-                inferenceTime: 0,
+                inferenceTime: totalTimeMs,
                 pipelineStages: [...stages],
               });
             } catch (err: any) {

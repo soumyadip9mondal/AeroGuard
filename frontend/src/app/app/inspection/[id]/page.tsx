@@ -214,7 +214,7 @@ export default function InspectionDetailPage() {
           </div>
           <div className="flex flex-col xs:flex-row flex-wrap gap-2 w-full sm:w-auto">
             <Link
-              href="/app/models/demo"
+              href={`/app/models/${job.id}`}
               className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-[13px] font-medium text-white hover:bg-accent-hover transition-colors"
             >
               <Box className="h-3.5 w-3.5" /> View 3D Twin

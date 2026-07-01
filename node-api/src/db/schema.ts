@@ -30,6 +30,7 @@ export const metrics = pgTable('metrics', {
   frameTimestampMs: integer('frame_timestamp_ms').notNull(),
   metricType: text('metric_type').notNull(),
   label: text('label').notNull(),
+  partName: text('part_name'),
   confidence: real('confidence'),
   bboxX1: real('bbox_x1'),
   bboxY1: real('bbox_y1'),
@@ -44,3 +45,4 @@ export type Job = typeof jobs.$inferSelect;
 export type NewJob = typeof jobs.$inferInsert;
 export type Metric = typeof metrics.$inferSelect;
 export type NewMetric = typeof metrics.$inferInsert;
+

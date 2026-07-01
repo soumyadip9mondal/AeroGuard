@@ -50,8 +50,8 @@ function metricToDefect(m: DBMetric, index: number): Defect {
   return {
     id: m.id.slice(0, 8),
     inspectionId: m.jobId,
-    bladeId: detectedLabel,
-    section: m.metricType || 'detection',
+    bladeId: m.partName || detectedLabel,
+    section: m.partName || m.metricType || 'detection',
     type: detectedLabel,
     severity: sev,
     dimensions: { length: Math.round(width * 100) || 10, width: Math.round(height * 100) || 5 },
@@ -136,12 +136,17 @@ export default function DigitalTwinPage() {
       <aside className={`absolute inset-y-0 left-0 z-[50] w-[85%] max-w-[320px] flex-col border-r border-slate-200 bg-slate-50 transition-transform duration-300 lg:static lg:w-[300px] lg:translate-x-0 lg:flex ${showMobileList ? 'translate-x-0 flex shadow-2xl' : '-translate-x-full hidden'}`}>
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 bg-white">
           <div className="flex items-center gap-3">
-            <Link href="/app/dashboard" className="text-slate-500 hover:text-slate-900 transition-colors">
+            <Link href="/app/dashboard" className="text-slate-500 hover:text-slate-900 transition-colors" title="Dashboard">
               <ArrowLeft className="h-4 w-4" />
             </Link>
             <div>
               <div className="text-[14px] font-medium text-slate-900">3D Digital Twin</div>
-              <div className="text-[11px] text-slate-500 font-mono">{jobFilename} · {jobId.slice(0, 8)}</div>
+              <div className="text-[11px] text-slate-500 font-mono flex items-center gap-2">
+                {jobFilename} · {jobId.slice(0, 8)}
+                <Link href="/app/history" className="text-blue-500 hover:underline ml-1">
+                  View History
+                </Link>
+              </div>
             </div>
           </div>
           <button onClick={() => setShowMobileList(false)} className="lg:hidden text-slate-500 hover:text-slate-900 p-1">
@@ -213,18 +218,7 @@ export default function DigitalTwinPage() {
               <div className="text-slate-400 font-medium tracking-wide">Loading 3D Twin...</div>
             </div>
           </div>
-        ) : !aircraftModel || !['boeing 737', 'airbus a320'].some(m => aircraftModel.toLowerCase().includes(m)) ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-white flex-col gap-4">
-            <div className="rounded-full bg-slate-50 p-4 border border-slate-200">
-              <Box className="h-8 w-8 text-slate-400" />
-            </div>
-            <div className="text-center">
-              <h3 className="text-[16px] font-medium text-slate-800">3D Model Not Available</h3>
-              <p className="mt-1 text-[13px] text-slate-500 max-w-sm">
-                No 3D model is currently available for the aircraft model: <span className="font-medium text-slate-900">{aircraftModel || 'Unknown'}</span>. We currently support Boeing 737 and Airbus A320.
-              </p>
-            </div>
-          </div>
+
         ) : (
           <>
             <EngineViewer defects={defects} />

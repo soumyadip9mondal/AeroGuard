@@ -21,6 +21,7 @@ export interface DBMetric {
   frameTimestampMs: number;
   metricType: string;
   label: string;
+  partName?: string;
   confidence: number | null;
   bboxX1: number | null;
   bboxY1: number | null;

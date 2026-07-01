@@ -9,6 +9,7 @@ class ModelManager:
     _instance = None
     plane_model = None
     sahi_model = None
+    part_model = None
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -22,6 +23,7 @@ class ModelManager:
 
         defect_model_path = settings.YOLO_MODEL_PATH
         plane_model_path = settings.PLANE_MODEL_PATH
+        part_model_path = settings.PART_MODEL_PATH
         device = settings.DEVICE
 
         # Device fallback logic (check CUDA availability)
@@ -34,6 +36,7 @@ class ModelManager:
         # Ensure directory exists for model weights
         os.makedirs(os.path.dirname(plane_model_path) or "models", exist_ok=True)
         os.makedirs(os.path.dirname(defect_model_path) or "models", exist_ok=True)
+        os.makedirs(os.path.dirname(part_model_path) or "models", exist_ok=True)
 
         try:
             # If the plane model does not exist in the path, let's trigger ultralytics auto-download
@@ -61,6 +64,19 @@ class ModelManager:
                 device=device,
             )
             logger.info("SAHI model loaded successfully.")
+
+            # Load Part YOLO model
+            if not os.path.exists(part_model_path):
+                model_name = os.path.basename(part_model_path)
+                logger.info(f"Downloading {model_name}...")
+                _ = YOLO(model_name)
+                if os.path.exists(model_name) and model_name != part_model_path:
+                    import shutil
+                    shutil.move(model_name, part_model_path)
+                    
+            self.part_model = YOLO(part_model_path)
+            self.part_model.to(device)
+            logger.info("Part YOLO model loaded successfully.")
         except Exception as e:
             logger.error(f"Error loading model: {str(e)}")
             raise e
@@ -75,9 +91,15 @@ class ModelManager:
             self.load_model()
         return self.sahi_model
 
+    def get_part_model(self) -> YOLO:
+        if self.part_model is None:
+            self.load_model()
+        return self.part_model
+
     def unload_model(self):
         self.plane_model = None
         self.sahi_model = None
-        logger.info("YOLO plane and SAHI defect models unloaded.")
+        self.part_model = None
+        logger.info("YOLO plane, SAHI defect, and part models unloaded.")
 
 model_manager = ModelManager()
