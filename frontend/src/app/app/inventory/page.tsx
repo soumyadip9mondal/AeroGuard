@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import TopBar from '@/components/layout/TopBar';
+import { useState, useEffect } from 'react';
+import { useUIStore } from '@/stores/ui.store';
 import { Search, CheckCircle2, AlertTriangle, XCircle, Star, ExternalLink } from 'lucide-react';
 
 const parts = [
@@ -40,12 +40,13 @@ const statusBadge = (s: string) => {
 export default function InventoryPage() {
   const [tab, setTab] = useState<'inventory' | 'orders' | 'suppliers'>('inventory');
   const [search, setSearch] = useState('');
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('Inventory & Procurement'); }, [setPageTitle]);
 
   const filteredParts = parts.filter((p) => !search || p.pn.toLowerCase().includes(search.toLowerCase()) || p.desc.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="Inventory & Procurement" />
+    <div>
       <div className="page-enter px-3 py-4 md:p-6 space-y-5 content-max">
         {/* Tabs */}
         <div className="flex gap-1 border-b border-border-subtle overflow-x-auto custom-scrollbar">
@@ -76,7 +77,7 @@ export default function InventoryPage() {
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search parts..." className="w-full rounded-md border border-border-subtle bg-elevated pl-9 pr-3 py-2 text-[13px] text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent" />
             </div>
 
-            <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto">
+            <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto shadow-sm">
               <table className="w-full text-left">
                 <thead><tr className="border-b border-border-subtle">
                   {['Part #', 'Description', 'Manufacturer', 'Qty', 'Min', 'Status'].map((h) => (
@@ -101,7 +102,7 @@ export default function InventoryPage() {
         {tab === 'orders' && (
           <div className="space-y-3">
             {dummyOrders.map((o) => (
-              <div key={o.id} className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-5 hover:border-border-default transition-colors">
+              <div key={o.id} className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-5 hover:border-border-default transition-colors shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-2">
                   <div>
                     <span className="font-mono text-[14px] font-medium text-text-primary">{o.id}</span>
@@ -125,7 +126,7 @@ export default function InventoryPage() {
         {tab === 'suppliers' && (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {suppliers.map((s) => (
-              <div key={s.name} className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-5 hover:border-border-default transition-colors">
+              <div key={s.name} className="rounded-lg border border-border-subtle bg-surface p-4 sm:p-5 hover:border-border-default transition-colors shadow-sm">
                 <div className="text-[15px] font-medium text-text-primary mb-1">{s.name}</div>
                 <div className="text-[12px] text-text-tertiary mb-3">{s.location}</div>
                 <div className="space-y-1.5 text-[13px]">

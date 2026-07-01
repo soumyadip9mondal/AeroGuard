@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import TopBar from '@/components/layout/TopBar';
+import { useUIStore } from '@/stores/ui.store';
 import DefectBadge from '@/components/shared/DefectBadge';
 import SeverityIndicator from '@/components/shared/SeverityIndicator';
 import { Box, FileText, Flag, Loader2, AlertCircle } from 'lucide-react';
@@ -38,6 +38,8 @@ export default function InspectionDetailPage() {
   const [metrics, setMetrics] = useState<DBMetric[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('Inspection Detail', jobId); }, [setPageTitle, jobId]);
 
   useEffect(() => {
     if (!jobId) return;
@@ -79,8 +81,7 @@ export default function InspectionDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-base">
-        <TopBar title="Inspection Detail" subtitle={jobId} />
+      <div>
         <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 rounded-lg border border-border-subtle bg-surface p-4 sm:p-6">
             <div>
@@ -128,15 +129,13 @@ export default function InspectionDetailPage() {
             </div>
           </div>
         </div>
-        <FullscreenLoader />
       </div>
     );
   }
 
   if (error || !job) {
     return (
-      <div className="min-h-screen bg-base">
-        <TopBar title="Inspection Detail" subtitle={jobId} />
+      <div>
         <div className="flex flex-col items-center justify-center p-24">
           <AlertCircle className="h-8 w-8 text-red-500 mb-3" />
           <span className="text-[13px] text-text-secondary">{error || 'Inspection not found'}</span>
@@ -190,8 +189,7 @@ export default function InspectionDetailPage() {
   });
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="Inspection Detail" subtitle={job.originalFilename || job.id.slice(0, 8)} />
+    <div>
       <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 rounded-lg border border-border-subtle bg-surface p-4 sm:p-6">

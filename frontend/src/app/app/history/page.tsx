@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import TopBar from '@/components/layout/TopBar';
+import { useUIStore } from '@/stores/ui.store';
 import FullscreenLoader from '@/components/shared/FullscreenLoader';
 import { getJobs, DBJob } from '@/lib/api';
 import { Search, ChevronLeft, ChevronRight, Filter, Loader2 } from 'lucide-react';
@@ -25,6 +25,8 @@ export default function HistoryPage() {
   const [showFilters, setShowFilters] = useState(true);
   const [page, setPage] = useState(0);
   const perPage = 8;
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('Inspection History'); }, [setPageTitle]);
 
   useEffect(() => {
     async function fetchJobs() {
@@ -64,12 +66,11 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-base">
-      <TopBar title="Inspection History" />
+    <div>
       <div className="page-enter flex flex-col lg:flex-row">
         {/* Filter sidebar */}
         {showFilters && (
-          <aside className="hidden w-[260px] shrink-0 border-r border-border-subtle bg-surface p-5 lg:block">
+          <aside className="hidden w-[260px] shrink-0 border-r border-border-subtle bg-surface p-5 lg:block shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[13px] font-medium text-text-primary">Filters</span>
               <button onClick={() => { setStatusFilter([]); setSearch(''); setPage(0); }} className="text-[11px] text-accent hover:text-accent-hover">Clear all</button>
@@ -106,7 +107,7 @@ export default function HistoryPage() {
 
           {/* Mobile filter panel — inline collapsible */}
           {showFilters && (
-            <div className="mb-4 rounded-lg border border-border-subtle bg-surface p-4 space-y-4 lg:hidden">
+            <div className="mb-4 rounded-lg border border-border-subtle bg-surface p-4 space-y-4 lg:hidden shadow-sm">
               <div className="flex items-center justify-between">
                 <span className="text-[13px] font-medium text-text-primary">Filters</span>
                 <button onClick={() => { setStatusFilter([]); setSearch(''); setPage(0); }} className="text-[11px] text-accent hover:text-accent-hover">Clear all</button>
@@ -128,7 +129,7 @@ export default function HistoryPage() {
 
           {loading ? (
             <>
-            <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto">
+            <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto shadow-sm">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-border-subtle">
@@ -150,11 +151,11 @@ export default function HistoryPage() {
                 </tbody>
               </table>
             </div>
-            <FullscreenLoader />
+            
           </>
           ) : (
             <>
-              <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto">
+              <div className="rounded-lg border border-border-subtle bg-surface overflow-x-auto shadow-sm">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-border-subtle">

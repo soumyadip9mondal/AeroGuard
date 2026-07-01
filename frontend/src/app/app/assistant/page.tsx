@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import TopBar from '@/components/layout/TopBar';
+import { useUIStore } from '@/stores/ui.store';
 import { useAssistantStore } from '@/stores/assistant.store';
 import { Send, FileText, BookOpen, Shield, Package, Sparkles } from 'lucide-react';
 
@@ -28,6 +28,8 @@ export default function AssistantPage() {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [contextSources, setContextSources] = useState(['Inspection Reports', 'FAA Regulations']);
+  const setPageTitle = useUIStore((s) => s.setPageTitle);
+  useEffect(() => { setPageTitle('AI Assistant', 'Ask questions about inspections, fleet health, and compliance'); }, [setPageTitle]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -45,9 +47,8 @@ export default function AssistantPage() {
   const allSources = ['Inspection Reports', 'Aircraft Manuals', 'FAA Regulations', 'Inventory'];
 
   return (
-    <div className="flex h-[100dvh] flex-col xl:flex-row bg-base overflow-hidden">
+    <div className="flex h-full flex-col xl:flex-row overflow-hidden">
       <div className="flex flex-1 flex-col min-w-0 min-h-0">
-        <TopBar title="AI Assistant" subtitle="Ask questions about inspections, fleet health, and compliance" />
 
         {/* Messages */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
@@ -116,7 +117,7 @@ export default function AssistantPage() {
       </div>
 
       {/* Context panel */}
-      <aside className="hidden w-[300px] shrink-0 border-l border-border-subtle bg-surface p-5 xl:block">
+      <aside className="hidden w-[300px] shrink-0 border-l border-border-subtle bg-surface p-5 xl:block shadow-sm">
         <h3 className="mb-4 text-[13px] font-medium text-text-primary">Context Sources</h3>
         <div className="space-y-2">
           {allSources.map((src) => {

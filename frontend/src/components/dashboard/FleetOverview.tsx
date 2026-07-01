@@ -60,7 +60,7 @@ export default function FleetOverview({ jobs }: { jobs: DBJob[] }) {
   const tickFontSize = Math.min(12, Math.max(9, containerWidth * 0.03));
 
   return (
-    <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
+    <div className="card-elevated p-4 sm:p-5 h-full flex flex-col">
       <h3 className="mb-4 text-[15px] font-medium text-text-primary">File Health Overview</h3>
       {data.length === 0 ? (
         <div className="flex items-center justify-center h-[240px] sm:h-[280px] text-[13px] text-text-tertiary">

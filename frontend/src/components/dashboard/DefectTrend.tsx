@@ -50,7 +50,7 @@ export default function DefectTrend({ jobs }: { jobs: DBJob[] }) {
   const data = computeTrendData(jobs, days);
 
   return (
-    <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5">
+    <div className="card-elevated p-4 sm:p-5 h-full flex flex-col">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-[15px] font-medium text-text-primary">Defect Trends</h3>
         <div className="flex gap-1 rounded-md border border-border-subtle p-0.5">

@@ -66,7 +66,7 @@ export default function CommandPalette() {
   if (!commandPaletteOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100]">
+    <div className="fixed inset-0 z-[60]">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 animate-fade-in"

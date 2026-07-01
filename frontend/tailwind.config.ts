@@ -9,50 +9,64 @@ const config: Config = {
   theme: {
     extend: {
       screens: {
-        'xs': '390px', // iPhone 14 / 15 width — slot between default mobile and sm:640px
+        'xs': '390px',
       },
       colors: {
-        base: '#090909',
-        surface: '#111111',
-        elevated: '#171717',
-        overlay: '#1C1C1C',
-        'border-subtle': '#1F1F1F',
-        'border-default': '#2A2A2A',
-        'border-strong': '#383838',
-        'text-primary': '#FAFAFA',
-        'text-secondary': '#A1A1AA',
-        'text-tertiary': '#71717A',
+        /* ── Shell tokens (v2) ── */
+        shell: '#161b27',
+        content: '#0f1117',
+        'card-bg': '#1e2536',
+
+        /* ── Legacy (kept for non-shell pages) ── */
+        base: 'var(--bg-base)',
+        surface: 'var(--bg-surface)',
+        elevated: 'var(--bg-elevated)',
+        overlay: 'var(--bg-overlay)',
+
+        /* ── Borders ── */
+        'border-subtle': 'var(--border-subtle)',
+        'border-default': 'var(--border-default)',
+        'border-strong': 'var(--border-strong)',
+
+        /* ── Text ── */
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-tertiary': 'var(--text-tertiary)',
         'text-inverse': '#0A0A0A',
+
+        /* ── Accent ── */
         accent: {
-          DEFAULT: '#2563EB',
-          hover: '#1D4ED8',
-          subtle: 'rgba(37, 99, 235, 0.12)',
+          DEFAULT: '#3b82f6',
+          hover: '#2563eb',
+          subtle: 'rgba(59, 130, 246, 0.12)',
         },
+
+        /* ── Semantic ── */
         success: {
-          DEFAULT: '#16A34A',
-          subtle: 'rgba(22, 163, 74, 0.10)',
+          DEFAULT: '#22c55e',
+          subtle: 'rgba(34, 197, 94, 0.10)',
         },
         warning: {
-          DEFAULT: '#D97706',
-          subtle: 'rgba(217, 119, 6, 0.10)',
+          DEFAULT: '#f59e0b',
+          subtle: 'rgba(245, 158, 11, 0.10)',
         },
         danger: {
-          DEFAULT: '#DC2626',
-          subtle: 'rgba(220, 38, 38, 0.10)',
+          DEFAULT: '#ef4444',
+          subtle: 'rgba(239, 68, 68, 0.10)',
         },
         info: {
           DEFAULT: '#0EA5E9',
           subtle: 'rgba(14, 165, 233, 0.10)',
         },
         heatmap: {
-          minor: '#16A34A',
-          moderate: '#D97706',
+          minor: '#22c55e',
+          moderate: '#f59e0b',
           major: '#EA580C',
-          critical: '#DC2626',
+          critical: '#ef4444',
         },
       },
       fontFamily: {
-        display: ['var(--font-google-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['var(--font-jetbrains-mono)', 'monospace'],
         heading: ['var(--font-mileast)', 'serif'],
       },
@@ -73,6 +87,8 @@ const config: Config = {
         md: '6px',
         lg: '8px',
         xl: '12px',
+        '2xl': '16px',
+        '3xl': '20px',
       },
       boxShadow: {
         sm: '0 1px 2px rgba(0,0,0,0.4)',
