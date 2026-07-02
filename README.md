@@ -173,8 +173,13 @@ Users upload 4K borescope videos. The system handles secure, direct-to-cloud upl
 </details>
 
 <details>
-<summary><b>2. 3D Digital Twin Interactive Dashboard</b></summary>
-Displays an interactive, procedural 3D model of a jet engine. Detected defects are mapped accurately as glowing hotspots on the 3D model, colored by severity. Clicking a hotspot reveals specific dimensions and AI confidences.
+<summary><b>2. 3D Digital Twin Interactive Dashboard & Exact Projection Pipeline</b></summary>
+Displays an interactive, procedural 3D model of a jet engine. Rather than placing arbitrary markers, AeroGuard employs a mathematically precise 3-step projection architecture to map 2D bounding boxes onto the 3D mesh:
+<ul>
+  <li><b>Step 1 (NDC Conversion):</b> The AI's 2D pixel coordinates are converted into Normalized Device Coordinates (NDC).</li>
+  <li><b>Step 2 (Virtual Raycasting):</b> A <code>THREE.PerspectiveCamera</code> is dynamically instantiated to perfectly mirror the drone's spatial position and FOV at that specific video timestamp. A <code>THREE.Raycaster</code> shoots a ray through the NDC coordinates, penetrating the 3D model.</li>
+  <li><b>Step 3 (Decal Rendering):</b> We intercept the hit point and surface normal (ignoring transparent meshes like propeller blades), and dynamically render a <code>@react-three/drei</code> <code>&lt;Decal&gt;</code> that skin-wraps the exact curvature of the airplane fuselage using <code>createPortal</code>.</li>
+</ul>
 </details>
 
 <details>
