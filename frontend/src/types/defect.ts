@@ -18,4 +18,9 @@ export interface Defect {
   repairCost: number;
   priority: 'immediate' | 'next_shop_visit' | 'monitor';
   position3d: { x: number; y: number; z: number };
+  ndc?: { x: number; y: number };
+  cameraState?: {
+    position: [number, number, number];
+    lookAt: [number, number, number];
+  };
 }

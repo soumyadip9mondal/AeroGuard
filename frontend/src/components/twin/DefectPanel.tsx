@@ -1,11 +1,9 @@
 'use client';
 
 import { Defect } from '@/types/defect';
-import { generatePDFReport } from '@/lib/pdfGenerator';
-import { DBJob, DBMetric } from '@/lib/api';
 import { useTwinStore } from '@/stores/twin.store';
 import SeverityIndicator from '@/components/shared/SeverityIndicator';
-import { X, ShoppingCart, FileText, Flag } from 'lucide-react';
+import { X, ShoppingCart } from 'lucide-react';
 
 const sevLevel: Record<string, number> = { critical: 5, major: 4, moderate: 3, minor: 2 };
 
@@ -53,46 +51,6 @@ export default function DefectPanel({ defect }: { defect: Defect }) {
         <div className="border-t border-slate-200 pt-4 space-y-2">
           <button className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-[13px] font-medium text-white hover:bg-blue-700 transition-colors shadow-sm">
             <ShoppingCart className="h-3.5 w-3.5" /> Draft Parts Order
-          </button>
-          <button 
-            className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-[13px] text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-sm"
-            onClick={() => {
-              const mockJob: DBJob = {
-                id: defect.inspectionId,
-                r2ObjectKey: '',
-                originalFilename: 'Defect Report',
-                fileSizeBytes: 0,
-                status: 'completed',
-                errorMessage: null,
-                aircraftModel: '-',
-                registrationNumber: '-',
-                tailNumber: '-',
-                inspectionType: '-',
-                metadata: {},
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                completedAt: new Date().toISOString(),
-                purgedAt: null,
-                metricsCount: 1,
-              };
-              const mockMetric: DBMetric = {
-                id: defect.id,
-                jobId: defect.inspectionId,
-                frameTimestampMs: 0,
-                metricType: defect.section,
-                label: defect.type,
-                confidence: defect.confidence,
-                bboxX1: null, bboxY1: null, bboxX2: null, bboxY2: null,
-                rawValue: null,
-                createdAt: new Date().toISOString(),
-              };
-              generatePDFReport(mockJob, [mockMetric]);
-            }}
-          >
-            <FileText className="h-3.5 w-3.5" /> Download Report
-          </button>
-          <button className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-[13px] text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-sm">
-            <Flag className="h-3.5 w-3.5" /> Flag for Review
           </button>
         </div>
       </div>

@@ -13,7 +13,7 @@ import { useTwinStore } from '@/stores/twin.store';
 import { Defect, DefectSeverity, DefectType } from '@/types/defect';
 import { useUIStore } from '@/stores/ui.store';
 import { ArrowLeft, Loader2, Box, List, X } from 'lucide-react';
-
+import { useMemo } from 'react';
 const EngineViewer = dynamic(() => import('@/components/twin/EngineViewer'), {
   ssr: false,
   loading: () => (
@@ -34,39 +34,56 @@ function deriveSeverity(confidence: number | null): DefectSeverity {
 
 
 function metricToDefect(m: DBMetric, index: number, maxTime: number): Defect {
-  const conf = m.confidence !== null ? m.confidence * 100 : Math.random() * 20 + 80;
+  const conf = m.confidence !== null ? m.confidence * 100 : 80;
   const sev = deriveSeverity(conf);
   
-  // Flight path projection: Map video timeline to 3D spatial loop
+  // --- EXACT BBOX-BASED 3D POSITION MAPPING (NDC) ---
   const timeProgress = (m.frameTimestampMs || (index * 1000)) / Math.max(maxTime, 1);
-  
-  let mappedX = 0;
-  let mappedZ = 0;
-  let mappedY = 0;
+
+  // 1. Compute exact center of the AI bounding box in pixel space
+  const bx1 = m.bboxX1 ?? 0;
+  const by1 = m.bboxY1 ?? 0;
+  const bx2 = m.bboxX2 ?? 0;
+  const by2 = m.bboxY2 ?? 0;
+  const bboxCenterX = (bx1 + bx2) / 2;
+  const bboxCenterY = (by1 + by2) / 2;
+
+  const isPixelCoords = bx2 > 1;
+  const imageWidth = isPixelCoords ? Math.max(bx2, 1920) : 1;
+  const imageHeight = isPixelCoords ? Math.max(by2, 1080) : 1;
+
+  // Step 1: Calculate NDC
+  const x_ndc = (bboxCenterX / imageWidth) * 2 - 1;
+  const y_ndc = -(bboxCenterY / imageHeight) * 2 + 1;
+
+  let camPos: [number, number, number] = [0, 0, 0];
+  let camLookAt: [number, number, number] = [0, 0, 0];
 
   if (timeProgress < 0.4) {
-     // First 40% of video: Drone flies nose to tail on the Port side
-     const localProgress = timeProgress / 0.4;
-     mappedX = 0.5 - localProgress; // 0.5 (nose) down to -0.5 (tail)
-     mappedZ = 0.25; // Port side
+    // Port side
+    const localProgress = timeProgress / 0.4;
+    const x = 0.5 - localProgress;
+    camPos = [x, 0, 0.5]; // 0.5 represents a safe distance outside the bounding box
+    camLookAt = [x, 0, 0];
   } else if (timeProgress < 0.8) {
-     // Next 40% of video: Drone flies tail to nose on Starboard side
-     const localProgress = (timeProgress - 0.4) / 0.4;
-     mappedX = -0.5 + localProgress; // -0.5 (tail) up to 0.5 (nose)
-     mappedZ = -0.25; // Starboard side
+    // Starboard side
+    const localProgress = (timeProgress - 0.4) / 0.4;
+    const x = -0.5 + localProgress;
+    camPos = [x, 0, -0.5];
+    camLookAt = [x, 0, 0];
   } else {
-     // Last 20% of video: Drone inspects wings/top
-     const localProgress = (timeProgress - 0.8) / 0.2;
-     mappedX = 0;
-     mappedZ = 0.5 - localProgress; // Wing tip to wing tip
-     mappedY = 0.15; // Above wings
+    // Top
+    const localProgress = (timeProgress - 0.8) / 0.2;
+    const z = 0.5 - localProgress;
+    camPos = [0, 0.5, z];
+    camLookAt = [0, 0, z];
   }
-  
-  // Use bbox to accurately jitter height/depth within the current spatial block
-  const x1 = m.bboxX1 || 0;
-  const y1 = m.bboxY1 || 0;
-  const jitterY = ((y1 % 100) / 100) * 0.15 - 0.075;
-  const jitterZ = ((x1 % 100) / 100) * 0.05 - 0.025;
+
+  const bboxWidthPx  = Math.abs(bx2 - bx1);
+  const bboxHeightPx = Math.abs(by2 - by1);
+  const pxToMm = 15.6;
+  const dimLength = bboxWidthPx > 0 ? Math.round(bboxWidthPx * pxToMm) / 10 : 5;
+  const dimWidth  = bboxHeightPx > 0 ? Math.round(bboxHeightPx * pxToMm) / 10 : 3;
 
   return {
     id: `D-${m.id.substring(0, 4)}`,
@@ -75,7 +92,7 @@ function metricToDefect(m: DBMetric, index: number, maxTime: number): Defect {
     section: m.metricType,
     type: m.label,
     severity: sev,
-    dimensions: { length: Math.random() * 10 + 2, width: Math.random() * 5 + 1 },
+    dimensions: { length: dimLength, width: dimWidth },
     confidence: conf,
     location: `Video Time: ${(m.frameTimestampMs / 1000).toFixed(1)}s`,
     faaReference: 'AC 43.13-1B',
@@ -83,10 +100,11 @@ function metricToDefect(m: DBMetric, index: number, maxTime: number): Defect {
     partNumber: 'N/A',
     repairCost: sev === 'critical' ? 45000 : sev === 'major' ? 25000 : sev === 'moderate' ? 12000 : 5000,
     priority: sev === 'critical' || sev === 'major' ? 'immediate' : 'monitor',
-    position3d: {
-      x: mappedX, 
-      y: mappedY + jitterY,               
-      z: mappedZ + jitterZ,               
+    position3d: { x: 0, y: 0, z: 0 }, // legacy fallback
+    ndc: { x: x_ndc, y: y_ndc },
+    cameraState: {
+      position: camPos,
+      lookAt: camLookAt,
     },
   };
 }
@@ -101,6 +119,7 @@ export default function DigitalTwinPage() {
   const [aircraftModel, setAircraftModel] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMobileList, setShowMobileList] = useState(false);
+  const [validDefectIds, setValidDefectIds] = useState<string[] | null>(null);
   const setGlobalLoading = useUIStore((s) => s.setGlobalLoading);
 
   useEffect(() => {
@@ -139,7 +158,12 @@ export default function DigitalTwinPage() {
     return () => clearInterval(interval);
   }, [jobId, setGlobalLoading]);
 
-  const selectedDefect = defects.find((d) => d.id === selectedDefectId) || null;
+  const displayDefects = useMemo(() => {
+    if (!validDefectIds) return defects;
+    return defects.filter(d => validDefectIds.includes(d.id));
+  }, [defects, validDefectIds]);
+
+  const selectedDefect = displayDefects.find((d) => d.id === selectedDefectId) || null;
 
   return (
     <div className="flex h-full min-h-[calc(100vh-120px)] bg-white text-slate-900 overflow-hidden relative rounded-[24px] shadow-sm border border-slate-200">
@@ -190,9 +214,9 @@ export default function DigitalTwinPage() {
           ) : (
             <>
               <div className="px-2 py-1 text-[11px] font-medium uppercase tracking-[0.04em] text-slate-500">
-                {defects.length} Defects Found
+                {displayDefects.length} Defects Found
               </div>
-              {defects.map((d) => (
+              {displayDefects.map((d) => (
                 <button
                   key={d.id}
                   onClick={() => { setSelectedDefect(d.id); setShowMobileList(false); }}
@@ -239,8 +263,7 @@ export default function DigitalTwinPage() {
 
         ) : (
           <>
-            <EngineViewer defects={defects} />
-            <ViewerToolbar />
+            <EngineViewer defects={defects} onComputed={setValidDefectIds} />
             <HeatmapLegend />
           </>
         )}
