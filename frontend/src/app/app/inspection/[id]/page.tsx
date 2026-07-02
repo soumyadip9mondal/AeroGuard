@@ -9,7 +9,6 @@ import SeverityIndicator from '@/components/shared/SeverityIndicator';
 import { Box, FileText, Flag, Loader2, AlertCircle } from 'lucide-react';
 import { DBJob, DBMetric, getJob, getJobMetrics } from '@/lib/api';
 import { generatePDFReport } from '@/lib/pdfGenerator';
-import FullscreenLoader from '@/components/shared/FullscreenLoader';
 import { DefectSeverity } from '@/types/defect';
 
 function deriveSeverity(confidence: number | null): DefectSeverity {

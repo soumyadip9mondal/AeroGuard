@@ -137,7 +137,7 @@ export default function DigitalTwinPage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [jobId]);
+  }, [jobId, setGlobalLoading]);
 
   const selectedDefect = defects.find((d) => d.id === selectedDefectId) || null;
 
