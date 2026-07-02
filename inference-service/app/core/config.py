@@ -10,5 +10,8 @@ class Settings(BaseModel):
     DEVICE: str = os.getenv("DEVICE", "cpu")
     MAX_FILE_SIZE_MB: int = int(os.getenv("MAX_FILE_SIZE_MB", "15"))  # 15MB max
     ALLOWED_EXTENSIONS: list = ["jpg", "jpeg", "png", "webp"]
+    # Aircraft validation settings (uses COCO-pretrained YOLOv8n)
+    AIRCRAFT_YOLO_MODEL_PATH: str = os.getenv("AIRCRAFT_YOLO_MODEL_PATH", "models/yolov8n.pt")
+    AIRCRAFT_CONFIDENCE_THRESHOLD: float = float(os.getenv("AIRCRAFT_CONFIDENCE_THRESHOLD", "0.35"))
 
 settings = Settings()

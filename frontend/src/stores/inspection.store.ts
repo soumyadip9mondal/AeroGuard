@@ -28,6 +28,7 @@ interface InspectionState {
   detections: Detection[];
   inferenceTime: number;
   pipelineError: string | null;
+  isRejected: boolean;
   pipelineStages: PipelineStage[];
   isUploading: boolean;
   isPipelineRunning: boolean;
@@ -48,6 +49,7 @@ interface InspectionState {
 
   removeVideo: () => void;
   startPipeline: () => Promise<void>;
+  setInspectionData: (data: any) => void;
   reset: () => void;
 }
 
@@ -75,6 +77,7 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
   detections: [],
   inferenceTime: 0,
   pipelineError: null,
+  isRejected: false,
   pipelineStages: STAGE_DEFAULTS.map((s) => ({ ...s })),
   isUploading: false,
   isPipelineRunning: false,
@@ -90,6 +93,11 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
     jobId: null,
     pipelineError: null,
     isUploading: false,
+  }),
+
+  setInspectionData: (data: any) => set({
+    detections: data.parts ?? data.detections ?? [],
+    jobId: data.inspectionId ?? data.jobId ?? get().jobId,
   }),
 
   startUpload: async (file) => {
@@ -253,6 +261,14 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
               stages[3].status = 'running';
               stages[3].progress = 'Processing frames and running inference...';
               set({ pipelineStages: [...stages] });
+            } else if (status === 'rejected') {
+              handleCleanup();
+              set({
+                isPipelineRunning: false,
+                isRejected: true,
+                pipelineError: 'No aircraft detected. Inspection aborted.',
+                pipelineStages: [...stages],
+              });
             }
           } else if (data.type === 'progress') {
             const count = typeof data.progress === 'object' ? data.progress.frameCount : data.progress;
@@ -346,6 +362,19 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
               pipelineError: data.error || 'Job failed during execution.',
               pipelineStages: [...stages],
             });
+          } else if (data.type === 'job_rejected') {
+            handleCleanup();
+            // Mark validation stage as error, keep prior stages as-is
+            const runningIdx = stages.findIndex((s) => s.status === 'running');
+            if (runningIdx !== -1) {
+              stages[runningIdx].status = 'error';
+            }
+            set({
+              isPipelineRunning: false,
+              isRejected: true,
+              pipelineError: data.error || 'No aircraft detected. Inspection aborted.',
+              pipelineStages: [...stages],
+            });
           }
         } catch (parseErr) {
           console.error('Error parsing SSE event data:', parseErr);
@@ -388,6 +417,7 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
       detections: [],
       inferenceTime: 0,
       pipelineError: null,
+      isRejected: false,
       pipelineStages: STAGE_DEFAULTS.map((s) => ({ ...s })),
       isUploading: false,
       isPipelineRunning: false,

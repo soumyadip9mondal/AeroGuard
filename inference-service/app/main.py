@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.endpoints import router
 from app.services.model_manager import model_manager
+from app.services.aircraft_validator import aircraft_validator
 from app.core.logging import logger
 
 import os
@@ -24,19 +25,27 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Failed to load YOLO model during startup: {str(e)}")
         raise e
-        
+
+    # Load aircraft validation model (COCO-pretrained YOLOv8n)
+    try:
+        aircraft_validator.load_model()
+    except Exception as e:
+        logger.error(f"Failed to load aircraft validation model during startup: {str(e)}")
+        raise e
+
     # Start BullMQ worker in the background
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
     logger.info("Starting BullMQ background worker...")
     worker_instance = Worker("video-inspection", process, {"connection": redis_url})
-    
+
     yield
-    
-    # Shutdown: Clean up cached model reference
+
+    # Shutdown: Clean up cached model references
     logger.info("Service shutting down. Cleaning up model references and workers...")
     if worker_instance:
         await worker_instance.close()
     model_manager.unload_model()
+    aircraft_validator._model = None
 
 app = FastAPI(
     title="AeroGuard Detection Service",

@@ -10,6 +10,7 @@ import { Box, FileText, Flag, Loader2, AlertCircle } from 'lucide-react';
 import { DBJob, DBMetric, getJob, getJobMetrics } from '@/lib/api';
 import { generatePDFReport } from '@/lib/pdfGenerator';
 import { DefectSeverity } from '@/types/defect';
+import InventoryLookupPanel from '@/features/inventory/components/InventoryLookupPanel';
 
 function deriveSeverity(confidence: number | null): DefectSeverity {
   if (confidence === null) return 'minor';
@@ -159,6 +160,7 @@ export default function InspectionDetailPage() {
     completed: { label: 'Complete', color: '#16A34A' },
     processing: { label: 'Processing', color: '#2563EB' },
     failed: { label: 'Failed', color: '#DC2626' },
+    rejected: { label: 'Rejected', color: '#F59E0B' },
     pending: { label: 'Pending', color: '#71717A' },
     queued: { label: 'Queued', color: '#71717A' },
     uploaded: { label: 'Uploaded', color: '#71717A' },
@@ -318,6 +320,11 @@ export default function InspectionDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Inventory Lookup — only for completed inspections */}
+        {job.status === 'completed' && (
+          <InventoryLookupPanel inspectionId={job.id} />
+        )}
       </div>
     </div>
   );

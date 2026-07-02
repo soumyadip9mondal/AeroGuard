@@ -10,6 +10,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   completed: { label: 'Complete', color: '#16A34A' },
   processing: { label: 'Processing', color: '#2563EB' },
   failed: { label: 'Failed', color: '#DC2626' },
+  rejected: { label: 'Rejected', color: '#F59E0B' },
   pending: { label: 'Pending', color: '#71717A' },
   queued: { label: 'Queued', color: '#71717A' },
   uploaded: { label: 'Uploaded', color: '#71717A' },
@@ -87,7 +88,7 @@ export default function HistoryPage() {
             </div>
             <div className="mb-5">
               <span className="mb-2 block text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Status</span>
-              {['completed', 'processing', 'failed', 'pending', 'queued'].map((s) => (
+              {['completed', 'processing', 'failed', 'rejected', 'pending', 'queued'].map((s) => (
                 <label key={s} className="flex items-center gap-2 py-1 text-[13px] text-text-secondary cursor-pointer hover:text-text-primary">
                   <input type="checkbox" checked={statusFilter.includes(s)} onChange={() => { toggle(statusFilter, s, setStatusFilter); setPage(0); }} className="h-3.5 w-3.5 rounded border-border-default bg-elevated accent-accent" />
                   <span>{statusConfig[s]?.label}</span>

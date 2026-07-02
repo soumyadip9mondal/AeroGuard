@@ -1,11 +1,16 @@
-import { type LucideIcon } from 'lucide-react';
+import React from 'react';
 
-export default function EmptyState({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <Icon className="mb-4 h-10 w-10 text-text-tertiary/40" />
-      <h3 className="mb-1 text-[16px] font-medium text-text-secondary">{title}</h3>
-      <p className="max-w-[320px] text-[13px] text-text-tertiary">{description}</p>
-    </div>
-  );
+interface EmptyStateProps {
+  title?: string;
+  description?: string;
+  message?: string;
 }
+
+const EmptyState: React.FC<EmptyStateProps> = ({ title, description, message }) => (
+  <div className="rounded-lg border border-border-subtle bg-surface p-8 text-center">
+    <h3 className="text-sm font-medium text-text-primary">{title || message || 'No data found'}</h3>
+    {description && <p className="mt-1 text-xs text-text-secondary">{description}</p>}
+  </div>
+);
+
+export default EmptyState;

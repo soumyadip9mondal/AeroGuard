@@ -4,14 +4,28 @@ export type OrderStatus = 'pending' | 'approved' | 'shipped' | 'delivered' | 'ca
 export interface Part {
   id: string;
   partNumber: string;
-  description: string;
-  manufacturer: string;
-  compatibleAircraft: string[];
-  quantity: number;
-  minThreshold: number;
-  unitCost: number;
-  category: string;
-  stockStatus: StockStatus;
+  name: string;
+  description?: string;
+  aircraftModel?: string;
+  ataChapter?: string;
+  category?: string;
+  manufacturer?: string;
+  serialNumber?: string;
+  compatibleAircraft?: string[];
+  warehouseId?: string;
+  shelfLocation?: string;
+  availableQty: number;
+  reservedQty: number;
+  minStock?: number;
+  maxStock?: number;
+  unitCost?: number;
+  leadTimeDays?: number;
+  supplierId?: string;
+  barcode?: string;
+  qrCodeUrl?: string;
+  imageUrl?: string;
+  lifecycleStatus?: string;
+  stockStatus?: StockStatus;
 }
 
 export interface Supplier {

@@ -5,6 +5,11 @@ import * as path from 'path';
 import uploadsRouter from './routes/uploads';
 import webhooksRouter from './routes/webhooks';
 import jobsRouter from './routes/jobs';
+import inventoryRouter from './routes/inventory';
+import authRouter from './routes/auth';
+import { requireAuth } from './middleware/auth';
+import { db } from './db/client';
+import { sql } from 'drizzle-orm';
 
 dotenv.config();
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
@@ -14,16 +19,15 @@ const PORT = process.env.PORT || 3001;
 
 // 1. CORS Configuration
 const allowedOrigins = [
-  'http://localhost:3000',
-  ...(process.env.CORS_ORIGINS 
-    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim()) 
-    : [])
+  ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : []),
+  ...(process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
+    : []),
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or local server-to-server)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -43,20 +47,48 @@ app.use(
   })
 );
 
-// 2. Health Endpoint (matching FastAPI status style)
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+// 2. Health Endpoint — checks PostgreSQL and Redis connectivity
+app.get('/health', async (_req, res) => {
+  const checks: Record<string, string> = {};
+
+  try {
+    await db.execute(sql`SELECT 1`);
+    checks.postgresql = 'ok';
+  } catch {
+    checks.postgresql = 'error';
+  }
+
+  try {
+    const { redisConnection } = await import('./lib/redis');
+    if (redisConnection.status === 'ready') {
+      checks.redis = 'ok';
+    } else {
+      checks.redis = 'not_ready';
+    }
+  } catch {
+    checks.redis = 'error';
+  }
+
+  const allOk = Object.values(checks).every((v) => v === 'ok');
+  res.status(allOk ? 200 : 503).json({
+    status: allOk ? 'ok' : 'degraded',
+    checks,
+  });
 });
 
-// Route to serve test_video.mp4 for E2E simulation/automation
-app.get('/test_video.mp4', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../../test_video.mp4'));
-});
+// Route to serve test_video.mp4 for E2E simulation/automation (dev only)
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/test_video.mp4', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../../test_video.mp4'));
+  });
+}
 
 // 3. API Routes
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/uploads', uploadsRouter);
 app.use('/api/v1/webhooks', webhooksRouter);
 app.use('/api/v1/jobs', jobsRouter);
+app.use('/api/v1/inventory', requireAuth, inventoryRouter);
 
 // Start Server
 app.listen(PORT, () => {

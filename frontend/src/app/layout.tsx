@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Playfair_Display } from 'next/font/google';
 import './globals.css';
+import Providers from './providers';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -46,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="font-display antialiased">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

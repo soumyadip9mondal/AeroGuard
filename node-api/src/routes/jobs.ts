@@ -175,6 +175,14 @@ router.get('/:jobId/stream', async (req: Request, res: Response) => {
       return;
     }
 
+    // Handle rejected jobs immediately on reload
+    if (initialJob.status === 'rejected') {
+      sendEvent('status_update', { status: 'rejected' });
+      sendEvent('job_rejected', { error: initialJob.errorMessage || 'No aircraft detected. Inspection aborted.' });
+      res.end();
+      return;
+    }
+
     // Handle failed jobs immediately on reload
     if (initialJob.status === 'failed') {
       sendEvent('status_update', { status: 'failed' });
@@ -218,8 +226,15 @@ router.get('/:jobId/stream', async (req: Request, res: Response) => {
     const onFailed = ({ jobId: failedId, failedReason }: { jobId: string; failedReason: string }) => {
       console.log(`[QueueEvents] failed event: ${failedId}. Reason: ${failedReason}`);
       if (failedId === jobId) {
-        sendEvent('status_update', { status: 'failed' });
-        sendEvent('job_failed', { error: failedReason || 'Job execution failed.' });
+        // Check if the job was rejected (aircraft validation failed)
+        const isRejected = failedReason && failedReason.includes('No aircraft detected');
+        if (isRejected) {
+          sendEvent('status_update', { status: 'rejected' });
+          sendEvent('job_rejected', { error: failedReason || 'No aircraft detected. Inspection aborted.' });
+        } else {
+          sendEvent('status_update', { status: 'failed' });
+          sendEvent('job_failed', { error: failedReason || 'Job execution failed.' });
+        }
         cleanup();
         res.end();
       }

@@ -1,6 +1,6 @@
 import { DefectSeverity } from './defect';
 
-export type InspectionStatus = 'pending' | 'in_progress' | 'complete' | 'failed';
+export type InspectionStatus = 'pending' | 'in_progress' | 'complete' | 'failed' | 'rejected';
 export type InspectionType = 'engine_borescope' | 'airframe' | 'landing_gear' | 'full_inspection';
 export type PipelineStageStatus = 'pending' | 'running' | 'complete' | 'error';
 export type PipelineStageName =

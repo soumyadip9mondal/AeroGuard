@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, Circle, Loader2, XCircle, FileText, Flag, Box, PlayCircle, ShieldCheck, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, Circle, Loader2, XCircle, FileText, Flag, Box, PlayCircle, ShieldCheck, ShieldAlert, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { generatePDFReport } from '@/lib/pdfGenerator';
 import { DBJob, DBMetric } from '@/lib/api';
 import { useInspectionStore } from '@/stores/inspection.store';
@@ -24,6 +24,7 @@ export default function PipelineProgress() {
     detections,
     inferenceTime,
     pipelineError,
+    isRejected,
     setStep
   } = useInspectionStore();
 
@@ -81,13 +82,33 @@ export default function PipelineProgress() {
       </div>
 
       {/* Error State Summary */}
-      {pipelineError && (
+      {pipelineError && !isRejected && (
         <div className="animate-slide-up rounded-lg border border-danger/30 bg-danger-subtle p-5">
           <div className="flex items-start gap-3">
             <XCircle className="mt-0.5 h-5 w-5 text-danger shrink-0" />
             <div className="flex-1">
               <h3 className="text-[15px] font-medium text-text-primary mb-1">Pipeline Failed</h3>
               <p className="text-[13px] text-text-secondary mb-4">{pipelineError}</p>
+              <button
+                onClick={() => setStep(2)}
+                className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" /> Back to Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rejected State — No Aircraft Detected */}
+      {isRejected && (
+        <div className="animate-slide-up rounded-lg border border-warning/30 bg-warning-subtle p-5">
+          <div className="flex items-start gap-3">
+            <ShieldAlert className="mt-0.5 h-5 w-5 text-warning shrink-0" />
+            <div className="flex-1">
+              <h3 className="text-[15px] font-medium text-text-primary mb-1">Inspection Rejected</h3>
+              <p className="text-[13px] text-text-secondary mb-1">{pipelineError || 'No aircraft detected. Inspection aborted.'}</p>
+              <p className="text-[12px] text-text-tertiary mb-4">Only aircraft videos are accepted for inspection. Please upload a video containing an aircraft.</p>
               <button
                 onClick={() => setStep(2)}
                 className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors"

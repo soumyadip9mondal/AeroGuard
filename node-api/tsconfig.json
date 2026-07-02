@@ -12,7 +12,11 @@
   "exclude": [
     "src/verify-pipeline-e2e.ts",
     "src/test-e2e-pipeline.ts",
-    "src/test-full-upload.ts"
+    "src/test-full-upload.ts",
+    "src/test-inventory.ts",
+    "src/test-api.ts",
+    "src/verify-db.ts",
+    "src/seed-test-data.ts"
   ],
   "include": [
     "src/**/*"
