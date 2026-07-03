@@ -41,7 +41,7 @@ function UnifiedAuthPage() {  const router = useRouter();
     if (initialMode && !isSignUp) {
       setIsSignUp(true);
     }
-  }, [initialMode]);
+  }, [initialMode, isSignUp]);
 
   // Validation functions
   const validateEmail = (email: string) => {
@@ -500,7 +500,7 @@ function UnifiedAuthPage() {  const router = useRouter();
               {/* Mobile toggle link */}
               <div className="mt-4 text-center md:hidden">
                 <button type="button" onClick={() => togglePanel(true)} className="text-sm text-gray-500 hover:text-gray-900">
-                  Don't have an account? <span className="text-[var(--auth-primary)] font-medium">Sign Up</span>
+                  Don&apos;t have an account? <span className="text-[var(--auth-primary)] font-medium">Sign Up</span>
                 </button>
               </div>
             </form>
