@@ -1,6 +1,7 @@
 import React from 'react';
 import { useInventoryStore } from '../store/inventoryStore';
 import { useQuery } from '@tanstack/react-query';
+import { inventoryFetch } from '../lib/inventoryFetch';
 import {
   Dialog,
   DialogPopup,
@@ -35,7 +36,7 @@ const PartHistoryModal: React.FC = () => {
   const { data: history, isLoading } = useQuery<Transaction[]>({
     queryKey: ['partHistory', selectedPartId],
     queryFn: async () => {
-      const res = await fetch(`/api/v1/inventory/parts/${selectedPartId}/history`);
+      const res = await inventoryFetch(`/api/v1/inventory/parts/${selectedPartId}/history`);
       if (!res.ok) throw new Error('Failed to fetch history');
       return res.json();
     },

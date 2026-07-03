@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useInventoryStore } from '../store/inventoryStore';
+import { inventoryFetch } from '../lib/inventoryFetch';
 
 const fetchOptions = async (url: string) => {
-  const res = await fetch(url);
+  const res = await inventoryFetch(url);
   if (!res.ok) throw new Error('Failed to fetch options');
   return res.json();
 };
