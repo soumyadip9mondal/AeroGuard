@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import NeuralBackground from '../components/shared/NeuralBackground';
 import { Button as NeonButton } from '@/components/ui/neon-button';
@@ -31,6 +32,7 @@ function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const setPendingRoute = useUIStore((state: any) => state.setPendingRoute);
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -80,16 +82,12 @@ function Nav() {
 
         {/* Desktop nav links — hidden below lg */}
         <div className="hidden lg:flex items-center gap-3">
-          <Link href="/signup" onClick={() => setPendingRoute('/signup')}>
-            <NeonButton variant="ghost" className="rounded-[16px] border border-[#CBD5E1] bg-white px-5 py-2 text-[15px] font-medium text-[#0F172A] transition-all duration-300 hover:bg-gray-50 hover:scale-105">
-              Sign up
-            </NeonButton>
-          </Link>
-          <Link href="/login" onClick={() => setPendingRoute('/login')}>
-            <NeonButton variant="solid" className="rounded-[16px] bg-[#5D5FEF] px-5 py-2 text-[15px] font-medium text-white transition-all duration-300 hover:bg-[#4B4DD9] hover:scale-105">
-              Log in
-            </NeonButton>
-          </Link>
+          <NeonButton onClick={() => { setPendingRoute('/signup'); router.push('/signup'); }} variant="ghost" className="rounded-[16px] border border-[#CBD5E1] bg-white px-5 py-2 text-[15px] font-medium text-[#0F172A] transition-all duration-300 hover:bg-gray-50 hover:scale-105">
+            Sign up
+          </NeonButton>
+          <NeonButton onClick={() => { setPendingRoute('/login'); router.push('/login'); }} variant="solid" className="rounded-[16px] bg-[#5D5FEF] px-5 py-2 text-[15px] font-medium text-white transition-all duration-300 hover:bg-[#4B4DD9] hover:scale-105">
+            Log in
+          </NeonButton>
         </div>
 
         {/* Hamburger button — visible below lg, 44×44px touch target */}
@@ -114,28 +112,28 @@ function Nav() {
           }`}
       >
         <div className="flex flex-col gap-3 px-4 py-4">
-          <Link
-            href="/signup"
+          <NeonButton
             onClick={() => {
               setMobileOpen(false);
               setPendingRoute('/signup');
+              router.push('/signup');
             }}
+            variant="ghost"
+            className="w-full rounded-[16px] border border-[#CBD5E1] bg-white px-4 py-3.5 text-[15px] font-medium text-[#0F172A] transition-all duration-300 hover:bg-gray-50 hover:scale-[1.02]"
           >
-            <NeonButton variant="ghost" className="w-full rounded-[16px] border border-[#CBD5E1] bg-white px-4 py-3.5 text-[15px] font-medium text-[#0F172A] transition-all duration-300 hover:bg-gray-50 hover:scale-[1.02]">
-              Sign up
-            </NeonButton>
-          </Link>
-          <Link
-            href="/login"
+            Sign up
+          </NeonButton>
+          <NeonButton
             onClick={() => {
               setMobileOpen(false);
               setPendingRoute('/login');
+              router.push('/login');
             }}
+            variant="solid"
+            className="w-full rounded-[16px] bg-[#5D5FEF] px-4 py-3.5 text-[15px] font-medium text-white transition-all duration-300 hover:bg-[#4B4DD9] hover:scale-[1.02]"
           >
-            <NeonButton variant="solid" className="w-full rounded-[16px] bg-[#5D5FEF] px-4 py-3.5 text-[15px] font-medium text-white transition-all duration-300 hover:bg-[#4B4DD9] hover:scale-[1.02]">
-              Log in
-            </NeonButton>
-          </Link>
+            Log in
+          </NeonButton>
         </div>
       </div>
     </>

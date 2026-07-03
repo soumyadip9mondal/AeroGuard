@@ -36,12 +36,10 @@ function UnifiedAuthPage() {  const router = useRouter();
   const loginEmailRef = useRef<HTMLInputElement>(null);
   const signupFirstNameRef = useRef<HTMLInputElement>(null);
 
-  // Sync mode with URL gracefully
+  // Initialize state based on URL, but don't force it to revert
   useEffect(() => {
-    if (initialMode && !isSignUp) {
-      setIsSignUp(true);
-    }
-  }, [initialMode, isSignUp]);
+    setIsSignUp(searchParams?.get('mode') === 'signup');
+  }, [searchParams]);
 
   // Validation functions
   const validateEmail = (email: string) => {
@@ -97,10 +95,10 @@ function UnifiedAuthPage() {  const router = useRouter();
       if (toSignUp) {
         signupFirstNameRef.current?.focus();
         // optionally update URL without reload
-        window.history.pushState(null, '', '/login?mode=signup');
+        router.replace('/login?mode=signup', { scroll: false });
       } else {
         loginEmailRef.current?.focus();
-        window.history.pushState(null, '', '/login');
+        router.replace('/login', { scroll: false });
       }
     }, 100);
   };
