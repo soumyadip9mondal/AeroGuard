@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Part } from '@/types/inventory';
+import { inventoryFetch } from '../lib/inventoryFetch';
 
 interface UsePartsParams {
   page: number;
@@ -38,7 +39,7 @@ export const useParts = (params: UsePartsParams) => {
       if (sortField) query.append('sortField', sortField);
       if (sortOrder) query.append('sortOrder', sortOrder);
 
-      const response = await fetch(`/api/v1/inventory/parts?${query.toString()}`);
+      const response = await inventoryFetch(`/api/v1/inventory/parts?${query.toString()}`);
       if (!response.ok) {
         throw new Error('Failed to fetch parts');
       }

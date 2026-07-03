@@ -3,6 +3,7 @@ import { useInventoryLookup } from '../hooks/useInventoryLookup';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Package, ShoppingCart } from 'lucide-react';
+import { inventoryFetch } from '../lib/inventoryFetch';
 
 interface InventoryLookupPanelProps {
   inspectionId: string;
@@ -41,7 +42,7 @@ const InventoryLookupPanel: React.FC<InventoryLookupPanelProps> = ({ inspectionI
     setReservingId(partId);
     setReserveStatus((prev) => ({ ...prev, [partId]: { ok: false, msg: '' } }));
     try {
-      const res = await fetch('/api/v1/inventory/reservations', {
+      const res = await inventoryFetch('/api/v1/inventory/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ partId, quantity: qty, inspectionId }),
@@ -62,7 +63,7 @@ const InventoryLookupPanel: React.FC<InventoryLookupPanelProps> = ({ inspectionI
     setReservingId(partId);
     setReserveStatus((prev) => ({ ...prev, [partId]: { ok: false, msg: '' } }));
     try {
-      const res = await fetch('/api/v1/inventory/purchase-requests', {
+      const res = await inventoryFetch('/api/v1/inventory/purchase-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ partId, quantity: quantities[partId] || 1, notes: `Auto-created for inspection ${inspectionId.slice(0, 8)}` }),

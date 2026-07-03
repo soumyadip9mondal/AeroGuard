@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useInventoryStore } from '../store/inventoryStore';
 import { usePart } from '../hooks/usePart';
+import { inventoryFetch } from '../lib/inventoryFetch';
 import {
   Dialog,
   DialogPopup,
@@ -44,7 +45,7 @@ const ReservePartModal: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('/api/v1/inventory/reservations', {
+      const response = await inventoryFetch('/api/v1/inventory/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ partId: selectedPartId, quantity }),
