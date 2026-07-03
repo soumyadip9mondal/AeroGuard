@@ -75,15 +75,15 @@ const InventoryTable: React.FC = () => {
         <ArchiveIcon className="h-6 w-6 text-text-tertiary" />
       </div>
       <div className="text-[15px] font-medium text-text-primary mb-1">No Parts Found</div>
-      <div className="text-[13px] text-text-tertiary max-w-sm">We couldn't find any inventory matching your current filters or search query. Try adjusting them to see more results.</div>
+      <div className="text-[13px] text-text-tertiary max-w-sm">We could not find any inventory matching your current filters or search query. Try adjusting them to see more results.</div>
     </div>
   );
 
   const parts: Part[] = data.data;
 
-  const getStatusBadge = (available: number, min: number | null, reserved: number) => {
+  const getStatusBadge = (available: number, min: number | null | undefined, reserved: number) => {
     if (available === 0) return <span className="inline-flex items-center gap-1 text-[11px] font-medium text-danger bg-danger-subtle px-2 py-0.5 rounded-full"><span className="h-1.5 w-1.5 rounded-full bg-danger"></span>Out of Stock</span>;
-    if (min !== null && available < min) return <span className="inline-flex items-center gap-1 text-[11px] font-medium text-warning bg-warning-subtle px-2 py-0.5 rounded-full"><span className="h-1.5 w-1.5 rounded-full bg-warning"></span>Low Stock</span>;
+    if (min != null && available < min) return <span className="inline-flex items-center gap-1 text-[11px] font-medium text-warning bg-warning-subtle px-2 py-0.5 rounded-full"><span className="h-1.5 w-1.5 rounded-full bg-warning"></span>Low Stock</span>;
     if (reserved > 0) return <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent bg-accent-subtle px-2 py-0.5 rounded-full"><span className="h-1.5 w-1.5 rounded-full bg-accent"></span>Reserved</span>;
     return <span className="inline-flex items-center gap-1 text-[11px] font-medium text-success bg-success-subtle px-2 py-0.5 rounded-full"><span className="h-1.5 w-1.5 rounded-full bg-success"></span>In Stock</span>;
   };
@@ -135,7 +135,7 @@ const InventoryTable: React.FC = () => {
               <td className="hidden md:table-cell px-4 py-3 align-top">
                 <div className="flex flex-col items-start gap-1">
                   {getStatusBadge(part.availableQty, part.minStock, part.reservedQty)}
-                  {part.minStock !== null && part.availableQty < part.minStock && (
+                  {part.minStock != null && part.availableQty < part.minStock && (
                     <div className="text-[10px] text-accent font-medium mt-0.5">Recommended Purchase: {part.minStock - part.availableQty + 10} Units</div>
                   )}
                 </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, Eye, EyeOff, Github, Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { API_URL } from '@/lib/api';
 
 function UnifiedAuthPage() {  const router = useRouter();
   const searchParams = useSearchParams();
@@ -121,11 +122,7 @@ function UnifiedAuthPage() {  const router = useRouter();
     setLoading(true);
 
     try {
-      // =====================================================================
-      // TODO (Backend Integration): Replace block with actual login request
-      // =====================================================================
-      /*
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password: loginPassword })
@@ -134,14 +131,10 @@ function UnifiedAuthPage() {  const router = useRouter();
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Invalid credentials');
+        throw new Error(data.error || 'Invalid credentials');
       }
       
-      // Store token (e.g., localStorage.setItem('token', data.token))
-      */
-      
-      // Simulated Network Request
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      localStorage.setItem('token', data.token);
       
       // On Success
       setToast({ message: 'Welcome back! Redirecting...', type: 'success' });
