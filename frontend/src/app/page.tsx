@@ -82,10 +82,10 @@ function Nav() {
 
         {/* Desktop nav links — hidden below lg */}
         <div className="hidden lg:flex items-center gap-3">
-          <NeonButton onClick={() => { setPendingRoute('/signup'); router.push('/signup'); }} variant="ghost" className="rounded-[16px] border border-[#CBD5E1] bg-white px-5 py-2 text-[15px] font-medium text-[#0F172A] transition-all duration-300 hover:bg-gray-50 hover:scale-105">
+          <NeonButton onClick={() => { router.push('/signup'); }} variant="ghost" className="rounded-[16px] border border-[#CBD5E1] bg-white px-5 py-2 text-[15px] font-medium text-[#0F172A] transition-all duration-300 hover:bg-gray-50 hover:scale-105">
             Sign up
           </NeonButton>
-          <NeonButton onClick={() => { setPendingRoute('/login'); router.push('/login'); }} variant="solid" className="rounded-[16px] bg-[#5D5FEF] px-5 py-2 text-[15px] font-medium text-white transition-all duration-300 hover:bg-[#4B4DD9] hover:scale-105">
+          <NeonButton onClick={() => { router.push('/login'); }} variant="solid" className="rounded-[16px] bg-[#5D5FEF] px-5 py-2 text-[15px] font-medium text-white transition-all duration-300 hover:bg-[#4B4DD9] hover:scale-105">
             Log in
           </NeonButton>
         </div>
@@ -115,7 +115,6 @@ function Nav() {
           <NeonButton
             onClick={() => {
               setMobileOpen(false);
-              setPendingRoute('/signup');
               router.push('/signup');
             }}
             variant="ghost"
@@ -126,7 +125,6 @@ function Nav() {
           <NeonButton
             onClick={() => {
               setMobileOpen(false);
-              setPendingRoute('/login');
               router.push('/login');
             }}
             variant="solid"
@@ -143,6 +141,7 @@ function Nav() {
 /* ─── Hero Section ─── */
 function Hero() {
   const setPendingRoute = useUIStore((state: any) => state.setPendingRoute);
+  const [navigating, setNavigating] = useState<'trial' | 'demo' | null>(null);
 
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -224,16 +223,44 @@ function Hero() {
           >
             <Link
               href="/app/dashboard"
-              onClick={() => setPendingRoute('/app/dashboard')}
-              className="flex items-center justify-center gap-2 rounded-[12px] bg-accent px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-accent-hover shadow-md shadow-accent/20 w-full sm:w-auto"
+              onClick={() => {
+                setPendingRoute('/app/dashboard');
+                setNavigating('trial');
+              }}
+              className="flex items-center justify-center gap-2 rounded-[12px] bg-accent px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-accent-hover shadow-md shadow-accent/20 w-full sm:w-auto min-w-[160px]"
             >
-              Start Free Trial
-              <ArrowRight className="h-4 w-4" />
+              {navigating === 'trial' ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  Start Free Trial
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </Link>
-            <button className="flex items-center justify-center gap-2 rounded-[12px] border border-accent bg-white px-6 py-3 text-[15px] font-medium text-accent transition-colors hover:bg-[#DAEFFF] w-full sm:w-auto">
-              <Play className="h-4 w-4" />
-              Watch Demo
-            </button>
+            <Link
+              href="/app/dashboard"
+              onClick={() => {
+                setPendingRoute('/app/dashboard');
+                setNavigating('demo');
+              }}
+              className="flex items-center justify-center gap-2 rounded-[12px] border border-accent bg-white px-6 py-3 text-[15px] font-medium text-accent transition-colors hover:bg-[#DAEFFF] w-full sm:w-auto min-w-[160px]"
+            >
+              {navigating === 'demo' ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4" />
+                  Watch Demo
+                </>
+              )}
+            </Link>
           </motion.div>
 
           {/* Trust badges — flex-wrap so they never clip on narrow viewports */}
@@ -613,6 +640,7 @@ function Security() {
 /* ─── CTA ─── */
 function FinalCTA() {
   const setPendingRoute = useUIStore((state: any) => state.setPendingRoute);
+  const [navigating, setNavigating] = useState<'trial' | 'enterprise' | null>(null);
 
   return (
     <section className="border-t border-border-subtle py-16 sm:py-24">
@@ -628,19 +656,43 @@ function FinalCTA() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 mt-6">
           <Link
             href="/app/dashboard"
-            onClick={() => setPendingRoute('/app/dashboard')}
-            className="flex items-center justify-center gap-2 rounded-[12px] bg-accent px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-accent-hover shadow-md shadow-accent/20 w-full sm:w-auto"
+            onClick={() => {
+              setPendingRoute('/app/dashboard');
+              setNavigating('trial');
+            }}
+            className="flex items-center justify-center gap-2 rounded-[12px] bg-accent px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-accent-hover shadow-md shadow-accent/20 w-full sm:w-auto min-w-[180px]"
           >
-            Start Free Trial
-            <ArrowRight className="h-4 w-4" />
+            {navigating === 'trial' ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                Start Free Trial
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </Link>
           <Link
             href="/app/dashboard"
-            onClick={() => setPendingRoute('/app/dashboard')}
-            className="flex items-center justify-center gap-2 rounded-[12px] border border-accent bg-white px-6 py-3 text-[15px] font-medium text-accent transition-colors hover:bg-[#DAEFFF] w-full sm:w-auto"
+            onClick={() => {
+              setPendingRoute('/app/dashboard');
+              setNavigating('enterprise');
+            }}
+            className="flex items-center justify-center gap-2 rounded-[12px] border border-accent bg-white px-6 py-3 text-[15px] font-medium text-accent transition-colors hover:bg-[#DAEFFF] w-full sm:w-auto min-w-[240px]"
           >
-            Request Enterprise Demo
-            <ChevronRight className="h-4 w-4" />
+            {navigating === 'enterprise' ? (
+              <>
+                <span className="w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                Request Enterprise Demo
+                <ChevronRight className="h-4 w-4" />
+              </>
+            )}
           </Link>
         </div>
       </div>
