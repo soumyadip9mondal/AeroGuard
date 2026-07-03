@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { Mesh, MeshStandardMaterial, Color } from 'three';
 import { useInspectionStore } from '@/stores/inspection.store';
 import { useTwinStore } from '@/stores/twin.store';
@@ -45,10 +45,12 @@ export const HighlightManager = () => {
   };
 
   // Build a lookup from part name to detection
-  const detectionMap = detections.reduce((acc, d) => {
-    if (d.class_name) acc[d.class_name] = d;
-    return acc;
-  }, {} as Record<string, any>);
+  const detectionMap = useMemo(() => {
+    return detections.reduce((acc, d) => {
+      if (d.class_name) acc[d.class_name] = d;
+      return acc;
+    }, {} as Record<string, any>);
+  }, [detections]);
 
   // Apply highlights whenever highlightedParts or heatmapMode changes
   useEffect(() => {
@@ -99,7 +101,7 @@ export const HighlightManager = () => {
         }
       }
     });
-  }, [highlightedParts, heatmapMode, detections, getMesh]);
+  }, [highlightedParts, heatmapMode, detectionMap, getMesh]);
 
   // Pulse animation (non‑critical) and flash (critical)
   useFrame((state, delta) => {
@@ -118,20 +120,22 @@ export const HighlightManager = () => {
 
   // Cleanup on unmount: restore originals and dispose resources
   useEffect(() => {
+    const origMats = originalMaterials.current;
+    const highMats = highlightMaterials.current;
     return () => {
       // Restore original materials and dispose only the temporary highlight materials
-      originalMaterials.current.forEach((orig, partName) => {
+      origMats.forEach((orig, partName) => {
         const mesh = getMesh(partName) as Mesh;
         if (mesh) {
           mesh.material = orig;
         }
       });
       // Dispose any highlight materials we created
-      highlightMaterials.current.forEach((mat) => mat.dispose());
-      originalMaterials.current.clear();
-      highlightMaterials.current.clear();
+      highMats.forEach((mat) => mat.dispose());
+      origMats.clear();
+      highMats.clear();
     };
-  }, []);
+  }, [getMesh]);
 
   return null; // This component only manipulates three.js objects
 };
