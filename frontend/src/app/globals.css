@@ -193,7 +193,7 @@ body {
   border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .sidebar {
     transition: width 200ms ease;
   }
@@ -238,7 +238,7 @@ body {
 }
 
 /* Mobile: topbar loses its geometric corner radius */
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
   .topbar {
     border-radius: 0;
     padding: 0 16px;
@@ -252,7 +252,7 @@ body {
   }
 }
 
-@media (min-width: 640px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   .content {
     padding: 20px 16px;
   }
@@ -327,7 +327,7 @@ body {
 }
 
 /* ── Mobile: Disable carved cutout, use simpler active style ── */
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
 
   .nav-item.active::after {
     display: none;
@@ -863,4 +863,585 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .radar::after { animation: none; }
+}
+
+/* ═══════════════════════════════════════════
+   Landing Page Theme (Light Premium)
+   ═══════════════════════════════════════════ */
+.theme-landing {
+  --color-shell: #F2F5FA;
+  --color-content: #F2F5FA;
+  --color-card: #FFFFFF;
+  --color-text: #245C92;
+  --color-muted: #7E97B2;
+  --color-border: rgba(36, 92, 146, 0.1);
+  --color-accent: #559BD5;
+
+  --bg-base: #F2F5FA;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F2F5FA;
+  --bg-overlay: rgba(255, 255, 255, 0.8);
+
+  --text-primary: #245C92;
+  --text-secondary: #5B7A9D;
+  --text-tertiary: #7E97B2;
+  --text-inverse: #FFFFFF;
+
+  --accent: #559BD5;
+  --accent-hover: #4a8ac2;
+  --accent-subtle: #C4E1FF;
+
+  --border-subtle: rgba(36, 92, 146, 0.1);
+  --border-default: rgba(36, 92, 146, 0.15);
+  --border-strong: rgba(36, 92, 146, 0.25);
+  
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+}
+/* ═══════════════════════════════════════════
+   Dashboard Content Overrides
+   ═══════════════════════════════════════════ */
+
+.content {
+  /* ROLLBACK: background: #FFFEF7; */
+  background:
+    radial-gradient(circle at 10% 15%, rgba(147, 197, 253, 0.45) 0%, transparent 65%),
+    radial-gradient(circle at 90% 10%, rgba(196, 181, 253, 0.4) 0%, transparent 65%),
+    radial-gradient(circle at 30% 60%, rgba(167, 139, 250, 0.25) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(147, 197, 253, 0.3) 0%, transparent 60%),
+    #FFFEF7;
+  background-attachment: local;
+  --color-card: #F1EBFA;
+  --color-text: #111827;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-tertiary: #6B7280;
+
+  --bg-elevated: #F3F4F6;
+  --bg-surface: #F1EBFA;
+
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.16);
+}
+
+.content .card,
+.content .stat-card {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.6) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(200, 210, 255, 0.3) 0%, transparent 50%),
+    #F1EBFA;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  position: relative;
+  z-index: 1;
+}
+
+.content .card:hover,
+.content .stat-card:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Pipeline Stepper Animation */
+.pipeline-stage {
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+  overflow: visible;
+}
+
+.pipeline-stage.active {
+  opacity: 1;
+  position: relative;
+}
+
+.pipeline-stage.active::after {
+  content: '';
+  position: absolute;
+  left: 6px; 
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: #2563EB;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  animation: stage-pulse 1.2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6);
+}
+
+.pipeline-stage.complete {
+  opacity: 1;
+}
+
+@keyframes stage-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+/* ═══════════════════════════════════════════
+   Fullscreen Loader Animations
+   ═══════════════════════════════════════════ */
+
+/* Nav chart grid background */
+.chart-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse at 50% 45%, black 40%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, black 40%, transparent 78%);
+}
+
+/* Decorative radar */
+.radar {
+  width: 46px; 
+  height: 46px; 
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+}
+.radar::after {
+  content: "";
+  width: 100%; 
+  height: 100%; 
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(59, 130, 246, 0.55), transparent 30%);
+  animation: radar-spin 2.4s linear infinite;
+}
+@keyframes radar-spin { 
+  to { transform: rotate(360deg); } 
+}
+
+/* Flight Path SVG */
+.route-base {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 2;
+  stroke-dasharray: 2 10;
+  stroke-linecap: round;
+}
+.route-lit {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.85));
+}
+.waypoint {
+  fill: var(--color-card);
+  stroke: var(--color-muted);
+  stroke-width: 1.5;
+  transition: all 0.3s ease;
+}
+.waypoint.passed {
+  stroke: var(--color-warning);
+  fill: var(--color-warning);
+  animation: waypoint-pulse 1.5s infinite;
+}
+@keyframes waypoint-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); filter: drop-shadow(0 0 4px rgba(245,158,11,0.8)); }
+  70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); filter: drop-shadow(0 0 0 rgba(245,158,11,0)); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.plane {
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.9));
+}
+.plane path {
+  fill: #FFFFFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radar::after { animation: none; }
+}
+
+/* ═══════════════════════════════════════════
+   Landing Page Theme (Light Premium)
+   ═══════════════════════════════════════════ */
+.theme-landing {
+  --color-shell: #F2F5FA;
+  --color-content: #F2F5FA;
+  --color-card: #FFFFFF;
+  --color-text: #245C92;
+  --color-muted: #7E97B2;
+  --color-border: rgba(36, 92, 146, 0.1);
+  --color-accent: #559BD5;
+
+  --bg-base: #F2F5FA;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F2F5FA;
+  --bg-overlay: rgba(255, 255, 255, 0.8);
+
+  --text-primary: #245C92;
+  --text-secondary: #5B7A9D;
+  --text-tertiary: #7E97B2;
+  --text-inverse: #FFFFFF;
+
+  --accent: #559BD5;
+  --accent-hover: #4a8ac2;
+  --accent-subtle: #C4E1FF;
+
+  --border-subtle: rgba(36, 92, 146, 0.1);
+  --border-default: rgba(36, 92, 146, 0.15);
+  --border-strong: rgba(36, 92, 146, 0.25);
+  
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+}
+
+.landing-mesh-bg {
+  background-color: #F8FAFC;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(215, 235, 255, 0.9) 0%, transparent 55%),
+    radial-gradient(circle at 85% 20%, rgba(255, 248, 220, 0.9) 0%, transparent 55%),
+    radial-gradient(circle at 80% 85%, rgba(235, 220, 255, 0.9) 0%, transparent 55%),
+    radial-gradient(circle at 20% 80%, rgba(205, 230, 255, 0.8) 0%, transparent 55%);
+}
+
+.landing-middle-mesh-bg {
+  background-color: #ffffff;
+  background-image: 
+    radial-gradient(circle at 15% 30%, rgba(224, 242, 254, 0.9) 0%, transparent 50%),
+    radial-gradient(circle at 85% 20%, rgba(255, 251, 235, 0.9) 0%, transparent 50%),
+    radial-gradient(circle at 75% 85%, rgba(243, 232, 255, 0.9) 0%, transparent 50%),
+    radial-gradient(circle at 25% 80%, rgba(219, 234, 254, 0.7) 0%, transparent 50%);
+}
+
+@keyframes wave-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.landing-footer-mesh-bg {
+  background-image: 
+    radial-gradient(circle at 10% 90%, rgba(161, 196, 253, 0.5) 0%, transparent 70%), /* Blue */
+    radial-gradient(circle at 90% 90%, rgba(202, 200, 249, 0.6) 0%, transparent 70%), /* Lavender */
+    radial-gradient(circle at 50% 50%, rgba(252, 246, 227, 0.5) 0%, transparent 70%); /* Cream */
+}
+
+/* ═══════════════════════════════════════════
+   Auth Page - Sliding Panel
+   ═══════════════════════════════════════════ */
+
+/* Variables specifically for Auth Page */
+:root {
+  --auth-primary: #3b82f6; /* Vibrant Blue */
+  --auth-secondary: #93c5fd; /* Light Blue */
+  --auth-bg: #f8f9fc;
+  --auth-text: #1f2937;
+  --auth-error: #ef4444;
+  --auth-success: #10b981;
+}
+
+.auth-page-bg {
+  background-color: #cac8f9; /* Lavender base */
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(161, 196, 253, 0.7) 0%, transparent 60%), /* Blue */
+    radial-gradient(circle at 90% 80%, rgba(252, 246, 227, 0.8) 0%, transparent 60%), /* Cream */
+    radial-gradient(circle at 80% 10%, rgba(255, 251, 235, 0.9) 0%, transparent 60%), /* Light Cream */
+    radial-gradient(circle at 20% 90%, rgba(233, 213, 255, 0.9) 0%, transparent 60%); /* Light Lavender */
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.auth-wrapper {
+  perspective: 1000px;
+}
+
+/* Base Container */
+.auth-container {
+  background-color: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.05);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 900px;
+  min-height: 600px;
+  transition: transform 0.6s ease-in-out;
+}
+
+/* Forms container */
+.auth-form-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 40px;
+}
+
+.auth-form-container form {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+/* Sign In Form */
+.sign-in-container {
+  left: 0;
+  width: 50%;
+  z-index: 2;
+}
+
+.auth-container.right-panel-active .sign-in-container {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sign Up Form */
+.sign-up-container {
+  left: 0;
+  width: 50%;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.auth-container.right-panel-active .sign-up-container {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+  pointer-events: auto;
+  animation: show 0.6s;
+}
+
+@keyframes show {
+  0%, 49.99% {
+    opacity: 0;
+    z-index: 1;
+  }
+  50%, 100% {
+    opacity: 1;
+    z-index: 5;
+  }
+}
+
+/* Overlay */
+.auth-overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 100;
+  /* Start with curved left edge (for Sign In view) - bigger curve */
+  border-radius: 180px 0 0 180px;
+  transition: transform 0.6s ease-in-out, border-radius 0.6s ease-in-out;
+}
+
+.auth-container.right-panel-active .auth-overlay-container {
+  transform: translateX(-100%);
+  /* Morph to curved right edge (for Sign Up view) - bigger curve */
+  border-radius: 0 180px 180px 0;
+}
+
+.auth-overlay {
+  background-color: #4c1d95; /* Base fallback */
+  background-image: 
+    radial-gradient(circle at 20% 0%, rgba(59, 130, 246, 0.8) 0%, transparent 65%),
+    radial-gradient(circle at 80% 100%, rgba(245, 158, 11, 0.7) 0%, transparent 65%),
+    radial-gradient(circle at 80% 0%, rgba(124, 58, 237, 0.8) 0%, transparent 65%),
+    radial-gradient(circle at 20% 100%, rgba(59, 130, 246, 0.8) 0%, transparent 65%),
+    linear-gradient(rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.5)), /* Dark tint */
+    url('/video/download.jpeg');
+  background-size: cover, cover, cover, cover, cover, cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+}
+
+.auth-container.right-panel-active .auth-overlay {
+  transform: translateX(50%);
+}
+
+/* Overlay Panels */
+.auth-overlay-panel {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 40px;
+  text-align: center;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+}
+
+.auth-overlay-left {
+  transform: translateX(-20%);
+}
+
+.auth-container.right-panel-active .auth-overlay-left {
+  transform: translateX(0);
+}
+
+.auth-overlay-right {
+  right: 0;
+  transform: translateX(0);
+}
+
+.auth-container.right-panel-active .auth-overlay-right {
+  transform: translateX(20%);
+}
+
+/* Mobile Stacked Layout */
+@media (max-width: 767px) {
+  .auth-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+    min-height: auto;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    overflow: hidden; /* Clips the bubble so it stays inside */
+    position: relative;
+  }
+  
+  /* The Curved Wipe Blob */
+  .auth-overlay-container {
+    display: block;
+    position: absolute;
+    /* Exactly match box width so the curve starts perfectly at the corners */
+    left: 0;
+    width: 100%;
+    height: 150%;
+    z-index: 50; /* Above forms */
+    background-color: #dbeafe; /* Light Blue Base */
+    background-image: 
+      radial-gradient(circle at 20% 0%, #93c5fd 0%, transparent 65%), /* Soft Blue */
+      radial-gradient(circle at 80% 100%, #60a5fa 0%, transparent 65%), /* Medium Blue */
+      radial-gradient(circle at 80% 0%, #ffffff 0%, transparent 65%), /* Bright White */
+      radial-gradient(circle at 20% 100%, #bfdbfe 0%, transparent 65%); /* Pale Blue */
+    
+    /* Default state (Sign In): rests at the top */
+    /* Peeks 40px into the box, making the curve slightly smaller/shallower */
+    top: calc(-150% + 40px);
+    border-radius: 0 0 50% 50% / 0 0 40px 40px;
+    
+    transform: none !important;
+    /* Smoothly animate top and border-radius over 0.9s */
+    transition: top 0.9s ease-in-out, border-radius 0.9s ease-in-out !important;
+    pointer-events: none;
+  }
+  
+  /* Hide the inner text on mobile */
+  .auth-overlay {
+    display: none;
+  }
+
+  /* Switched state (Sign Up): rests at the bottom */
+  .auth-container.right-panel-active .auth-overlay-container {
+    /* Peeks 40px into the box */
+    top: calc(100% - 40px);
+    border-radius: 50% 50% 0 0 / 40px 40px 0 0;
+    animation: none; /* Ensure no desktop animations interfere */
+  }
+
+  .auth-form-container {
+    grid-area: 1 / 1;
+    position: relative;
+    width: 100%;
+    left: 0 !important;
+    padding: 64px 24px; /* Extra padding top & bottom so forms don't touch resting bubbles */
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    transition: none; /* Disable desktop transition */
+  }
+
+  /* Keyframes for bubble-up overshoot */
+  @keyframes bubbleUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    60% {
+      opacity: 1;
+      transform: translateY(-4px) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Default state: Sign In is visible, Sign Up is sinking/hidden */
+  .sign-in-container {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 5;
+    visibility: visible;
+    transform: none; /* override desktop */
+    animation: bubbleUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
+  }
+
+  .sign-up-container {
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.98);
+    transition: opacity 0s 0.35s, transform 0s 0.35s, visibility 0s 0.35s;
+    animation: none;
+  }
+
+  /* Right-panel-active state: Sign In sinks, Sign Up bubbles up */
+  .auth-container.right-panel-active .sign-in-container {
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.98);
+    transition: opacity 0s 0.35s, transform 0s 0.35s, visibility 0s 0.35s;
+    animation: none;
+  }
+  
+  .auth-container.right-panel-active .sign-up-container {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 5;
+    visibility: visible;
+    transform: none; /* override desktop translateX */
+    transition: none; /* Let animation take over */
+    animation: bubbleUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .auth-overlay-container {
+      display: none !important;
+    }
+    .sign-in-container,
+    .auth-container.right-panel-active .sign-up-container {
+      animation: none !important;
+      transition: opacity 0.3s ease;
+      transform: none;
+    }
+    .sign-up-container,
+    .auth-container.right-panel-active .sign-in-container {
+      transform: none;
+      transition: opacity 0.3s ease, visibility 0s 0.3s;
+    }
+  }
 }

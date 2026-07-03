@@ -138,19 +138,19 @@ export default function HistoryPage() {
                 <thead>
                   <tr className="border-b border-border-subtle">
                     {['Job ID', 'File', 'Created', 'Defects', 'Status', ''].map((h, i) => (
-                      <th key={i} className="px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
+                      <th key={i} className={`px-2 sm:px-4 py-2.5 text-text-tertiary whitespace-nowrap ${i === 2 || i === 3 ? 'hidden sm:table-cell' : ''}`} style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {[...Array(5)].map((_, i) => (
                     <tr key={i} className="border-b border-border-subtle last:border-0">
-                      <td className="px-4 py-3"><div className="skeleton h-4 w-16" /></td>
-                      <td className="px-4 py-3"><div className="skeleton h-4 w-32" /></td>
-                      <td className="px-4 py-3"><div className="skeleton h-4 w-24" /></td>
-                      <td className="px-4 py-3"><div className="skeleton h-4 w-8" /></td>
-                      <td className="px-4 py-3"><div className="skeleton h-4 w-16" /></td>
-                      <td className="px-4 py-3"><div className="skeleton h-4 w-16" /></td>
+                      <td className="px-2 sm:px-4 py-3"><div className="skeleton h-4 w-16" /></td>
+                      <td className="px-2 sm:px-4 py-3"><div className="skeleton h-4 w-24 sm:w-32" /></td>
+                      <td className="px-2 sm:px-4 py-3 hidden sm:table-cell"><div className="skeleton h-4 w-24" /></td>
+                      <td className="px-2 sm:px-4 py-3 hidden sm:table-cell"><div className="skeleton h-4 w-8" /></td>
+                      <td className="px-2 sm:px-4 py-3"><div className="skeleton h-4 w-16" /></td>
+                      <td className="px-2 sm:px-4 py-3"><div className="skeleton h-4 w-12 sm:w-16" /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -165,7 +165,7 @@ export default function HistoryPage() {
                   <thead>
                     <tr className="border-b border-border-subtle">
                       {['Job ID', 'File', 'Created', 'Defects', 'Status', ''].map((h, i) => (
-                        <th key={i} className="px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
+                        <th key={i} className={`px-2 sm:px-4 py-2.5 text-text-tertiary whitespace-nowrap ${i === 2 || i === 3 ? 'hidden sm:table-cell' : ''}`} style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -175,28 +175,29 @@ export default function HistoryPage() {
                       const created = new Date(job.createdAt);
                       return (
                         <tr key={job.id} className="border-b border-border-subtle last:border-0 hover:bg-elevated/50 transition-colors cursor-pointer">
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <Link href={`/app/inspection/${job.id}`} className="font-mono text-[13px] text-text-primary hover:text-accent">
                               {job.id.slice(0, 8)}
                             </Link>
                           </td>
-                          <td className="px-4 py-3 text-[13px] text-text-secondary whitespace-nowrap max-w-[200px] truncate">
+                          <td className="px-2 sm:px-4 py-3 text-[13px] text-text-secondary whitespace-nowrap max-w-[90px] sm:max-w-[200px] truncate">
                             {job.originalFilename || '—'}
                           </td>
-                          <td className="px-4 py-3 text-[13px] text-text-tertiary">
+                          <td className="px-2 sm:px-4 py-3 text-[13px] text-text-tertiary hidden sm:table-cell">
                             {created.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </td>
-                          <td className="px-4 py-3 text-[13px] text-text-primary">{job.metricsCount}</td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3 text-[13px] text-text-primary hidden sm:table-cell">{job.metricsCount}</td>
+                          <td className="px-2 sm:px-4 py-3">
                             <span className="inline-flex items-center gap-1.5 text-[12px]" style={{ color: st.color }}>
                               <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
                               {st.label}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-right">
+                          <td className="px-2 sm:px-4 py-3 text-right">
                             {job.status === 'completed' && (
                               <Link href={`/app/models/${job.id}`} className="text-[12px] font-medium text-accent hover:underline">
-                                View 3D Twin
+                                <span className="sm:hidden">View</span>
+                                <span className="hidden sm:inline">View 3D Twin</span>
                               </Link>
                             )}
                           </td>

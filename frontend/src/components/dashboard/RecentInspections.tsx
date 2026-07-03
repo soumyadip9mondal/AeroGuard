@@ -51,10 +51,10 @@ export default function RecentInspections() {
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-border-subtle">
-              {['ID', 'File / Details', 'Detections', 'Status', ''].map((h) => (
+              {['ID', 'File', 'Date', 'Detections', 'Status'].map((h, i) => (
                 <th
                   key={h}
-                  className="px-3 sm:px-4 py-2 sm:py-2.5 text-text-tertiary whitespace-nowrap"
+                  className={`px-3 sm:px-4 py-2 sm:py-2.5 text-text-tertiary whitespace-nowrap ${i === 2 ? 'hidden sm:table-cell' : ''}`}
                   style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}
                 >
                   {h}
@@ -87,10 +87,10 @@ export default function RecentInspections() {
                         {job.id.slice(0, 8)}
                       </Link>
                     </td>
-                    <td className="px-3 sm:px-5 py-3 text-[13px] text-text-secondary max-w-[180px] truncate">
+                    <td className="px-3 sm:px-5 py-3 text-[13px] text-text-secondary max-w-[120px] sm:max-w-[180px] truncate">
                       {job.originalFilename || '—'}
                     </td>
-                    <td className="px-3 sm:px-5 py-3 text-[13px] text-text-tertiary">
+                    <td className="px-3 sm:px-5 py-3 text-[13px] text-text-tertiary hidden sm:table-cell">
                       {created.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </td>
                     <td className="px-3 sm:px-5 py-3 text-[13px] text-text-primary">{job.metricsCount}</td>

@@ -19,7 +19,7 @@ export default function TopBar() {
         {/* Hamburger — mobile only */}
         <button
           onClick={() => setMobileDrawerOpen(true)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg lg:hidden text-[#4B5563] hover:bg-[#F3F4F6] transition-colors"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg md:hidden text-[#4B5563] hover:bg-[#F3F4F6] transition-colors"
           aria-label="Open sidebar"
         >
           <Menu className="h-5 w-5" />
@@ -40,8 +40,8 @@ export default function TopBar() {
           className="flex items-center gap-2 rounded-lg bg-[#F3F4F6] hover:bg-[#E5E7EB] px-2.5 py-1 min-h-[32px] transition-colors text-[#4B5563]"
         >
           <Search className="h-4 w-4" />
-          <span className="hidden text-[13px] font-medium lg:inline">Search</span>
-          <kbd className="hidden text-[11px] font-mono px-1 py-0.5 rounded lg:inline bg-white text-[#9CA3AF] border border-[#E5E7EB]">⌘K</kbd>
+          <span className="hidden text-[13px] font-medium md:inline">Search</span>
+          <kbd className="hidden text-[11px] font-mono px-1 py-0.5 rounded md:inline bg-white text-[#9CA3AF] border border-[#E5E7EB]">⌘K</kbd>
         </button>
 
 

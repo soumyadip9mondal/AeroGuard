@@ -74,58 +74,54 @@ const InventoryTable: React.FC = () => {
   const parts: Part[] = data.data;
 
   return (
-    <>
-      <Table className="bg-white/5 backdrop-blur-sm dark:bg-black/20 rounded-md">
-        <TableHeader>
-          <TableRow>
-            <TableHead onClick={() => handleSort('partNumber')} className="cursor-pointer">Part Number</TableHead>
-            <TableHead onClick={() => handleSort('name')} className="cursor-pointer">Part Name</TableHead>
-            <TableHead>Aircraft Model</TableHead>
-            <TableHead>ATA Chapter</TableHead>
-            <TableHead>Manufacturer</TableHead>
-            <TableHead>Warehouse</TableHead>
-            <TableHead>Available</TableHead>
-            <TableHead>Reserved</TableHead>
-            <TableHead>Minimum Stock</TableHead>
-            <TableHead>Supplier</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+    <div className="rounded-[24px] border border-border-subtle bg-surface overflow-x-auto shadow-sm">
+      <table className="w-full text-left">
+        <thead>
+          <tr className="border-b border-border-subtle">
+            <th onClick={() => handleSort('partNumber')} className="px-3 sm:px-4 py-2.5 text-text-tertiary whitespace-nowrap cursor-pointer hover:text-text-primary transition-colors" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Part Number</th>
+            <th onClick={() => handleSort('name')} className="px-3 sm:px-4 py-2.5 text-text-tertiary whitespace-nowrap cursor-pointer hover:text-text-primary transition-colors" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Part Name</th>
+            <th className="hidden lg:table-cell px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Aircraft</th>
+            <th className="hidden xl:table-cell px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>ATA</th>
+            <th className="hidden md:table-cell px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Mfg</th>
+            <th className="hidden lg:table-cell px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Warehouse</th>
+            <th className="px-3 sm:px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Avail</th>
+            <th className="hidden sm:table-cell px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Rsvd</th>
+            <th className="hidden sm:table-cell px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Min</th>
+            <th className="hidden xl:table-cell px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Supplier</th>
+            <th className="hidden md:table-cell px-4 py-2.5 text-text-tertiary whitespace-nowrap" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Status</th>
+            <th className="px-3 sm:px-4 py-2.5 text-text-tertiary whitespace-nowrap text-right" style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
           {parts.map((part) => (
-            <TableRow
+            <tr
               key={part.id}
-              className={selectedPartId === part.id ? 'bg-blue-500/20' : ''}
+              className={`border-b border-border-subtle last:border-0 hover:bg-elevated/50 transition-colors cursor-pointer ${selectedPartId === part.id ? 'bg-accent-subtle/50' : ''}`}
               onClick={() => setSelectedPartId(part.id)}
             >
-              <TableCell>{part.partNumber}</TableCell>
-              <TableCell>{part.name}</TableCell>
-              <TableCell>{part.aircraftModel ?? '-'}</TableCell>
-              <TableCell>{part.ataChapter ?? '-'}</TableCell>
-              <TableCell>{part.manufacturer ?? '-'}</TableCell>
-              <TableCell>{(part as any).warehouseName ?? part.warehouseId ?? '-'}</TableCell>
-              <TableCell>{part.availableQty}</TableCell>
-              <TableCell>{part.reservedQty}</TableCell>
-              <TableCell>{part.minStock ?? '-'}</TableCell>
-              <TableCell>{(part as any).supplierName ?? part.supplierId ?? '-'}</TableCell>
-              <TableCell>{part.lifecycleStatus ?? 'unknown'}</TableCell>
-              <TableCell className="flex space-x-2">
-                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); openView(part.id); }}>
-                  <EyeIcon className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); openReserve(part.id); }}>
-                  <ArchiveIcon className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); openHistory(part.id); }}>
-                  <HistoryIcon className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
+              <td className="px-3 sm:px-4 py-3 font-mono text-[13px] text-text-primary hover:text-accent max-w-[90px] sm:max-w-none truncate">{part.partNumber}</td>
+              <td className="px-3 sm:px-4 py-3 text-[13px] text-text-secondary whitespace-nowrap max-w-[100px] sm:max-w-[150px] truncate">{part.name}</td>
+              <td className="hidden lg:table-cell px-4 py-3 text-[13px] text-text-tertiary">{part.aircraftModel ?? '-'}</td>
+              <td className="hidden xl:table-cell px-4 py-3 text-[13px] text-text-tertiary">{part.ataChapter ?? '-'}</td>
+              <td className="hidden md:table-cell px-4 py-3 text-[13px] text-text-tertiary">{part.manufacturer ?? '-'}</td>
+              <td className="hidden lg:table-cell px-4 py-3 text-[13px] text-text-tertiary">{(part as any).warehouseName ?? part.warehouseId ?? '-'}</td>
+              <td className="px-3 sm:px-4 py-3 text-[13px] text-text-primary font-medium">{part.availableQty}</td>
+              <td className="hidden sm:table-cell px-4 py-3 text-[13px] text-text-tertiary">{part.reservedQty}</td>
+              <td className="hidden sm:table-cell px-4 py-3 text-[13px] text-text-tertiary">{part.minStock ?? '-'}</td>
+              <td className="hidden xl:table-cell px-4 py-3 text-[13px] text-text-tertiary">{(part as any).supplierName ?? part.supplierId ?? '-'}</td>
+              <td className="hidden md:table-cell px-4 py-3 text-[13px] text-text-tertiary capitalize">{part.lifecycleStatus?.replace(/_/g, ' ') ?? 'unknown'}</td>
+              <td className="px-3 sm:px-4 py-3 text-right">
+                <div className="flex items-center justify-end gap-1 sm:gap-2">
+                  <button onClick={(e) => { e.stopPropagation(); openView(part.id); }} className="p-1.5 text-text-tertiary hover:text-accent transition-colors rounded-md hover:bg-elevated"><EyeIcon className="h-4 w-4" /></button>
+                  <button onClick={(e) => { e.stopPropagation(); openReserve(part.id); }} className="p-1.5 text-text-tertiary hover:text-accent transition-colors rounded-md hover:bg-elevated"><ArchiveIcon className="h-4 w-4" /></button>
+                  <button onClick={(e) => { e.stopPropagation(); openHistory(part.id); }} className="p-1.5 text-text-tertiary hover:text-accent transition-colors rounded-md hover:bg-elevated"><HistoryIcon className="h-4 w-4" /></button>
+                </div>
+              </td>
+            </tr>
           ))}
-        </TableBody>
-      </Table>
-    </>
+        </tbody>
+      </table>
+    </div>
   );
 };
 
