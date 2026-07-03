@@ -147,11 +147,11 @@ export default function AnalysisPage() {
       <div className="page-enter px-3 py-4 md:p-6 space-y-6 content-max">
         {/* Defect Trends — full width */}
         <div className="rounded-lg border border-border-subtle bg-surface p-3 sm:p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <h3 className="text-[15px] font-medium text-text-primary">Defect Trends</h3>
-            <div className="flex gap-1 rounded-md border border-border-subtle p-0.5">
+            <div className="flex gap-1 rounded-md border border-border-subtle p-0.5 w-full sm:w-auto">
               {(['7d', '30d', '90d'] as const).map((r) => (
-                <button key={r} onClick={() => setRange(r)} className={`rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${range === r ? 'bg-accent-subtle text-accent' : 'text-text-tertiary hover:text-text-secondary'}`}>{r}</button>
+                <button key={r} onClick={() => setRange(r)} className={`flex-1 sm:flex-none rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${range === r ? 'bg-accent-subtle text-accent' : 'text-text-tertiary hover:text-text-secondary'}`}>{r}</button>
               ))}
             </div>
           </div>

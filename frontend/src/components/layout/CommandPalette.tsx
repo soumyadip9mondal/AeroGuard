@@ -76,28 +76,28 @@ export default function CommandPalette() {
       {/* Dialog */}
       <div className="relative mx-auto mt-[15vh] sm:mt-[20vh] w-full max-w-[560px] px-3 sm:px-4 animate-slide-up">
         <Command
-          className="overflow-hidden rounded-xl border border-border-default bg-surface shadow-lg"
+          className="overflow-hidden rounded-xl border border-black/10 bg-[#FDFBF7] shadow-2xl ring-1 ring-black/5"
           shouldFilter={true}
         >
-          <div className="flex items-center border-b border-border-subtle px-4">
-            <Search className="mr-2 h-4 w-4 shrink-0 text-text-tertiary" />
+          <div className="flex items-center border-b border-black/10 px-4">
+            <Search className="mr-2 h-4 w-4 shrink-0 text-gray-500" />
             <Command.Input
               value={search}
               onValueChange={setSearch}
               placeholder="Search pages, actions, aircraft..."
-              className="flex h-12 w-full bg-transparent text-sm text-text-primary outline-none placeholder:text-text-tertiary"
+              className="flex h-12 w-full bg-transparent text-sm font-medium text-gray-900 outline-none placeholder:text-gray-400 placeholder:font-normal"
             />
-            <kbd className="text-[10px] font-mono text-text-tertiary bg-base px-1.5 py-0.5 rounded border border-border-subtle">
+            <kbd className="text-[10px] font-mono text-gray-500 bg-black/5 px-1.5 py-0.5 rounded border border-black/10">
               ESC
             </kbd>
           </div>
 
           <Command.List className="max-h-[min(320px,50vh)] overflow-y-auto p-2">
-            <Command.Empty className="py-8 text-center text-sm text-text-tertiary">
+            <Command.Empty className="py-8 text-center text-sm font-medium text-gray-500">
               No results found.
             </Command.Empty>
 
-            <Command.Group heading="Navigation" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-text-tertiary">
+            <Command.Group heading="Navigation" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-bold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-gray-400">
               {pages.map((page) => {
                 const Icon = page.icon;
                 return (
@@ -105,28 +105,28 @@ export default function CommandPalette() {
                     key={page.href}
                     value={page.name}
                     onSelect={() => navigate(page.href)}
-                    className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-sm text-text-secondary transition-colors aria-selected:bg-accent-subtle aria-selected:text-text-primary"
+                    className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-sm text-gray-700 transition-colors aria-selected:bg-black/5 aria-selected:text-gray-900"
                   >
-                    <Icon className="h-4 w-4 text-text-tertiary" />
-                    <span>{page.name}</span>
-                    <ArrowRight className="ml-auto h-3 w-3 text-text-tertiary opacity-0 aria-selected:opacity-100" />
+                    <Icon className="h-4 w-4 text-gray-500 aria-selected:text-blue-600" />
+                    <span className="font-medium">{page.name}</span>
+                    <ArrowRight className="ml-auto h-3 w-3 text-gray-400 opacity-0 aria-selected:opacity-100" />
                   </Command.Item>
                 );
               })}
             </Command.Group>
 
-            <Command.Separator className="my-1.5 h-px bg-border-subtle" />
+            <Command.Separator className="my-1.5 h-px bg-black/5" />
 
-            <Command.Group heading="Quick Actions" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-text-tertiary">
+            <Command.Group heading="Quick Actions" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-bold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-gray-400">
               {quickActions.map((action) => (
                 <Command.Item
                   key={action.name}
                   value={action.name}
                   onSelect={() => navigate(action.href)}
-                  className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-sm text-text-secondary transition-colors aria-selected:bg-accent-subtle aria-selected:text-text-primary"
+                  className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-sm text-gray-700 transition-colors aria-selected:bg-black/5 aria-selected:text-gray-900"
                 >
-                  <ArrowRight className="h-4 w-4 text-text-tertiary" />
-                  <span>{action.name}</span>
+                  <ArrowRight className="h-4 w-4 text-gray-400 aria-selected:text-blue-600" />
+                  <span className="font-medium">{action.name}</span>
                 </Command.Item>
               ))}
             </Command.Group>

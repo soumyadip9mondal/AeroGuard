@@ -166,7 +166,7 @@ export default function DigitalTwinPage() {
   const selectedDefect = displayDefects.find((d) => d.id === selectedDefectId) || null;
 
   return (
-    <div className="flex h-full min-h-[calc(100vh-120px)] bg-white text-slate-900 overflow-hidden relative rounded-[24px] shadow-sm border border-slate-200">
+    <div className="flex w-full h-[calc(100dvh-120px)] sm:h-[calc(100vh-120px)] bg-white text-slate-900 overflow-hidden relative sm:rounded-[24px] shadow-sm sm:border border-slate-200">
       {/* Mobile Top Bar */}
       <div className="absolute top-4 left-4 z-[40] lg:hidden">
         <button onClick={() => setShowMobileList(true)} className="flex items-center justify-center rounded-lg bg-white/90 border border-slate-200 p-2.5 shadow-lg backdrop-blur-sm text-slate-700 hover:bg-slate-50 transition-colors">

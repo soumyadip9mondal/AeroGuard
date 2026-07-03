@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { useInventoryStore } from '../store/inventoryStore';
 
 const fetchOptions = async (url: string) => {
@@ -25,56 +24,50 @@ const FilterPanel: React.FC = () => {
     fetchOptions('/api/v1/inventory/suppliers').then(setSuppliers).catch(() => {});
   }, []);
 
-  const handleChange = (key: string, value: string | null) => {
-    setFilters({ [key]: value ?? undefined });
+  const handleChange = (key: string, value: string) => {
+    setFilters({ [key]: value === '' ? undefined : value });
     setCurrentPage(1);
   };
 
+  const selectClass = "w-full sm:w-auto min-w-[120px] rounded-md border border-border-subtle bg-elevated px-3 py-1.5 text-[13px] text-text-primary outline-none focus:border-accent transition-colors appearance-none cursor-pointer";
+
   return (
-    <div className="flex flex-wrap gap-2">
-      <Select value={selectedFilters.warehouseId ?? undefined} onValueChange={(v) => handleChange('warehouseId', v)}>
-        <SelectTrigger className="w-40">
-          <SelectValue placeholder="Warehouse" />
-        </SelectTrigger>
-        <SelectContent>
+    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+      <div className="relative w-full sm:w-auto">
+        <select value={selectedFilters.warehouseId ?? ''} onChange={(e) => handleChange('warehouseId', e.target.value)} className={selectClass}>
+          <option value="">Warehouse</option>
           {warehouses.map((w) => (
-            <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+            <option key={w.id} value={w.id}>{w.name}</option>
           ))}
-        </SelectContent>
-      </Select>
+        </select>
+      </div>
 
-      <Select value={selectedFilters.categoryId ?? undefined} onValueChange={(v) => handleChange('categoryId', v)}>
-        <SelectTrigger className="w-40">
-          <SelectValue placeholder="Category" />
-        </SelectTrigger>
-        <SelectContent>
+      <div className="relative w-full sm:w-auto">
+        <select value={selectedFilters.categoryId ?? ''} onChange={(e) => handleChange('categoryId', e.target.value)} className={selectClass}>
+          <option value="">Category</option>
           {categories.map((c) => (
-            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+            <option key={c.id} value={c.id}>{c.name}</option>
           ))}
-        </SelectContent>
-      </Select>
+        </select>
+      </div>
 
-      <Select value={selectedFilters.supplierId ?? undefined} onValueChange={(v) => handleChange('supplierId', v)}>
-        <SelectTrigger className="w-40">
-          <SelectValue placeholder="Supplier" />
-        </SelectTrigger>
-        <SelectContent>
+      <div className="relative w-full sm:w-auto">
+        <select value={selectedFilters.supplierId ?? ''} onChange={(e) => handleChange('supplierId', e.target.value)} className={selectClass}>
+          <option value="">Supplier</option>
           {suppliers.map((s) => (
-            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+            <option key={s.id} value={s.id}>{s.name}</option>
           ))}
-        </SelectContent>
-      </Select>
+        </select>
+      </div>
 
-      <Select value={selectedFilters.status ?? undefined} onValueChange={(v) => handleChange('status', v)}>
-        <SelectTrigger className="w-40">
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-        <SelectContent>
+      <div className="relative w-full sm:w-auto">
+        <select value={selectedFilters.status ?? ''} onChange={(e) => handleChange('status', e.target.value)} className={selectClass}>
+          <option value="">Status</option>
           {statusOptions.map((st) => (
-            <SelectItem key={st.value} value={st.value}>{st.label}</SelectItem>
+            <option key={st.value} value={st.value}>{st.label}</option>
           ))}
-        </SelectContent>
-      </Select>
+        </select>
+      </div>
     </div>
   );
 };

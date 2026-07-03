@@ -78,7 +78,7 @@ export default function RiskMatrix({ jobs }: { jobs: DBJob[] }) {
           </tbody>
         </table>
       </div>
-      <div className="mt-3 flex items-center justify-end gap-3">
+      <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-2">
         {Object.entries(statusColors).map(([label, color]) => (
           <span key={label} className="flex items-center gap-1.5 text-[11px] text-text-tertiary">
             <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: color }} />

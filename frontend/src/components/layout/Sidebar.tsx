@@ -23,7 +23,7 @@ export default function Sidebar() {
   // Close drawer on Escape key (mobile)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && mobileDrawerOpen && window.innerWidth < 1024) {
+      if (e.key === 'Escape' && mobileDrawerOpen && window.innerWidth < 768) {
         setMobileDrawerOpen(false);
       }
     };
@@ -33,19 +33,19 @@ export default function Sidebar() {
 
   // Swipe-to-close on mobile
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (window.innerWidth >= 1024) return;
+    if (window.innerWidth >= 768) return;
     touchStartX.current = e.touches[0].clientX;
     touchCurrentX.current = e.touches[0].clientX;
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (window.innerWidth >= 1024 || touchStartX.current === null) return;
+    if (window.innerWidth >= 768 || touchStartX.current === null) return;
     touchCurrentX.current = e.touches[0].clientX;
   }, []);
 
   const handleTouchEnd = useCallback(() => {
     if (
-      window.innerWidth >= 1024 ||
+      window.innerWidth >= 768 ||
       touchStartX.current === null ||
       touchCurrentX.current === null
     )
@@ -61,7 +61,7 @@ export default function Sidebar() {
 
   // Close drawer on mobile when navigating
   const handleMobileClose = useCallback(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setMobileDrawerOpen(false);
     }
   }, [setMobileDrawerOpen]);
@@ -71,7 +71,7 @@ export default function Sidebar() {
       {/* Mobile overlay — z-40 */}
       {mobileDrawerOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
           style={{ transition: 'opacity 200ms ease' }}
           onClick={() => setMobileDrawerOpen(false)}
         />
@@ -87,32 +87,32 @@ export default function Sidebar() {
           /* Desktop: in-flow sidebar via .sidebar CSS class */
           'sidebar',
           /* Mobile: fixed drawer */
-          'max-lg:fixed max-lg:left-0 max-lg:top-0 max-lg:z-50 max-lg:h-screen max-lg:overflow-y-auto max-lg:overflow-x-hidden',
-          'max-lg:w-[280px] max-lg:sm:w-[320px] max-lg:bg-white',
-          'max-lg:transition-transform max-lg:duration-standard max-lg:ease-standard',
+          'max-md:fixed max-md:left-0 max-md:top-0 max-md:z-50 max-md:h-[100dvh] max-md:overflow-y-auto max-md:overflow-x-hidden',
+          'max-md:w-[260px] max-md:sm:w-[280px] max-md:bg-white',
+          'max-md:transition-transform max-md:duration-standard max-md:ease-standard',
           mobileDrawerOpen
-            ? 'max-lg:translate-x-0 max-lg:shadow-lg'
-            : 'max-lg:-translate-x-full',
+            ? 'max-md:translate-x-0 max-md:shadow-lg'
+            : 'max-md:-translate-x-full',
           /* Hide on mobile when not open (desktop always visible via .sidebar) */
-          !mobileDrawerOpen && 'max-lg:pointer-events-none'
+          !mobileDrawerOpen && 'max-md:pointer-events-none'
         )}
         data-collapsed={sidebarCollapsed}
       >
         {/* Header */}
-        <div className="group relative flex h-[56px] items-center gap-3 px-[14px] mt-4">
+        <div className="group relative flex h-[56px] items-center gap-3 px-[14px] pt-4">
           <img
             src="/logo.png"
             alt="AeroGuard Logo"
             className={cn("h-12 w-12 shrink-0 object-contain mx-auto transition-opacity duration-200", sidebarCollapsed ? "opacity-100 group-hover:opacity-0" : "opacity-100")}
           />
-          <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 max-lg:max-w-[200px] max-lg:opacity-100" : "max-w-[200px] opacity-100")}>
+          <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[200px] max-md:opacity-100" : "max-w-[200px] opacity-100")}>
             <div className="text-[19px] font-bold text-[#0951B8] tracking-wide truncate">{APP_NAME}</div>
           </div>
 
           {/* Desktop Toggle Button */}
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className={cn("hidden lg:flex h-8 items-center justify-center rounded-lg hover:bg-[#F3F4F6] transition-colors text-[#6B7280] hover:text-[#111827]", sidebarCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-8 opacity-100 ml-auto")}
+            className={cn("hidden md:flex h-8 items-center justify-center rounded-lg hover:bg-[#F3F4F6] transition-colors text-[#6B7280] hover:text-[#111827]", sidebarCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-8 opacity-100 ml-auto")}
             aria-label="Toggle sidebar"
           >
             <PanelLeft className="h-5 w-5 shrink-0" />
@@ -121,7 +121,7 @@ export default function Sidebar() {
           <button
             onClick={() => setSidebarCollapsed(false)}
             className={cn(
-              "hidden lg:flex absolute top-0 left-0 h-[72px] w-full items-center justify-center transition-all duration-200 z-10",
+              "hidden md:flex absolute top-0 left-0 h-[72px] w-full items-center justify-center transition-all duration-200 z-10",
               sidebarCollapsed ? "opacity-0 group-hover:opacity-100 cursor-pointer" : "opacity-0 pointer-events-none"
             )}
             aria-label="Expand sidebar"
@@ -134,7 +134,7 @@ export default function Sidebar() {
           {/* Mobile close button */}
           <button
             onClick={() => setMobileDrawerOpen(false)}
-            className="ml-auto flex h-8 w-8 items-center justify-center rounded-lg lg:hidden"
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-lg md:hidden"
             style={{ color: '#1E3A8A' }}
             aria-label="Close sidebar"
           >
@@ -166,7 +166,7 @@ export default function Sidebar() {
                       className={cn('nav-item', isActive && 'active')}
                     >
                       <Icon className="h-[22px] w-[22px] shrink-0" />
-                      <span className={cn("transition-all duration-200 overflow-hidden", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 max-lg:max-w-[150px] max-lg:opacity-100" : "max-w-[150px] opacity-100")}>{item.label}</span>
+                      <span className={cn("transition-all duration-200 overflow-hidden", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[150px] max-md:opacity-100" : "max-w-[150px] opacity-100")}>{item.label}</span>
                     </Link>
                   );
                 })}
@@ -184,12 +184,12 @@ export default function Sidebar() {
             >
               JR
             </div>
-            <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden whitespace-nowrap", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 max-lg:max-w-[200px] max-lg:opacity-100" : "max-w-[200px] opacity-100")}>
+            <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden whitespace-nowrap", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[200px] max-md:opacity-100" : "max-w-[200px] opacity-100")}>
               <div className="text-[15px] font-medium text-[#1E3A8A] truncate">J. Rivera</div>
               <div className="text-[13px] truncate" style={{ color: 'rgba(30,58,138,0.7)' }}>MRO Engineer</div>
             </div>
             <button
-              className={cn("transition-all duration-200 overflow-hidden", sidebarCollapsed ? "lg:max-w-0 lg:opacity-0 lg:px-0 max-lg:max-w-[50px] max-lg:opacity-100" : "max-w-[50px] opacity-100")}
+              className={cn("transition-all duration-200 overflow-hidden", sidebarCollapsed ? "md:max-w-0 md:opacity-0 md:px-0 max-md:max-w-[50px] max-md:opacity-100" : "max-w-[50px] opacity-100")}
               style={{ color: 'rgba(30,58,138,0.7)' }}
               aria-label="Sign out"
             >

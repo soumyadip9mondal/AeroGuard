@@ -41,13 +41,13 @@ export default function AppShell({ children }: AppShellProps) {
   const { setMobileDrawerOpen } = useUIStore();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setMobileDrawerOpen(false);
     }
   }, [setMobileDrawerOpen]);
 
   const handleResize = useCallback(() => {
-    const isMobile = window.innerWidth < 1024;
+    const isMobile = window.innerWidth < 768;
     const drawerOpen = useUIStore.getState().mobileDrawerOpen;
     if (isMobile && drawerOpen) {
       setMobileDrawerOpen(false);
@@ -71,7 +71,7 @@ export default function AppShell({ children }: AppShellProps) {
     <div className="shell">
       <Sidebar />
       <CommandPalette />
-      <div className="main max-lg:w-full">
+      <div className="main max-md:w-full">
         <TopBar />
         <div className="content relative">
           <UniversalLoader />

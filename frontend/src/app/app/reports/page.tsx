@@ -78,19 +78,19 @@ export default function ReportsPage() {
             <table className="w-full text-left">
               <thead><tr className="border-b border-border-subtle">
                 {['Report', 'Tail #', 'Date', 'Status', 'Format', 'Size', ''].map((h) => (
-                  <th key={h} className={`px-4 py-2.5 text-text-tertiary whitespace-nowrap ${['Tail #', 'Format', 'Size'].includes(h) ? 'hidden md:table-cell' : ''}`} style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} className={`px-2 sm:px-4 py-2.5 text-text-tertiary whitespace-nowrap ${['Tail #', 'Format', 'Size'].includes(h) ? 'hidden md:table-cell' : ''} ${h === 'Date' ? 'hidden sm:table-cell' : ''}`} style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr></thead>
               <tbody>
                 {[...Array(5)].map((_, i) => (
                   <tr key={i} className="border-b border-border-subtle last:border-0">
-                    <td className="px-4 py-3"><div className="skeleton h-8 w-32" /></td>
-                    <td className="px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-16" /></td>
-                    <td className="px-4 py-3"><div className="skeleton h-4 w-24" /></td>
-                    <td className="px-4 py-3"><div className="skeleton h-4 w-16" /></td>
-                    <td className="px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-8" /></td>
-                    <td className="px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-12" /></td>
-                    <td className="px-4 py-3"><div className="skeleton h-6 w-20" /></td>
+                    <td className="px-2 sm:px-4 py-3"><div className="skeleton h-8 w-24 sm:w-32" /></td>
+                    <td className="px-2 sm:px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-16" /></td>
+                    <td className="px-2 sm:px-4 py-3 hidden sm:table-cell"><div className="skeleton h-4 w-24" /></td>
+                    <td className="px-2 sm:px-4 py-3"><div className="skeleton h-4 w-16" /></td>
+                    <td className="px-2 sm:px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-8" /></td>
+                    <td className="px-2 sm:px-4 py-3 hidden md:table-cell"><div className="skeleton h-4 w-12" /></td>
+                    <td className="px-2 sm:px-4 py-3"><div className="skeleton h-6 w-12 sm:w-20" /></td>
                   </tr>
                 ))}
               </tbody>
@@ -106,33 +106,33 @@ export default function ReportsPage() {
             <table className="w-full text-left">
               <thead><tr className="border-b border-border-subtle">
                 {['Report', 'Tail #', 'Date', 'Status', 'Format', 'Size', ''].map((h) => (
-                  <th key={h} className={`px-4 py-2.5 text-text-tertiary whitespace-nowrap ${['Tail #', 'Format', 'Size'].includes(h) ? 'hidden md:table-cell' : ''}`} style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} className={`px-2 sm:px-4 py-2.5 text-text-tertiary whitespace-nowrap ${['Tail #', 'Format', 'Size'].includes(h) ? 'hidden md:table-cell' : ''} ${h === 'Date' ? 'hidden sm:table-cell' : ''}`} style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr></thead>
               <tbody>{filtered.map((job) => (
                 <tr key={job.id} className="border-b border-border-subtle last:border-0 hover:bg-elevated/50 transition-colors">
-                  <td className="px-4 py-3">
+                  <td className="px-2 sm:px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-text-tertiary shrink-0" />
-                      <div>
-                        <div className="text-[13px] font-medium text-text-primary">{job.originalFilename || 'Inspection Report'}</div>
+                      <FileText className="hidden sm:block h-4 w-4 text-text-tertiary shrink-0" />
+                      <div className="max-w-[120px] sm:max-w-[200px] truncate">
+                        <div className="text-[13px] font-medium text-text-primary truncate">{job.originalFilename || 'Inspection Report'}</div>
                         <div className="text-[11px] font-mono text-text-tertiary">{job.id.slice(0,8)}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-text-secondary hidden md:table-cell">{job.registrationNumber || job.tailNumber || '-'}</td>
-                  <td className="px-4 py-3 text-[13px] text-text-tertiary">{new Date(job.createdAt).toLocaleDateString()}</td>
-                  <td className="px-4 py-3">{typeBadge(job.status)}</td>
-                  <td className="px-4 py-3 text-[12px] font-mono text-text-tertiary hidden md:table-cell">PDF</td>
-                  <td className="px-4 py-3 text-[12px] text-text-tertiary hidden md:table-cell">{job.fileSizeBytes ? `${(job.fileSizeBytes / (1024 * 1024)).toFixed(1)} MB` : '-'}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 sm:px-4 py-3 text-[13px] text-text-secondary hidden md:table-cell">{job.registrationNumber || job.tailNumber || '-'}</td>
+                  <td className="px-2 sm:px-4 py-3 text-[13px] text-text-tertiary hidden sm:table-cell">{new Date(job.createdAt).toLocaleDateString()}</td>
+                  <td className="px-2 sm:px-4 py-3">{typeBadge(job.status)}</td>
+                  <td className="px-2 sm:px-4 py-3 text-[12px] font-mono text-text-tertiary hidden md:table-cell">PDF</td>
+                  <td className="px-2 sm:px-4 py-3 text-[12px] text-text-tertiary hidden md:table-cell">{job.fileSizeBytes ? `${(job.fileSizeBytes / (1024 * 1024)).toFixed(1)} MB` : '-'}</td>
+                  <td className="px-2 sm:px-4 py-3 text-right">
                     <button 
                       onClick={() => handleDownload(job)}
                       disabled={downloadingId === job.id}
-                      className="flex items-center gap-1 rounded-md border border-border-subtle px-2.5 py-1 text-[11px] text-text-secondary hover:text-text-primary hover:border-border-default transition-colors disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border-subtle px-2 sm:px-2.5 py-1 sm:py-1 text-[11px] text-text-secondary hover:text-text-primary hover:border-border-default transition-colors disabled:opacity-50"
                     >
-                      {downloadingId === job.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
-                      Download
+                      {downloadingId === job.id ? <Loader2 className="h-3 w-3 animate-spin shrink-0" /> : <Download className="h-3 w-3 shrink-0" />}
+                      <span className="hidden sm:inline">Download</span>
                     </button>
                   </td>
                 </tr>

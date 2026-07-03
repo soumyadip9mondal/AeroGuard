@@ -51,14 +51,14 @@ export default function DefectTrend({ jobs }: { jobs: DBJob[] }) {
 
   return (
     <div className="card-elevated p-4 sm:p-5 h-full flex flex-col">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-[15px] font-medium text-text-primary">Defect Trends</h3>
-        <div className="flex gap-1 rounded-md border border-border-subtle p-0.5">
+        <div className="flex gap-1 rounded-md border border-border-subtle p-0.5 w-full sm:w-auto">
           {(['7d', '30d', '90d'] as const).map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`rounded px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
+              className={`flex-1 sm:flex-none rounded px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
                 range === r ? 'bg-accent-subtle text-accent' : 'text-text-tertiary hover:text-text-secondary'
               }`}
             >
