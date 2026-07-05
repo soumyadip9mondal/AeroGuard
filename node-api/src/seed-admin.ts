@@ -22,7 +22,7 @@ async function seedAdminUser() {
     passwordHash: hashPassword(password),
     firstName: 'Admin',
     lastName: 'User',
-    role: 'admin',
+    role: 'Fleet Manager',
   });
 
   console.log(`Seeded admin user: ${email} / ${password}`);
