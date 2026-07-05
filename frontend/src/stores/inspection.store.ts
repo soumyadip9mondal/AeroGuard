@@ -200,9 +200,10 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
       };
 
       xhr.onerror = () => {
+        console.error('R2 direct upload failed. URL was:', uploadUrl?.split('?')[0]);
         set({
           isUploading: false,
-          pipelineError: 'Network error occurred during direct upload to R2.',
+          pipelineError: 'Network error during direct upload to R2. This is usually a CORS or credentials issue — check the browser console for details.',
         });
       };
 

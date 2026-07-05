@@ -138,6 +138,12 @@ router.post('/presign', requireAuth, async (req: Request, res: Response) => {
     const currentUser = await getCurrentDbUser(req);
     if (!currentUser) return res.status(401).json({ error: 'User not found in DB.' });
 
+    // Guard: Ensure R2 credentials are configured
+    if (!process.env.R2_ACCESS_KEY_ID || !process.env.R2_SECRET_ACCESS_KEY) {
+      console.error('[presign] R2_ACCESS_KEY_ID or R2_SECRET_ACCESS_KEY is not set.');
+      return res.status(503).json({ error: 'Storage service is not configured. Please contact the administrator.' });
+    }
+
     // 1. Zod request validation
     const parsed = presignRequestSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -220,6 +226,8 @@ router.post('/presign', requireAuth, async (req: Request, res: Response) => {
     const expirySeconds = Number(process.env.PRESIGNED_URL_EXPIRY_SECONDS || 900);
     const uploadUrl = await getSignedUrl(r2Client, command, { expiresIn: expirySeconds });
     const expiresAt = new Date(Date.now() + expirySeconds * 1000).toISOString();
+
+    console.log(`[presign] Generated presigned URL for bucket="${bucketName}", key="${r2ObjectKey}", url_host="${new URL(uploadUrl).host}"`);
 
     // 7. Return payload
     return res.status(200).json({

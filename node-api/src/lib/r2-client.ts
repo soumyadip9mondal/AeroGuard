@@ -19,9 +19,11 @@ if (!accountId && process.env.CLOUDFLARE_R2_URL) {
 }
 
 if (!accountId || !accessKeyId || !secretAccessKey) {
-  console.warn(
-    'Warning: Cloudflare R2 credentials (R2_ACCOUNT_ID/CLOUDFLARE_R2_URL, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY) are not fully configured.'
+  console.error(
+    `[R2 Client] MISSING CREDENTIALS — accountId=${accountId ? 'SET' : 'MISSING'}, accessKeyId=${accessKeyId ? 'SET' : 'MISSING'}, secretAccessKey=${secretAccessKey ? 'SET' : 'MISSING'}. Presigned uploads WILL FAIL.`
   );
+} else {
+  console.log(`[R2 Client] Configured — endpoint: https://${accountId}.r2.cloudflarestorage.com`);
 }
 
 export const r2Client = new S3Client({

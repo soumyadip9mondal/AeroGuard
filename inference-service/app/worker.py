@@ -17,10 +17,10 @@ def get_s3_client():
     if not r2_url:
         logger.error("CLOUDFLARE_R2_URL missing")
         return None, None
-    # Parse format: s3://access_key:secret_key@account_id.r2.cloudflarestorage.com/bucket_name
+    # Parse format: s3://access_key:secret_key@account_id.r2.cloudflarestorage.com/bucket_name or https://...
     parsed = urlparse(r2_url)
-    access_key = parsed.username
-    secret_key = parsed.password
+    access_key = parsed.username or os.environ.get("R2_ACCESS_KEY_ID")
+    secret_key = parsed.password or os.environ.get("R2_SECRET_ACCESS_KEY")
     account_id = parsed.hostname.split('.')[0]
     bucket_name = parsed.path.lstrip('/')
     
