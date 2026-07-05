@@ -1,3 +1,13 @@
+---
+title: AeroGuard Inference Engine
+emoji: ✈️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+license: mit
+---
+
 # AeroGuard Detection Service
 
 A standalone, production-ready microservice wrapping YOLOv8 (Ultralytics) with FastAPI for intelligent aircraft defect and anomaly detection.
