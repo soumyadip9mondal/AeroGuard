@@ -35,19 +35,7 @@ app.use(
     credentials: true,
   })
 );
-
-app.use(clerkMiddleware({ clockSkewInMs: 100000 }));
-
-// Middleware - Parse JSON and capture raw body buffer for signature verification
-app.use(
-  express.json({
-    verify: (req: any, res, buf) => {
-      req.rawBody = buf.toString('utf8');
-    },
-  })
-);
-
-// 2. Health Endpoint — checks PostgreSQL and Redis connectivity
+// 2. Health Endpoint — registered BEFORE Clerk so it always works
 app.get('/health', async (_req, res) => {
   const checks: Record<string, string> = {};
 
@@ -75,6 +63,22 @@ app.get('/health', async (_req, res) => {
     checks,
   });
 });
+
+// Clerk middleware — applied after health check
+try {
+  app.use(clerkMiddleware({ clockSkewInMs: 100000 }));
+} catch (err) {
+  console.error('Failed to initialize Clerk middleware:', err);
+}
+
+// Middleware - Parse JSON and capture raw body buffer for signature verification
+app.use(
+  express.json({
+    verify: (req: any, res, buf) => {
+      req.rawBody = buf.toString('utf8');
+    },
+  })
+);
 
 // Route to serve test_video.mp4 for E2E simulation/automation
 app.get('/test_video.mp4', (req, res) => {
