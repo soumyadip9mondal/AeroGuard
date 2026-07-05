@@ -16,10 +16,11 @@ export default function VideoUploadZone({ onNext, onBack }: { onNext: () => void
     e.preventDefault();
     e.stopPropagation();
     try {
-      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-      const response = await fetch(`${API_URL}/test_video.mp4`);
+      // Use the video from the frontend's public folder so it always works in production
+      const response = await fetch('/video/1.mp4');
+      if (!response.ok) throw new Error('Video not found in public folder');
       const blob = await response.blob();
-      const file = new File([blob], 'test_video.mp4', { type: 'video/mp4' });
+      const file = new File([blob], 'inspection-demo.mp4', { type: 'video/mp4' });
       startUpload(file);
     } catch (err) {
       console.error('Failed to run E2E simulation:', err);

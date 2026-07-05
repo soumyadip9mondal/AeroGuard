@@ -10,6 +10,7 @@ import authRouter from './routes/auth';
 import { requireAuth } from './middleware/auth';
 import { db } from './db/client';
 import { sql } from 'drizzle-orm';
+import { clerkMiddleware } from '@clerk/express';
 
 dotenv.config();
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
@@ -34,6 +35,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(clerkMiddleware({ clockSkewInMs: 100000 }));
 
 // Middleware - Parse JSON and capture raw body buffer for signature verification
 app.use(
@@ -73,12 +76,10 @@ app.get('/health', async (_req, res) => {
   });
 });
 
-// Route to serve test_video.mp4 for E2E simulation/automation (dev only)
-if (process.env.NODE_ENV !== 'production') {
-  app.get('/test_video.mp4', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../../test_video.mp4'));
-  });
-}
+// Route to serve test_video.mp4 for E2E simulation/automation
+app.get('/test_video.mp4', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../../test_video.mp4'));
+});
 
 // 3. API Routes
 app.use('/api/v1/auth', authRouter);

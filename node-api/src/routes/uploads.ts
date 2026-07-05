@@ -131,8 +131,13 @@ router.post('/direct', upload.single('file'), async (req: Request, res: Response
   }
 });
 
-router.post('/presign', async (req: Request, res: Response) => {
+import { requireAuth, getCurrentDbUser } from '../middleware/auth';
+
+router.post('/presign', requireAuth, async (req: Request, res: Response) => {
   try {
+    const currentUser = await getCurrentDbUser(req);
+    if (!currentUser) return res.status(401).json({ error: 'User not found in DB.' });
+
     // 1. Zod request validation
     const parsed = presignRequestSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -191,6 +196,7 @@ router.post('/presign', async (req: Request, res: Response) => {
       tailNumber: tailNumber || null,
       inspectionType: inspectionType || null,
       metadata: parsedMetadata,
+      createdBy: currentUser.id,
     });
 
     // 6. Generate S3 presigned PUT URL
@@ -267,7 +273,19 @@ router.post('/upload-success', async (req: Request, res: Response) => {
       })
       .where(eq(jobs.id, job.id));
 
-    console.log(`[upload-success] Job ${jobId} status updated to "uploaded". Returning success.`);
+    // 2. Enqueue the job for worker processing
+    try {
+      await addVideoJob({
+        jobId: job.id,
+        r2ObjectKey: job.r2ObjectKey,
+        fileSizeBytes: job.fileSizeBytes ?? 0,
+        uploadedAt: new Date().toISOString(),
+      });
+      console.log(`[upload-success] Job ${jobId} status updated to "uploaded" and enqueued to BullMQ.`);
+    } catch (enqueueError) {
+      console.error(`[upload-success] Failed to enqueue job ${jobId} to BullMQ:`, enqueueError);
+      // We still return 200 to the client since the upload succeeded, but the queue might need a retry mechanism
+    }
 
     return res.status(200).json({
       status: 'ok',

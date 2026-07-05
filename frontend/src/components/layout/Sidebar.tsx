@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { PlusCircle, X, LogOut, PanelLeft, PanelLeftOpen } from 'lucide-react';
+import { useUser, useClerk, UserButton } from '@clerk/nextjs';
 import { navigation } from '@/config/nav';
 import { APP_NAME, ORG_NAME } from '@/config/constants';
 import { useUIStore } from '@/stores/ui.store';
@@ -12,6 +13,8 @@ import { cn } from '@/lib/utils';
 export default function Sidebar() {
   const pathname = usePathname();
   const { mobileDrawerOpen, setMobileDrawerOpen, pendingRoute, setPendingRoute, sidebarCollapsed, setSidebarCollapsed } = useUIStore();
+  const { user } = useUser();
+  const { signOut } = useClerk();
   const sidebarRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number | null>(null);
   const touchCurrentX = useRef<number | null>(null);
@@ -72,7 +75,7 @@ export default function Sidebar() {
       {mobileDrawerOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 md:hidden"
-          style={{ transition: 'opacity 200ms ease' }}
+          style={{ transition: 'opacity 75ms ease' }}
           onClick={() => setMobileDrawerOpen(false)}
         />
       )}
@@ -89,7 +92,7 @@ export default function Sidebar() {
           /* Mobile: fixed drawer */
           'max-md:fixed max-md:left-0 max-md:top-0 max-md:z-50 max-md:h-[100dvh] max-md:overflow-y-auto max-md:overflow-x-hidden',
           'max-md:w-[260px] max-md:sm:w-[280px] max-md:bg-[#eaf6ff]',
-          'max-md:transition-transform max-md:duration-standard max-md:ease-standard',
+          'max-md:transition-transform max-md:duration-75 max-md:ease-out',
           mobileDrawerOpen
             ? 'max-md:translate-x-0 max-md:shadow-lg'
             : 'max-md:-translate-x-full',
@@ -103,9 +106,9 @@ export default function Sidebar() {
           <img
             src="/logo.png"
             alt="AeroGuard Logo"
-            className={cn("h-12 w-12 shrink-0 object-contain mx-auto transition-opacity duration-200", sidebarCollapsed ? "opacity-100 group-hover:opacity-0" : "opacity-100")}
+            className={cn("h-12 w-12 shrink-0 object-contain mx-auto transition-opacity duration-75", sidebarCollapsed ? "opacity-100 group-hover:opacity-0" : "opacity-100")}
           />
-          <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[200px] max-md:opacity-100" : "max-w-[200px] opacity-100")}>
+          <div className={cn("min-w-0 flex-1 transition-all duration-75 overflow-hidden", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[200px] max-md:opacity-100" : "max-w-[200px] opacity-100")}>
             <div className="text-[19px] font-bold text-[#0951B8] tracking-wide truncate">{APP_NAME}</div>
           </div>
 
@@ -121,7 +124,7 @@ export default function Sidebar() {
           <button
             onClick={() => setSidebarCollapsed(false)}
             className={cn(
-              "hidden md:flex absolute top-0 left-0 h-[72px] w-full items-center justify-center transition-all duration-200 z-10",
+              "hidden md:flex absolute top-0 left-0 h-[72px] w-full items-center justify-center transition-all duration-75 z-10",
               sidebarCollapsed ? "opacity-0 group-hover:opacity-100 cursor-pointer" : "opacity-0 pointer-events-none"
             )}
             aria-label="Expand sidebar"
@@ -166,7 +169,7 @@ export default function Sidebar() {
                       className={cn('nav-item', isActive && 'active')}
                     >
                       <Icon className="h-[22px] w-[22px] shrink-0" />
-                      <span className={cn("transition-all duration-200 overflow-hidden", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[150px] max-md:opacity-100" : "max-w-[150px] opacity-100")}>{item.label}</span>
+                      <span className={cn("transition-all duration-75 overflow-hidden", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[150px] max-md:opacity-100" : "max-w-[150px] opacity-100")}>{item.label}</span>
                     </Link>
                   );
                 })}
@@ -178,23 +181,26 @@ export default function Sidebar() {
         {/* Footer */}
         <div className="mt-auto" style={{ borderTop: '0.5px solid rgba(30,58,138,0.15)', padding: '12px 14px' }}>
           <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-medium mx-auto"
-              style={{ background: 'rgba(30,58,138,0.1)', color: '#1E3A8A' }}
-            >
-              JR
+            <div className="flex shrink-0 items-center justify-center mx-auto">
+              <UserButton 
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "w-10 h-10",
+                    userButtonPopoverCard: "bg-[#F4F9FF] border border-[#0951B8]/10 shadow-2xl rounded-xl w-[200px] py-1",
+                    userButtonPopoverActionButton: "hover:bg-[#0951B8]/10 text-[#1E3A8A] py-1.5",
+                    userButtonPopoverActionButtonText: "text-[#1E3A8A] font-medium text-sm",
+                    userButtonPopoverActionButtonIcon: "text-[#1E3A8A] w-4 h-4",
+                    userButtonPopoverFooter: "bg-[#EAF6FF] border-t border-[#0951B8]/10 py-1.5",
+                  }
+                }}
+              />
             </div>
-            <div className={cn("min-w-0 flex-1 transition-all duration-200 overflow-hidden whitespace-nowrap", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[200px] max-md:opacity-100" : "max-w-[200px] opacity-100")}>
-              <div className="text-[15px] font-medium text-[#1E3A8A] truncate">J. Rivera</div>
-              <div className="text-[13px] truncate" style={{ color: 'rgba(30,58,138,0.7)' }}>MRO Engineer</div>
+            <div className={cn("min-w-0 flex-1 transition-all duration-75 overflow-hidden whitespace-nowrap", sidebarCollapsed ? "md:max-w-0 md:opacity-0 max-md:max-w-[200px] max-md:opacity-100" : "max-w-[200px] opacity-100")}>
+              <div className="text-[15px] font-medium text-[#1E3A8A] truncate">{user?.fullName || 'AeroGuard User'}</div>
+              <div className="text-[13px] truncate" style={{ color: 'rgba(30,58,138,0.7)' }}>
+                {(user?.publicMetadata?.role as string) || 'MRO Engineer'}
+              </div>
             </div>
-            <button
-              className={cn("transition-all duration-200 overflow-hidden", sidebarCollapsed ? "md:max-w-0 md:opacity-0 md:px-0 max-md:max-w-[50px] max-md:opacity-100" : "max-w-[50px] opacity-100")}
-              style={{ color: 'rgba(30,58,138,0.7)' }}
-              aria-label="Sign out"
-            >
-              <LogOut className="h-[22px] w-[22px] shrink-0" />
-            </button>
           </div>
         </div>
       </aside>

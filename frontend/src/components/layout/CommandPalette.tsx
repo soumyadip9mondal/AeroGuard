@@ -27,7 +27,6 @@ const pages = [
   { name: 'AI Assistant', href: '/app/assistant', icon: MessageSquare, group: 'Navigation' },
   { name: 'Inventory', href: '/app/inventory', icon: Package, group: 'Navigation' },
   { name: 'Reports', href: '/app/reports', icon: FileText, group: 'Navigation' },
-  { name: 'Settings', href: '/app/settings', icon: Settings, group: 'Navigation' },
 ];
 
 const quickActions = [

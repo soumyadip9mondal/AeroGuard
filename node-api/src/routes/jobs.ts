@@ -8,9 +8,14 @@ import { addVideoJob } from '../lib/queue';
 
 const router = Router();
 
+import { requireAuth, getCurrentDbUser } from '../middleware/auth';
+
 // 0a. GET /api/v1/jobs — List all jobs with metrics count
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
   try {
+    const currentUser = await getCurrentDbUser(req);
+    if (!currentUser) return res.status(401).json({ error: 'User not found in DB.' });
+
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
     const limit = Math.max(1, Math.min(100, parseInt(req.query.limit as string) || 50));
     const offset = (page - 1) * limit;
@@ -36,6 +41,7 @@ router.get('/', async (req: Request, res: Response) => {
       })
       .from(jobs)
       .leftJoin(metrics, eq(metrics.jobId, jobs.id))
+      .where(eq(jobs.createdBy, currentUser.id))
       .groupBy(jobs.id)
       .orderBy(desc(jobs.createdAt))
       .limit(limit)
@@ -49,7 +55,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // 0b. GET /api/v1/jobs/:jobId — Single job detail
-router.get('/:jobId', async (req: Request, res: Response) => {
+router.get('/:jobId', requireAuth, async (req: Request, res: Response) => {
   const { jobId } = req.params;
 
   // Skip the SSE stream and metrics sub-routes
@@ -64,6 +70,9 @@ router.get('/:jobId', async (req: Request, res: Response) => {
   }
 
   try {
+    const currentUser = await getCurrentDbUser(req);
+    if (!currentUser) return res.status(401).json({ error: 'User not found in DB.' });
+
     const results = await db
       .select({
         id: jobs.id,
@@ -85,7 +94,7 @@ router.get('/:jobId', async (req: Request, res: Response) => {
       })
       .from(jobs)
       .leftJoin(metrics, eq(metrics.jobId, jobs.id))
-      .where(eq(jobs.id, jobId))
+      .where(sql`${jobs.id} = ${jobId} AND ${jobs.createdBy} = ${currentUser.id}`)
       .groupBy(jobs.id)
       .limit(1);
 

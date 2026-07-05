@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { PipelineStage, PipelineStageStatus } from '@/types/inspection';
-import { getJobMetrics, Detection } from '@/lib/api';
+import { getJobMetrics, Detection, getAuthToken } from '@/lib/api';
 
 const STAGE_DEFAULTS: PipelineStage[] = [
   { name: 'upload', label: 'Upload Complete', status: 'pending' },
@@ -105,19 +105,13 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
     try {
       const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
       
-      // Determine content type safely
       let contentType = file.type;
       if (!contentType) {
         const ext = file.name.split('.').pop()?.toLowerCase();
         if (ext === 'mov') contentType = 'video/quicktime';
         else if (ext === 'avi') contentType = 'video/x-msvideo';
-        else contentType = 'video/mp4'; // fallback
+        else contentType = 'video/mp4';
       }
-
-      // 1. Perform POST request directly to node-api using XMLHttpRequest
-      const xhr = new XMLHttpRequest();
-      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-      xhr.open('POST', `${API_URL}/api/v1/uploads/direct`, true);
 
       const { 
         aircraftMake, aircraftModel, airframeSerialNumber, yearOfManufacture,
@@ -127,21 +121,45 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
         registrationNumber, tailNumber, inspectionType 
       } = get();
 
-      const formData = new FormData();
-      formData.append('file', file);
-      
       const metadata = {
         aircraftMake, aircraftModel, airframeSerialNumber, yearOfManufacture,
         engineMake, engineModel, engineSerialNumber,
         propellerMakeModel, propellerSerialNumber,
         totalAirframeTime, totalEngineHours
       };
-      formData.append('metadata', JSON.stringify(metadata));
-      
-      if (aircraftModel) formData.append('aircraftModel', aircraftModel);
-      if (registrationNumber) formData.append('registrationNumber', registrationNumber);
-      if (tailNumber) formData.append('tailNumber', tailNumber);
-      if (inspectionType) formData.append('inspectionType', inspectionType);
+
+      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const token = await getAuthToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      // 1. Get Presigned URL
+      const presignRes = await fetch(`${API_URL}/api/v1/uploads/presign`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          filename: file.name,
+          fileSizeBytes: file.size,
+          contentType,
+          aircraftModel: aircraftModel || 'Unknown',
+          registrationNumber: registrationNumber || 'VT-XXX',
+          tailNumber: tailNumber || '',
+          inspectionType: inspectionType || 'Routine',
+          metadata
+        })
+      });
+
+      if (!presignRes.ok) {
+        const err = await presignRes.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to get secure upload URL');
+      }
+
+      const { uploadUrl, jobId } = await presignRes.json();
+
+      // 2. Upload directly to R2 via XMLHttpRequest to track progress
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', uploadUrl, true);
+      xhr.setRequestHeader('Content-Type', contentType);
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
@@ -151,26 +169,32 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
       };
 
       xhr.onload = async () => {
-        if (xhr.status === 200) {
+        if (xhr.status >= 200 && xhr.status < 300) {
           try {
-            const data = JSON.parse(xhr.responseText);
+            // 3. Notify backend of success
+            await fetch(`${API_URL}/api/v1/uploads/upload-success`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ jobId })
+            });
+
             set({
-              jobId: data.jobId,
+              jobId,
               uploadProgress: 100,
               isUploading: false,
               uploadedFile: { name: file.name, size: `${sizeMb} MB` },
             });
           } catch (notifyErr: any) {
-            console.error('Error parsing backend upload response:', notifyErr);
+            console.error('Error notifying backend:', notifyErr);
             set({
               isUploading: false,
-              pipelineError: notifyErr.message || 'Failed to initialize processing on backend.',
+              pipelineError: 'File uploaded, but failed to initialize processing.',
             });
           }
         } else {
           set({
             isUploading: false,
-            pipelineError: `Upload failed with status ${xhr.status}`,
+            pipelineError: `Direct upload failed with status ${xhr.status}`,
           });
         }
       };
@@ -178,11 +202,11 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
       xhr.onerror = () => {
         set({
           isUploading: false,
-          pipelineError: 'Network error occurred during upload.',
+          pipelineError: 'Network error occurred during direct upload to R2.',
         });
       };
 
-      xhr.send(formData);
+      xhr.send(file);
     } catch (error: any) {
       console.error('Error starting upload process:', error);
       set({

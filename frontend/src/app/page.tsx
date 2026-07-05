@@ -222,9 +222,9 @@ function Hero() {
             className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-6"
           >
             <Link
-              href="/app/dashboard"
+              href="/signup"
               onClick={() => {
-                setPendingRoute('/app/dashboard');
+                setPendingRoute('/signup');
                 setNavigating('trial');
               }}
               className="flex items-center justify-center gap-2 rounded-[12px] bg-accent px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-accent-hover shadow-md shadow-accent/20 w-full sm:w-auto min-w-[160px]"
@@ -242,9 +242,9 @@ function Hero() {
               )}
             </Link>
             <Link
-              href="/app/dashboard"
+              href="/login"
               onClick={() => {
-                setPendingRoute('/app/dashboard');
+                setPendingRoute('/login');
                 setNavigating('demo');
               }}
               className="flex items-center justify-center gap-2 rounded-[12px] border border-accent bg-white px-6 py-3 text-[15px] font-medium text-accent transition-colors hover:bg-[#DAEFFF] w-full sm:w-auto min-w-[160px]"
@@ -655,9 +655,9 @@ function FinalCTA() {
         {/* CTA buttons — stack on mobile, row on sm+ */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 mt-6">
           <Link
-            href="/app/dashboard"
+            href="/signup"
             onClick={() => {
-              setPendingRoute('/app/dashboard');
+              setPendingRoute('/signup');
               setNavigating('trial');
             }}
             className="flex items-center justify-center gap-2 rounded-[12px] bg-accent px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-accent-hover shadow-md shadow-accent/20 w-full sm:w-auto min-w-[180px]"
@@ -675,9 +675,9 @@ function FinalCTA() {
             )}
           </Link>
           <Link
-            href="/app/dashboard"
+            href="/login"
             onClick={() => {
-              setPendingRoute('/app/dashboard');
+              setPendingRoute('/login');
               setNavigating('enterprise');
             }}
             className="flex items-center justify-center gap-2 rounded-[12px] border border-accent bg-white px-6 py-3 text-[15px] font-medium text-accent transition-colors hover:bg-[#DAEFFF] w-full sm:w-auto min-w-[240px]"

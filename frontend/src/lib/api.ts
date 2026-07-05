@@ -1,5 +1,17 @@
 export const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
+export async function getAuthToken() {
+  if (typeof window !== 'undefined') {
+    // Try Clerk session first
+    const clerk = (window as any).Clerk;
+    if (clerk && clerk.session) {
+      return await clerk.session.getToken();
+    }
+    // Fallback to legacy token
+    return localStorage.getItem('token');
+  }
+  return null;
+}
 export interface Detection {
   class_name: string;
   confidence: number;
@@ -45,8 +57,13 @@ export async function detectDefects(file: File): Promise<DetectionResponse> {
   const formData = new FormData();
   formData.append('file', file);
 
+  const token = await getAuthToken();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const response = await fetch(`${API_URL}/detect`, {
     method: 'POST',
+    headers,
     body: formData,
   });
 
@@ -69,11 +86,15 @@ export async function getPresignedUrl(
   fileSizeBytes: number,
   contentType: string
 ): Promise<PresignedUrlResponse> {
+  const token = await getAuthToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const response = await fetch(`${API_URL}/api/v1/uploads/presign`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({ filename, fileSizeBytes, contentType }),
   });
 
@@ -109,7 +130,11 @@ export interface DBJob {
 }
 
 export async function getJobs(page = 1, limit = 50): Promise<DBJob[]> {
-  const response = await fetch(`${API_URL}/api/v1/jobs?page=${page}&limit=${limit}`);
+  const token = await getAuthToken();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const response = await fetch(`${API_URL}/api/v1/jobs?page=${page}&limit=${limit}`, { headers });
 
   if (!response.ok) {
     let errorMessage = 'Failed to fetch jobs';
@@ -124,7 +149,11 @@ export async function getJobs(page = 1, limit = 50): Promise<DBJob[]> {
 }
 
 export async function getJob(jobId: string): Promise<DBJob> {
-  const response = await fetch(`${API_URL}/api/v1/jobs/${jobId}`);
+  const token = await getAuthToken();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const response = await fetch(`${API_URL}/api/v1/jobs/${jobId}`, { headers });
 
   if (!response.ok) {
     let errorMessage = 'Failed to fetch job';
@@ -139,7 +168,11 @@ export async function getJob(jobId: string): Promise<DBJob> {
 }
 
 export async function getJobMetrics(jobId: string, page = 1, limit = 100): Promise<DBMetric[]> {
-  const response = await fetch(`${API_URL}/api/v1/jobs/${jobId}/metrics?page=${page}&limit=${limit}`);
+  const token = await getAuthToken();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const response = await fetch(`${API_URL}/api/v1/jobs/${jobId}/metrics?page=${page}&limit=${limit}`, { headers });
 
   if (!response.ok) {
     let errorMessage = 'Failed to fetch job metrics';

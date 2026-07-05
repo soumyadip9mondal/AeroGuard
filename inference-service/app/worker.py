@@ -48,10 +48,17 @@ def process_video_job_sync(job_id, r2_object_key, on_progress_callback=None, fps
         cursor.execute("UPDATE jobs SET status=%s, updated_at=NOW() WHERE id=%s", ('processing', job_id))
         conn.commit()
         
-        # 2. Skip S3 and use local file path directly
-        local_video_path = r2_object_key
-        if not os.path.exists(local_video_path):
-            raise Exception(f"File not found: {local_video_path}")
+        # 2. Download from S3/R2 or fallback to local
+        s3_client, bucket_name = get_s3_client()
+        if s3_client and bucket_name and not os.path.exists(r2_object_key):
+            local_video_path = f"/tmp/{uuid.uuid4()}_video.mp4"
+            logger.info(f"Downloading {r2_object_key} from R2 bucket {bucket_name} to {local_video_path}")
+            s3_client.download_file(bucket_name, r2_object_key, local_video_path)
+        else:
+            logger.info(f"Using local file path: {r2_object_key}")
+            local_video_path = r2_object_key
+            if not os.path.exists(local_video_path):
+                raise Exception(f"File not found locally and S3 download skipped: {local_video_path}")
         
         logger.info(f"Opening local video stream for {local_video_path}")
         cap = cv2.VideoCapture(local_video_path)

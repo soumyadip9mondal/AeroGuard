@@ -49,7 +49,6 @@ export const navigation: NavGroup[] = [
     label: 'System',
     items: [
       { label: 'AI Assistant', href: '/app/assistant', icon: MessageSquare },
-      { label: 'Settings', href: '/app/settings', icon: Settings },
     ],
   },
 ];

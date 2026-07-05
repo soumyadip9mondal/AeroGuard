@@ -86,4 +86,51 @@ router.get('/me', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/sync', async (req: Request, res: Response) => {
+  try {
+    const { email, firstName, lastName, role } = req.body;
+    
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    
+    let dbRole = role || 'Quality Inspector';
+
+    if (existingUser.length === 0) {
+      await db.insert(users).values({
+        email,
+        passwordHash: 'clerk_sso',
+        firstName: firstName || '',
+        lastName: lastName || '',
+        role: dbRole as any,
+      });
+    } else {
+      await db.update(users).set({ role: dbRole as any }).where(eq(users.email, email));
+    }
+    
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Sync error:', error);
+    return res.status(500).json({ error: 'Sync failed' });
+  }
+});
+
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const allUsers = await db.select({
+      id: users.id,
+      email: users.email,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      role: users.role,
+      createdAt: users.createdAt,
+    }).from(users);
+    
+    return res.status(200).json(allUsers);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
 export default router;

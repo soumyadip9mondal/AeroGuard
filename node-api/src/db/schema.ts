@@ -19,6 +19,7 @@ export const jobs = pgTable('jobs', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   completedAt: timestamp('completed_at', { withTimezone: true }),
   purgedAt: timestamp('purged_at', { withTimezone: true }),
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'cascade' }),
 });
 
 // Metrics Table Definition
@@ -155,7 +156,7 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash').notNull(),
   firstName: text('first_name'),
   lastName: text('last_name'),
-  role: text('role', { enum: ['admin', 'engineer', 'viewer'] }).notNull().default('viewer'),
+  role: text('role', { enum: ['Fleet Manager', 'MRO Engineer', 'Quality Inspector'] }).notNull().default('Quality Inspector'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({ emailUnique: uniqueIndex('idx_users_email').on(table.email) }));

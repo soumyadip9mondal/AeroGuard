@@ -3,7 +3,8 @@
 import { useRef, useEffect, useState } from 'react';
 import { useUIStore } from '@/stores/ui.store';
 import { useAssistantStore } from '@/stores/assistant.store';
-import { Send, FileText, BookOpen, Shield, Package, Sparkles } from 'lucide-react';
+import { Send, FileText, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const prompts = [
   'Show recurring defects',
@@ -24,53 +25,70 @@ const responses: Record<string, { text: string; citations: { label: string; type
 };
 
 export default function AssistantPage() {
-  const { messages, isStreaming, addUserMessage, simulateResponse } = useAssistantStore();
+  const { messages, isStreaming, hasUserSent, setIsStreaming, addUserMessage, simulateResponse } = useAssistantStore();
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [contextSources, setContextSources] = useState(['Inspection Reports', 'FAA Regulations']);
+
   const setPageTitle = useUIStore((s) => s.setPageTitle);
   useEffect(() => { setPageTitle('AI Assistant', 'Ask questions about inspections, fleet health, and compliance'); }, [setPageTitle]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages]);
+  }, [messages, isStreaming]);
 
-  const handleSend = (text?: string) => {
+  const handleSend = async (text?: string) => {
     const msg = text || input.trim();
     if (!msg || isStreaming) return;
     setInput('');
     addUserMessage(msg);
-    const resp = responses[msg] || responses.default;
-    simulateResponse(resp.text, resp.citations);
+
+    try {
+      setIsStreaming(true);
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to fetch AI response');
+      
+      simulateResponse(data.text, data.citations);
+    } catch (err: any) {
+      simulateResponse(`**Error:** ${err.message}. \n\n*Make sure you added GEMINI_API_KEY to your .env.local file.*`, []);
+    }
   };
 
-  const allSources = ['Inspection Reports', 'Aircraft Manuals', 'FAA Regulations', 'Inventory'];
+
 
   return (
-    <div className="flex h-full flex-col xl:flex-row overflow-hidden">
-      <div className="flex flex-1 flex-col min-w-0 min-h-0">
+    <div className="flex h-full flex-col overflow-hidden">
 
         {/* Messages */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
           {messages.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[100%] ${msg.role === 'user' ? '' : 'flex gap-3'}`}>
-                {msg.role === 'assistant' && (
-                  <div className="mt-1 h-6 w-6 shrink-0 rounded-full bg-accent flex items-center justify-center">
-                    <Sparkles className="h-3 w-3 text-white" />
-                  </div>
-                )}
-                <div>
-                  <div
-                    className={`rounded-xl px-4 py-2.5 text-[14px] leading-relaxed max-w-[90%] sm:max-w-[80%] break-words whitespace-pre-wrap ${
-                      msg.role === 'user'
-                        ? 'bg-accent text-white rounded-br-md'
-                        : 'border border-border-subtle bg-surface text-text-primary rounded-bl-md'
-                    }`}
-                  >
-                    {msg.content}
-                    {msg.isStreaming && <span className="inline-block w-0.5 h-4 bg-accent animate-pulse ml-0.5 align-middle" />}
-                  </div>
+            <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`flex max-w-[90%] sm:max-w-[80%] ${msg.role === 'user' ? 'justify-end' : 'gap-3'}`}>
+                  {msg.role === 'assistant' && (
+                    <div className="mt-1 h-6 w-6 shrink-0 rounded-full bg-accent flex items-center justify-center">
+                      <Sparkles className="h-3 w-3 text-white" />
+                    </div>
+                  )}
+                  <div className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                    <div
+                      className={`rounded-xl px-4 py-2.5 text-[14px] leading-relaxed break-words inline-block ${
+                        msg.role === 'user'
+                          ? 'bg-accent text-white rounded-br-md text-left whitespace-pre-wrap'
+                          : 'border border-border-subtle bg-surface text-text-primary rounded-bl-md prose prose-sm max-w-none prose-p:my-1.5 prose-strong:text-text-primary prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-headings:my-2 prose-headings:text-text-primary'
+                      }`}
+                    >
+                      {msg.role === 'assistant' ? (
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      ) : (
+                        msg.content
+                      )}
+                      {msg.isStreaming && <span className="inline-block w-0.5 h-4 bg-accent animate-pulse ml-0.5 align-middle" />}
+                    </div>
                   {msg.citations && msg.citations.length > 0 && !msg.isStreaming && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {msg.citations.map((c) => (
@@ -85,17 +103,37 @@ export default function AssistantPage() {
               </div>
             </div>
           ))}
+          {isStreaming && (
+            <div className="flex w-full justify-start">
+              <div className="flex max-w-[90%] sm:max-w-[80%] gap-3">
+                <div className="mt-1 h-6 w-6 shrink-0 rounded-full bg-accent flex items-center justify-center">
+                  <Sparkles className="h-3 w-3 text-white" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <div className="rounded-xl px-4 py-3 border border-border-subtle bg-surface text-text-primary rounded-bl-md inline-block">
+                    <span className="inline-flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-text-tertiary animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="h-1.5 w-1.5 rounded-full bg-text-tertiary animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="h-1.5 w-1.5 rounded-full bg-text-tertiary animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Quick prompts + Input */}
         <div className="border-t border-border-subtle p-4">
-          <div className="mb-3 flex flex-wrap gap-2">
-            {prompts.map((p) => (
-              <button key={p} onClick={() => handleSend(p)} className="whitespace-nowrap rounded-full border border-border-subtle bg-surface px-4 py-1.5 min-h-[36px] text-[13px] text-text-secondary hover:bg-elevated hover:text-text-primary transition-colors">
-                {p}
-              </button>
-            ))}
-          </div>
+          {!hasUserSent && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {prompts.map((p) => (
+                <button key={p} onClick={() => handleSend(p)} className="whitespace-nowrap rounded-full border border-border-subtle bg-surface px-4 py-1.5 min-h-[36px] text-[13px] text-text-secondary hover:bg-elevated hover:text-text-primary transition-colors">
+                  {p}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="flex gap-2">
             <textarea
               value={input}
@@ -114,40 +152,6 @@ export default function AssistantPage() {
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Context panel */}
-      <aside className="hidden w-[300px] shrink-0 border-l border-border-subtle bg-surface p-5 xl:block shadow-sm">
-        <h3 className="mb-4 text-[13px] font-medium text-text-primary">Context Sources</h3>
-        <div className="space-y-2">
-          {allSources.map((src) => {
-            const active = contextSources.includes(src);
-            const icons: Record<string, any> = { 'Inspection Reports': FileText, 'Aircraft Manuals': BookOpen, 'FAA Regulations': Shield, 'Inventory': Package };
-            const Icon = icons[src] || FileText;
-            return (
-              <button
-                key={src}
-                onClick={() => setContextSources(active ? contextSources.filter((s) => s !== src) : [...contextSources, src])}
-                className={`flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-left text-[13px] transition-colors ${
-                  active ? 'border-accent/30 bg-accent-subtle text-text-primary' : 'border-border-subtle text-text-secondary hover:border-border-default'
-                }`}
-              >
-                <Icon className={`h-4 w-4 ${active ? 'text-accent' : 'text-text-tertiary'}`} />
-                {src}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-6 rounded-md border border-border-subtle bg-elevated p-3">
-          <span className="text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary">Active Context</span>
-          <div className="mt-2 text-[12px] text-text-secondary">
-            <div className="font-mono text-text-primary">N-737AB</div>
-            <div>INS-2024-0847 · Boeing 737-800</div>
-            <div>3 defects · 1 Critical</div>
-          </div>
-        </div>
-      </aside>
     </div>
   );
 }

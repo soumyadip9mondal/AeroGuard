@@ -13,6 +13,8 @@ interface ChatMessage {
 interface AssistantState {
   messages: ChatMessage[];
   isStreaming: boolean;
+  hasUserSent: boolean;
+  setIsStreaming: (isStreaming: boolean) => void;
   addUserMessage: (content: string) => void;
   simulateResponse: (content: string, citations?: { label: string; type: string }[]) => void;
 }
@@ -25,22 +27,26 @@ const initialMessages: ChatMessage[] = [
 export const useAssistantStore = create<AssistantState>()((set, get) => ({
   messages: initialMessages,
   isStreaming: false,
+  hasUserSent: false,
+  setIsStreaming: (isStreaming) => set({ isStreaming }),
 
   addUserMessage: (content) => {
     const id = Date.now().toString();
-    set((s) => ({ messages: [...s.messages, { id, role: 'user', content }] }));
+    set((s) => ({ hasUserSent: true, messages: [...s.messages, { id, role: 'user', content }] }));
   },
 
   simulateResponse: (content, citations) => {
     const id = (Date.now() + 1).toString();
+    // Add empty streaming message
     set((s) => ({
       isStreaming: true,
       messages: [...s.messages, { id, role: 'assistant', content: '', isStreaming: true }],
     }));
 
+    // Fast typewriter: 8 chars every 12ms (like ChatGPT)
     let charIndex = 0;
     const interval = setInterval(() => {
-      charIndex += 2;
+      charIndex += 8;
       if (charIndex >= content.length) {
         clearInterval(interval);
         set((s) => ({
@@ -56,6 +62,7 @@ export const useAssistantStore = create<AssistantState>()((set, get) => ({
           ),
         }));
       }
-    }, 15);
+    }, 12);
   },
 }));
+
