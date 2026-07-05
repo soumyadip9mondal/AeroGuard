@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, AlertOctagon, Shield, Wrench, DollarSign, Loader2 } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 import { useUIStore } from '@/stores/ui.store';
 import KPICard from '@/components/dashboard/KPICard';
 import DefectTrend from '@/components/dashboard/DefectTrend';
@@ -13,12 +14,14 @@ import { getJobs, DBJob } from '@/lib/api';
 export default function DashboardPage() {
   const setPageTitle = useUIStore((s) => s.setPageTitle);
   const setGlobalLoading = useUIStore((s) => s.setGlobalLoading);
+  const { isLoaded } = useAuth();
   useEffect(() => { setPageTitle('Dashboard'); }, [setPageTitle]);
 
   const [jobs, setJobs] = useState<DBJob[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isLoaded) return;
     async function fetchJobs(isInitial = false) {
       if (isInitial) setGlobalLoading(true);
       try {
@@ -36,7 +39,7 @@ export default function DashboardPage() {
     // Poll every 5 seconds
     const interval = setInterval(() => fetchJobs(false), 5000);
     return () => clearInterval(interval);
-  }, [setGlobalLoading]);
+  }, [isLoaded, setGlobalLoading]);
 
   const totalJobs = jobs.length;
   const completedJobs = jobs.filter((j) => j.status === 'completed').length;
@@ -84,7 +87,7 @@ export default function DashboardPage() {
     },
   };
 
-  if (loading) {
+  if (!isLoaded || loading) {
     return (
       <div>
         {/* Responsive page padding: tighter on mobile */}

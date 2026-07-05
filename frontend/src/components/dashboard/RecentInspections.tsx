@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 import { getJobs, DBJob } from '@/lib/api';
 
 const statusLabels: Record<string, { label: string; color: string }> = {
@@ -20,8 +21,10 @@ export default function RecentInspections() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const perPage = 5;
+  const { isLoaded } = useAuth();
 
   useEffect(() => {
+    if (!isLoaded) return;
     async function fetchJobs() {
       try {
         const data = await getJobs(1, 20);
@@ -33,7 +36,7 @@ export default function RecentInspections() {
       }
     }
     fetchJobs();
-  }, []);
+  }, [isLoaded]);
 
   const pageData = jobs.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(jobs.length / perPage);
@@ -63,7 +66,7 @@ export default function RecentInspections() {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
+            {!isLoaded || loading ? (
               <tr>
                 <td colSpan={5} className="px-5 py-8 text-center">
                   <Loader2 className="h-4 w-4 animate-spin text-accent inline-block" />

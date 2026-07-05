@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useUIStore } from '@/stores/ui.store';
 import { getJobs, DBJob } from '@/lib/api';
 import { Search, ChevronLeft, ChevronRight, Filter, Loader2 } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   completed: { label: 'Complete', color: '#16A34A' },
@@ -27,10 +28,12 @@ export default function HistoryPage() {
   const perPage = 8;
   const setPageTitle = useUIStore((s) => s.setPageTitle);
   const setGlobalLoading = useUIStore((s) => s.setGlobalLoading);
+  const { isLoaded } = useAuth();
 
   useEffect(() => { setPageTitle('Inspection History'); }, [setPageTitle]);
 
   useEffect(() => {
+    if (!isLoaded) return;
     async function fetchJobs(isInitial = false) {
       if (isInitial) setGlobalLoading(true);
       try {
@@ -49,7 +52,7 @@ export default function HistoryPage() {
     // Poll every 5 seconds to keep status up to date
     const interval = setInterval(() => fetchJobs(false), 5000);
     return () => clearInterval(interval);
-  }, [setGlobalLoading]);
+  }, [isLoaded, setGlobalLoading]);
 
   const filtered = jobs.filter((job) => {
     if (search) {
@@ -102,7 +105,7 @@ export default function HistoryPage() {
         <div className="flex-1 px-3 py-4 sm:p-4 md:p-6 content-max">
           <div className="mb-4 flex items-center justify-between gap-3">
             <span className="text-[13px] text-text-tertiary shrink-0">
-              {loading ? 'Loading...' : `${filtered.length} inspections`}
+              {!isLoaded || loading ? 'Loading...' : `${filtered.length} inspections`}
             </span>
             <button onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-1.5 rounded-md border border-border-subtle px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors lg:hidden">
               <Filter className="h-3.5 w-3.5" /> Filters
@@ -131,7 +134,7 @@ export default function HistoryPage() {
             </div>
           )}
 
-          {loading ? (
+          {!isLoaded || loading ? (
             <>
             <div className="rounded-[24px] border border-border-subtle bg-surface overflow-x-auto shadow-sm">
               <table className="w-full text-left">
