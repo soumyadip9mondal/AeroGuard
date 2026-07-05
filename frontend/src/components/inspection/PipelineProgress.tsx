@@ -90,7 +90,10 @@ export default function PipelineProgress() {
               <h3 className="text-[15px] font-medium text-text-primary mb-1">Pipeline Failed</h3>
               <p className="text-[13px] text-text-secondary mb-4">{pipelineError}</p>
               <button
-                onClick={() => setStep(2)}
+                onClick={() => {
+                  useInspectionStore.getState().removeVideo();
+                  setStep(2);
+                }}
                 className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors"
               >
                 <ArrowLeft className="h-3.5 w-3.5" /> Back to Upload
@@ -110,7 +113,10 @@ export default function PipelineProgress() {
               <p className="text-[13px] text-text-secondary mb-1">{pipelineError || 'No aircraft detected. Inspection aborted.'}</p>
               <p className="text-[12px] text-text-tertiary mb-4">Only aircraft videos are accepted for inspection. Please upload a video containing an aircraft.</p>
               <button
-                onClick={() => setStep(2)}
+                onClick={() => {
+                  useInspectionStore.getState().removeVideo();
+                  setStep(2);
+                }}
                 className="flex items-center gap-1.5 rounded-md border border-border-default px-4 py-2 text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors"
               >
                 <ArrowLeft className="h-3.5 w-3.5" /> Back to Upload
