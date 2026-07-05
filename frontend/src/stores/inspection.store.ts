@@ -116,7 +116,7 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
 
       // 1. Perform POST request directly to node-api using XMLHttpRequest
       const xhr = new XMLHttpRequest();
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
       xhr.open('POST', `${API_URL}/api/v1/uploads/direct`, true);
 
       const { 
@@ -228,7 +228,7 @@ export const useInspectionStore = create<InspectionState>()((set, get) => ({
       stages[1].progress = 'Connecting to analysis stream...';
       set({ pipelineStages: [...stages] });
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
       // Explicitly start the job
       const startRes = await fetch(`${API_URL}/api/v1/jobs/${jobId}/start`, { method: 'POST' });

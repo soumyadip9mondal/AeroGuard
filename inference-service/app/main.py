@@ -35,6 +35,14 @@ async def lifespan(app: FastAPI):
 
     # Start BullMQ worker in the background
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+    frontend_url = os.environ.get("FRONTEND_URL")
+    BACKEND_URL = os.environ.get("BACKEND_URL")
+
+    if frontend_url:
+        logger.info(f"Connected to Frontend URL: {frontend_url}")
+    if BACKEND_URL:
+        logger.info(f"Connected to Backend API URL: {BACKEND_URL}")
+
     logger.info("Starting BullMQ background worker...")
     worker_instance = Worker("video-inspection", process, {"connection": redis_url})
 
