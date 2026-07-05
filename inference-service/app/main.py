@@ -73,3 +73,12 @@ app.add_middleware(
 
 # Include API endpoints
 app.include_router(router)
+
+@app.get("/")
+async def root():
+    return {
+        "status": "online",
+        "service": "AeroGuard Inference Engine",
+        "message": "The AI detection worker and API are running successfully.",
+        "docs": "/docs"
+    }
