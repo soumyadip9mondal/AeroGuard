@@ -176,22 +176,22 @@ export default function DigitalTwinPage() {
 
       {/* Left panel — defect list */}
       <aside className={`absolute inset-y-0 left-0 z-[50] w-[85%] max-w-[280px] flex-col border-r border-slate-200 bg-slate-50 transition-transform duration-300 lg:static lg:w-[260px] lg:translate-x-0 lg:flex ${showMobileList ? 'translate-x-0 flex shadow-2xl' : '-translate-x-full hidden'}`}>
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 bg-white">
-          <div className="flex items-center gap-3">
-            <Link href="/app/dashboard" className="text-slate-500 hover:text-slate-900 transition-colors" title="Dashboard">
+        <div className="flex items-center justify-between border-b border-slate-200 px-3 sm:px-4 py-3 bg-white gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <Link href="/app/dashboard" className="text-slate-500 hover:text-slate-900 transition-colors shrink-0" title="Dashboard">
               <ArrowLeft className="h-4 w-4" />
             </Link>
-            <div>
-              <div className="text-[14px] font-medium text-slate-900">3D Digital Twin</div>
-              <div className="text-[11px] text-slate-500 font-mono flex items-center gap-2">
-                {jobFilename} · {jobId.slice(0, 8)}
-                <Link href="/app/history" className="text-blue-500 hover:underline ml-1">
-                  View History
-                </Link>
+            <div className="min-w-0 flex-1">
+              <div className="text-[13px] sm:text-[14px] font-medium text-slate-900 truncate">3D Digital Twin</div>
+              <div className="text-[10px] sm:text-[11px] text-slate-500 font-mono truncate">
+                {jobFilename || 'Untitled'}
               </div>
+              <Link href="/app/history" className="text-[10px] sm:text-[11px] text-blue-500 hover:underline">
+                View History
+              </Link>
             </div>
           </div>
-          <button onClick={() => setShowMobileList(false)} className="lg:hidden text-slate-500 hover:text-slate-900 p-1">
+          <button onClick={() => setShowMobileList(false)} className="lg:hidden text-slate-500 hover:text-slate-900 p-1 shrink-0">
             <X className="h-5 w-5" />
           </button>
         </div>

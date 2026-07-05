@@ -143,6 +143,45 @@ body {
   scrollbar-width: none;  /* Firefox */
 }
 
+/* ── Input Autofill Reset ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f9fafb inset !important; /* bg-gray-50 */
+  -webkit-text-fill-color: #111827 !important; /* text-gray-900 */
+  transition: background-color 5000s ease-in-out 0s;
+}
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important; /* bg-white on focus */
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* ── Select / input focus reset ── */
+select:focus,
+select:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* ── Button reset (for custom selects) ── */
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+button:focus,
+button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 
 /* ═══════════════════════════════════════════
    Shell Layout
