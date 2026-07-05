@@ -5,12 +5,7 @@ import { useUIStore } from '@/stores/ui.store';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import CommandPalette from './CommandPalette';
-import dynamic from 'next/dynamic';
-
-const DotLottieReact = dynamic(
-  () => import('@lottiefiles/dotlottie-react').then((mod) => mod.DotLottieReact),
-  { ssr: false }
-);
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 function UniversalLoader() {
   const { pendingRoute, globalLoading } = useUIStore();

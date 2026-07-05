@@ -18,19 +18,24 @@ const InventoryToolbar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 p-3 sm:p-4 rounded-[16px] border border-border-subtle bg-surface shadow-sm mb-4">
-      <div className="w-full xl:w-auto xl:flex-1">
+    <div className="flex flex-col gap-3 p-3 sm:p-4 rounded-[16px] border border-border-subtle bg-surface shadow-sm mb-4">
+      {/* Search row */}
+      <div className="w-full max-w-full">
         <SearchBar />
       </div>
-      <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+
+      {/* Filters + actions row */}
+      <div className="flex flex-wrap items-center gap-2">
         <FilterPanel />
-        <button onClick={handleReset} className="rounded-md border border-border-subtle px-3 py-1.5 text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors whitespace-nowrap bg-transparent">
-          Reset Filters
-        </button>
-        <button onClick={handleRefresh} className="flex items-center gap-1.5 rounded-md border border-border-subtle px-3 py-1.5 text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors whitespace-nowrap bg-transparent">
-          <RefreshCw className="h-3.5 w-3.5" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2 ml-auto shrink-0">
+          <button onClick={handleReset} className="rounded-md border border-border-subtle px-3 py-1.5 text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors whitespace-nowrap bg-transparent">
+            Reset Filters
+          </button>
+          <button onClick={handleRefresh} className="flex items-center gap-1.5 rounded-md border border-border-subtle px-3 py-1.5 text-[12px] font-medium text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors whitespace-nowrap bg-transparent">
+            <RefreshCw className="h-3.5 w-3.5" />
+            Refresh
+          </button>
+        </div>
       </div>
     </div>
   );

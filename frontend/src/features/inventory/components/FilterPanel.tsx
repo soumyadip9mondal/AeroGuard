@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useInventoryStore } from '../store/inventoryStore';
 import { inventoryFetch } from '../lib/inventoryFetch';
+import CustomSelect from './CustomSelect';
 
 const fetchOptions = async (url: string) => {
   const res = await inventoryFetch(url);
@@ -13,11 +14,11 @@ const FilterPanel: React.FC = () => {
   const [warehouses, setWarehouses] = useState<Array<{ id: string; name: string }>>([]);
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
   const [suppliers, setSuppliers] = useState<Array<{ id: string; name: string }>>([]);
-  const [statusOptions] = useState<Array<{ value: string; label: string }>>([
+  const statusOptions = [
     { value: 'in_stock', label: 'In Stock' },
     { value: 'low_stock', label: 'Low Stock' },
     { value: 'out_of_stock', label: 'Out of Stock' },
-  ]);
+  ];
 
   useEffect(() => {
     fetchOptions('/api/v1/inventory/warehouses').then(setWarehouses).catch(() => {});
@@ -30,45 +31,33 @@ const FilterPanel: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const selectClass = "w-full sm:w-auto min-w-[120px] rounded-md border border-border-subtle bg-elevated px-3 py-1.5 text-[13px] text-text-primary outline-none focus:border-accent transition-colors appearance-none cursor-pointer";
-
   return (
-    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-      <div className="relative w-full sm:w-auto">
-        <select value={selectedFilters.warehouseId ?? ''} onChange={(e) => handleChange('warehouseId', e.target.value)} className={selectClass}>
-          <option value="">Warehouse</option>
-          {warehouses.map((w) => (
-            <option key={w.id} value={w.id}>{w.name}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="relative w-full sm:w-auto">
-        <select value={selectedFilters.categoryId ?? ''} onChange={(e) => handleChange('categoryId', e.target.value)} className={selectClass}>
-          <option value="">Category</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="relative w-full sm:w-auto">
-        <select value={selectedFilters.supplierId ?? ''} onChange={(e) => handleChange('supplierId', e.target.value)} className={selectClass}>
-          <option value="">Supplier</option>
-          {suppliers.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="relative w-full sm:w-auto">
-        <select value={selectedFilters.status ?? ''} onChange={(e) => handleChange('status', e.target.value)} className={selectClass}>
-          <option value="">Status</option>
-          {statusOptions.map((st) => (
-            <option key={st.value} value={st.value}>{st.label}</option>
-          ))}
-        </select>
-      </div>
+    <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-wrap sm:items-center sm:w-auto">
+      <CustomSelect
+        value={selectedFilters.warehouseId ?? ''}
+        onChange={(v) => handleChange('warehouseId', v)}
+        options={warehouses.map((w) => ({ value: w.id, label: w.name }))}
+        placeholder="Warehouse"
+      />
+      <CustomSelect
+        value={selectedFilters.categoryId ?? ''}
+        onChange={(v) => handleChange('categoryId', v)}
+        options={categories.map((c) => ({ value: c.id, label: c.name }))}
+        placeholder="Category"
+      />
+      <CustomSelect
+        value={selectedFilters.supplierId ?? ''}
+        onChange={(v) => handleChange('supplierId', v)}
+        options={suppliers.map((s) => ({ value: s.id, label: s.name }))}
+        placeholder="Supplier"
+      />
+      <CustomSelect
+        value={selectedFilters.status ?? ''}
+        onChange={(v) => handleChange('status', v)}
+        options={statusOptions}
+        placeholder="Status"
+        className="min-w-[160px]"
+      />
     </div>
   );
 };

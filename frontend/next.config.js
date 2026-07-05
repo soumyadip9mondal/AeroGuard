@@ -15,7 +15,7 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   experimental: {
-    optimizePackageImports: ['recharts'],
+    optimizePackageImports: ['recharts', 'lucide-react', '@base-ui/react'],
   },
   images: {
     formats: ['image/webp', 'image/avif'],

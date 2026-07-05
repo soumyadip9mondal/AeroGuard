@@ -88,7 +88,7 @@ export default function Sidebar() {
           'sidebar',
           /* Mobile: fixed drawer */
           'max-md:fixed max-md:left-0 max-md:top-0 max-md:z-50 max-md:h-[100dvh] max-md:overflow-y-auto max-md:overflow-x-hidden',
-          'max-md:w-[260px] max-md:sm:w-[280px] max-md:bg-white',
+          'max-md:w-[260px] max-md:sm:w-[280px] max-md:bg-[#eaf6ff]',
           'max-md:transition-transform max-md:duration-standard max-md:ease-standard',
           mobileDrawerOpen
             ? 'max-md:translate-x-0 max-md:shadow-lg'
