@@ -20,6 +20,7 @@ const PORT = process.env.PORT || 3001;
 // 1. CORS Configuration
 const allowedOrigins = [
   ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : []),
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
     : []),
@@ -28,11 +29,7 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
+      callback(null, true);
     },
     credentials: true,
   })
@@ -93,4 +90,10 @@ app.use('/api/v1/inventory', requireAuth, inventoryRouter);
 // Start Server
 app.listen(PORT, () => {
   console.log(`Node.js API Gateway listening on port ${PORT}`);
+  if (process.env.FRONTEND_URL) {
+    console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
+  }
+  if (process.env.INFERENCE_URL) {
+    console.log(`Inference API URL: ${process.env.INFERENCE_URL}`);
+  }
 });

@@ -25,8 +25,8 @@ COPY . .
 # Create models and uploads directories
 RUN mkdir -p models uploads
 
-# Expose port
-EXPOSE 8000
+# Expose port (7860 is the default for Hugging Face Spaces)
+EXPOSE 7860
 
 # Run FastAPI app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]

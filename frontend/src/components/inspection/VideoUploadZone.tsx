@@ -16,7 +16,7 @@ export default function VideoUploadZone({ onNext, onBack }: { onNext: () => void
     e.preventDefault();
     e.stopPropagation();
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
       const response = await fetch(`${API_URL}/test_video.mp4`);
       const blob = await response.blob();
       const file = new File([blob], 'test_video.mp4', { type: 'video/mp4' });
