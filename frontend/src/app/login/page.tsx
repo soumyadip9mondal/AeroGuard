@@ -16,14 +16,21 @@ function UnifiedAuthPage() {
   
   useEffect(() => {
     if (isLoaded && userId) {
-      router.replace('/app/dashboard');
+      window.location.href = '/app/dashboard';
     }
-  }, [isLoaded, userId, router]);
+  }, [isLoaded, userId]);
   
   const [isSignUp, setIsSignUp] = useState(initialMode);
+  const [resetKey, setResetKey] = useState(0);
   
   const togglePanel = (toSignUp: boolean) => {
     setIsSignUp(toSignUp);
+    setResetKey(prev => prev + 1);
+    
+    // Clear Clerk's hash state so it doesn't resume a stale flow
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
     
     setTimeout(() => {
       if (toSignUp) {
@@ -39,55 +46,67 @@ function UnifiedAuthPage() {
   }, [searchParams]);
 
   return (
-    <div className="auth-page-bg flex min-h-screen items-center justify-center p-4 text-gray-800">
+    <div className="auth-page-bg flex min-h-screen flex-col px-2 py-8 md:p-4 text-gray-800">
       
       <motion.div 
-        initial={{ x: isSignUp ? '100vw' : '-100vw' }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className={`auth-wrapper w-full max-w-[900px] ${isSignUp ? 'right-panel-active' : ''}`}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className={`auth-wrapper m-auto w-full max-w-[900px] ${isSignUp ? 'right-panel-active' : ''}`}
       >
 
         <div className={`auth-container ${isSignUp ? 'right-panel-active' : ''}`}>
           
           {/* Sign Up Panel */}
-          <div className="auth-form-container sign-up-container bg-white">
-            <div className="flex h-full w-full items-center justify-center pt-8 md:pt-0 overflow-y-auto">
+          <div className="auth-form-container sign-up-container bg-white flex flex-col">
+            <div className="w-full text-center pt-2 pb-2 md:pt-6 px-4">
+              <p className="text-xl md:text-2xl text-gray-900" style={{ fontFamily: "'Berkshire Swash', cursive", lineHeight: "1.3" }}>
+                Join the future of aircraft inspection — smarter, faster, safer.
+              </p>
+            </div>
+            <div className="flex h-full w-full items-center justify-center overflow-y-auto">
               <SignUp 
-                appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0" } }} 
+                key={`signup-${resetKey}`}
+                appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }} 
                 routing="hash" 
                 fallbackRedirectUrl="/app/dashboard"
-                signInFallbackRedirectUrl="/app/dashboard"
+                forceRedirectUrl="/app/dashboard"
               />
             </div>
             {/* Mobile toggle link */}
-            <div className="absolute bottom-2 left-0 w-full text-center md:hidden z-10 bg-white/90 py-2">
-              <button type="button" onClick={() => togglePanel(false)} className="text-sm text-gray-500 hover:text-gray-900">
-                Already have an account? <span className="text-[var(--auth-primary)] font-medium">Sign In</span>
+            <div className="relative w-full text-center md:hidden z-10 pb-4 pt-2">
+              <button type="button" onClick={() => togglePanel(false)} className="text-sm text-gray-500 hover:text-gray-900 font-medium">
+                Already have an account? <span className="text-[var(--auth-primary)]">Sign In</span>
               </button>
             </div>
           </div>
 
           {/* Sign In Panel */}
-          <div className="auth-form-container sign-in-container bg-white">
-            <div className="flex h-full w-full items-center justify-center pt-8 md:pt-0 overflow-y-auto">
+          <div className="auth-form-container sign-in-container bg-white flex flex-col">
+            <div className="w-full text-center pt-2 pb-2 md:pt-6 px-4">
+              <p className="text-2xl md:text-3xl text-gray-900" style={{ fontFamily: "'Berkshire Swash', cursive", lineHeight: "1.3" }}>
+                Welcome back to smarter inspections.
+              </p>
+            </div>
+            <div className="flex h-full w-full items-center justify-center overflow-y-auto">
               <SignIn 
-                appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0" } }} 
+                key={`signin-${resetKey}`}
+                appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }} 
                 routing="hash" 
                 fallbackRedirectUrl="/app/dashboard"
-                signUpFallbackRedirectUrl="/app/dashboard"
+                forceRedirectUrl="/app/dashboard"
               />
             </div>
             {/* Mobile toggle link */}
-            <div className="absolute bottom-2 left-0 w-full text-center md:hidden z-10 bg-white/90 py-2">
-              <button type="button" onClick={() => togglePanel(true)} className="text-sm text-gray-500 hover:text-gray-900">
-                Don&apos;t have an account? <span className="text-[var(--auth-primary)] font-medium">Sign Up</span>
+            <div className="relative w-full text-center md:hidden z-10 pb-4 pt-2">
+              <button type="button" onClick={() => togglePanel(true)} className="text-sm text-gray-500 hover:text-gray-900 font-medium">
+                Don&apos;t have an account? <span className="text-[var(--auth-primary)]">Sign Up</span>
               </button>
             </div>
           </div>
 
           {/* Overlay Container (Hidden on mobile) */}
-          <div className="auth-overlay-container hidden md:block">
+          <div className="auth-overlay-container">
             <div className="auth-overlay">
               
               {/* Left Overlay (Shown when signing up) */}
@@ -98,7 +117,10 @@ function UnifiedAuthPage() {
                 </p>
                 <button
                   onClick={() => togglePanel(false)}
-                  className="rounded-xl border-2 border-white px-12 py-3 text-sm font-semibold text-white hover:bg-white hover:text-[var(--auth-primary)] transition-colors"
+                  aria-label="Switch to sign in"
+                  className="rounded-xl border-2 border-white/80 px-12 py-3 text-sm font-semibold text-white backdrop-blur-sm
+                    hover:bg-white hover:text-[var(--auth-primary)] hover:border-white
+                    active:scale-95 transition-all duration-300"
                 >
                   Sign In
                 </button>
@@ -112,7 +134,10 @@ function UnifiedAuthPage() {
                 </p>
                 <button
                   onClick={() => togglePanel(true)}
-                  className="rounded-xl border-2 border-white px-12 py-3 text-sm font-semibold text-white hover:bg-white hover:text-[var(--auth-primary)] transition-colors"
+                  aria-label="Switch to sign up"
+                  className="rounded-xl border-2 border-white/80 px-12 py-3 text-sm font-semibold text-white backdrop-blur-sm
+                    hover:bg-white hover:text-[var(--auth-primary)] hover:border-white
+                    active:scale-95 transition-all duration-300"
                 >
                   Sign Up
                 </button>
