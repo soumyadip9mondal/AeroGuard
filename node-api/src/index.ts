@@ -36,6 +36,10 @@ app.use(
   })
 );
 // 2. Health Endpoint — registered BEFORE Clerk so it always works
+app.get('/ping', (_req, res) => {
+  res.status(200).send('pong');
+});
+
 app.get('/health', async (_req, res) => {
   const checks: Record<string, string> = {};
 
