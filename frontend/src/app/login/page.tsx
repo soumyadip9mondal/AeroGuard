@@ -24,21 +24,19 @@ function UnifiedAuthPage() {
   const [resetKey, setResetKey] = useState(0);
   
   const togglePanel = (toSignUp: boolean) => {
-    setIsSignUp(toSignUp);
+    // Increment key to force Clerk to re-mount with a fresh state
     setResetKey(prev => prev + 1);
+    setIsSignUp(toSignUp);
     
     // Clear Clerk's hash state so it doesn't resume a stale flow
-    if (window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    }
-    
-    setTimeout(() => {
-      if (toSignUp) {
-        router.replace('/login?mode=signup', { scroll: false });
-      } else {
-        router.replace('/login', { scroll: false });
-      }
-    }, 100);
+    // Use requestAnimationFrame to ensure state updates first
+    requestAnimationFrame(() => {
+      window.history.replaceState(
+        null, 
+        '', 
+        toSignUp ? '/login?mode=signup' : '/login'
+      );
+    });
   };
 
   useEffect(() => {
@@ -65,13 +63,16 @@ function UnifiedAuthPage() {
               </p>
             </div>
             <div className="flex h-full w-full items-center justify-center overflow-y-auto">
-              <SignUp 
-                key={`signup-${resetKey}`}
-                appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }} 
-                routing="hash" 
-                fallbackRedirectUrl="/app/dashboard"
-                forceRedirectUrl="/app/dashboard"
-              />
+              {isSignUp && (
+                <SignUp 
+                  key={`signup-${resetKey}`}
+                  appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }} 
+                  routing="hash" 
+                  signInUrl="/login"
+                  fallbackRedirectUrl="/app/dashboard"
+                  forceRedirectUrl="/app/dashboard"
+                />
+              )}
             </div>
             {/* Mobile toggle link */}
             <div className="relative w-full text-center md:hidden z-10 pb-4 pt-2">
@@ -89,13 +90,16 @@ function UnifiedAuthPage() {
               </p>
             </div>
             <div className="flex h-full w-full items-center justify-center overflow-y-auto">
-              <SignIn 
-                key={`signin-${resetKey}`}
-                appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }} 
-                routing="hash" 
-                fallbackRedirectUrl="/app/dashboard"
-                forceRedirectUrl="/app/dashboard"
-              />
+              {!isSignUp && (
+                <SignIn 
+                  key={`signin-${resetKey}`}
+                  appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }} 
+                  routing="hash" 
+                  signUpUrl="/login?mode=signup"
+                  fallbackRedirectUrl="/app/dashboard"
+                  forceRedirectUrl="/app/dashboard"
+                />
+              )}
             </div>
             {/* Mobile toggle link */}
             <div className="relative w-full text-center md:hidden z-10 pb-4 pt-2">
