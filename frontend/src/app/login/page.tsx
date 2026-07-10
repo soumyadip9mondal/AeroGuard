@@ -13,27 +13,27 @@ function UnifiedAuthPage() {
   const searchParams = useSearchParams();
   const initialMode = searchParams?.get('mode') === 'signup';
   const { isLoaded, userId } = useAuth();
-  
+
   useEffect(() => {
     if (isLoaded && userId) {
       window.location.href = '/app/dashboard';
     }
   }, [isLoaded, userId]);
-  
+
   const [isSignUp, setIsSignUp] = useState(initialMode);
   const [resetKey, setResetKey] = useState(0);
-  
+
   const togglePanel = (toSignUp: boolean) => {
     // Increment key to force Clerk to re-mount with a fresh state
     setResetKey(prev => prev + 1);
     setIsSignUp(toSignUp);
-    
+
     // Clear Clerk's hash state so it doesn't resume a stale flow
     // Use requestAnimationFrame to ensure state updates first
     requestAnimationFrame(() => {
       window.history.replaceState(
-        null, 
-        '', 
+        null,
+        '',
         toSignUp ? '/login?mode=signup' : '/login'
       );
     });
@@ -45,8 +45,8 @@ function UnifiedAuthPage() {
 
   return (
     <div className="auth-page-bg flex min-h-screen flex-col px-2 py-8 md:p-4 text-gray-800">
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -54,7 +54,7 @@ function UnifiedAuthPage() {
       >
 
         <div className={`auth-container ${isSignUp ? 'right-panel-active' : ''}`}>
-          
+
           {/* Sign Up Panel */}
           <div className="auth-form-container sign-up-container bg-white flex flex-col">
             <div className="w-full text-center pt-2 pb-2 md:pt-6 px-4">
@@ -64,10 +64,10 @@ function UnifiedAuthPage() {
             </div>
             <div className="flex h-full w-full items-center justify-center overflow-y-auto">
               {isSignUp && (
-                <SignUp 
+                <SignUp
                   key={`signup-${resetKey}`}
-                  appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }} 
-                  routing="hash" 
+                  appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }}
+                  routing="hash"
                   signInUrl="/login"
                   fallbackRedirectUrl="/app/dashboard"
                   forceRedirectUrl="/app/dashboard"
@@ -91,10 +91,10 @@ function UnifiedAuthPage() {
             </div>
             <div className="flex h-full w-full items-center justify-center overflow-y-auto">
               {!isSignUp && (
-                <SignIn 
+                <SignIn
                   key={`signin-${resetKey}`}
-                  appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }} 
-                  routing="hash" 
+                  appearance={{ elements: { rootBox: "w-full flex justify-center", card: "shadow-none border-0 m-0 w-full max-w-full", footerAction: "hidden" } }}
+                  routing="hash"
                   signUpUrl="/login?mode=signup"
                   fallbackRedirectUrl="/app/dashboard"
                   forceRedirectUrl="/app/dashboard"
@@ -112,7 +112,7 @@ function UnifiedAuthPage() {
           {/* Overlay Container (Hidden on mobile) */}
           <div className="auth-overlay-container">
             <div className="auth-overlay">
-              
+
               {/* Left Overlay (Shown when signing up) */}
               <div className="auth-overlay-panel auth-overlay-left">
                 <h2 className="text-3xl font-bold mb-4">Ready for Your Next Inspection?</h2>
@@ -129,7 +129,7 @@ function UnifiedAuthPage() {
                   Sign In
                 </button>
               </div>
-              
+
               {/* Right Overlay (Shown when signing in) */}
               <div className="auth-overlay-panel auth-overlay-right">
                 <h2 className="text-3xl font-bold mb-4">New Here?</h2>
