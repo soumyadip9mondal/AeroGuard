@@ -58,7 +58,7 @@ function UnifiedAuthPage() {
           {/* Sign Up Panel */}
           <div className="auth-form-container sign-up-container bg-white flex flex-col">
             <div className="w-full text-center pt-2 pb-2 md:pt-6 px-4">
-              <p className="text-xl md:text-2xl text-gray-900" style={{ fontFamily: "'Berkshire Swash', cursive", lineHeight: "1.3" }}>
+              <p className="text-xl md:text-2xl pt-2 text-gray-900" style={{ fontFamily: "'Berkshire Swash', cursive", lineHeight: "1.3" }}>
                 Join the future of aircraft inspection — smarter, faster, safer.
               </p>
             </div>
@@ -85,7 +85,7 @@ function UnifiedAuthPage() {
           {/* Sign In Panel */}
           <div className="auth-form-container sign-in-container bg-white flex flex-col">
             <div className="w-full text-center pt-2 pb-2 md:pt-6 px-4">
-              <p className="text-2xl md:text-3xl text-gray-900" style={{ fontFamily: "'Berkshire Swash', cursive", lineHeight: "1.3" }}>
+              <p className="text-2xl md:text-3xl pt-5 text-gray-900" style={{ fontFamily: "'Berkshire Swash', cursive", lineHeight: "1.3" }}>
                 Welcome back to smarter inspections.
               </p>
             </div>
